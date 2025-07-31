@@ -2,7 +2,7 @@ using Config;
 
 public class DiscoveryPopup {
     private Budgie.Popover popover;
-    private Gtk.Label greetingLabel;
+    private GreetingWidget greetingWidget;
     private Gdk.Screen screen;
 
     public DiscoveryPopup(Gtk.Widget parentWidget) {
@@ -16,9 +16,8 @@ public class DiscoveryPopup {
 
         var topRow = new Gtk.Box(Gtk.Orientation.HORIZONTAL, 0);
 
-        greetingLabel = new Gtk.Label("");
-        greetingLabel.get_style_context ().add_class ("greeting-label");
-        topRow.pack_start (greetingLabel, false);
+        greetingWidget = new GreetingWidget();
+        topRow.pack_start (greetingWidget.getLabel(), false);
         popoverLayout.pack_start (topRow, false);
 
         var g = screen.get_display().get_primary_monitor().get_geometry();
@@ -27,8 +26,6 @@ public class DiscoveryPopup {
         popoverLayout.set_size_request(popupWidth, popupHeight);
 
         load_style_sheet();
-
-        Timeout.add_seconds (1, updateTime);
     }
 
     public Budgie.Popover getPopover() {
@@ -48,47 +45,5 @@ public class DiscoveryPopup {
         } catch (Error e) {
             warning("Konnte CSS nicht laden: %s", e.message);
         }
-    }
-
-    private string get_real_name() {
-        var username = Environment.get_user_name();
-        try {
-            var file = File.new_for_path("/etc/passwd");
-            var dis = new DataInputStream(file.read());
-            string? line;
-            while ((line = dis.read_line(null)) != null) {
-                if (line.has_prefix(username + ":")) {
-                    var fields = line.split(":");
-                    if (fields.length > 4) {
-                        return fields[4].split(",")[0];
-                    }
-                }
-            }
-        } catch (Error e) {
-            // Fehlerbehandlung, falls Datei nicht lesbar
-        }
-        return username;
-    }
-
-    private bool updateTime() {
-        var now = new DateTime.now_local ();
-        var h = now.get_hour();
-        var greetingText = "";
-
-        if(h >= 0 && h <= 10) {
-            greetingText = "Good morning";
-        } else if(h > 10 && h <= 14) {
-            greetingText = "Good day";
-        } else if(h > 14 && h <= 18) {
-            greetingText = "Good afternoon";
-        } else if(h > 18) {
-            greetingText = "Good evening";
-        }
-
-        var real_name = get_real_name();
-        greetingText += ", " + real_name;
-        greetingLabel.set_text(greetingText);
-
-        return true;
     }
 }

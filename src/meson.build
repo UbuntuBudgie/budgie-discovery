@@ -22,7 +22,8 @@ config_header = configure_file(
 
 discovery_applet_sources = [
     'Applet.vala', 
-    'DiscoveryPopup.vala', 
+    'DiscoveryPopup.vala',
+    'GreetingWidget.vala',
     'FeedService.vala', 
     'WeatherService.vala'
 ]
