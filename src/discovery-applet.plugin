@@ -1,0 +1,8 @@
+[Plugin]
+Module=discoveryapplet.so
+Name=Discovery Plugin
+Description=Discovery Applet
+Authors=Andreas Bratfisch
+Copyright=Copyright © 2025 Andreas Bratfisch
+Website=https://github.com/k8scloud-io/discovery-applet
+Icon=x-office-calendar-symbolic
