@@ -20,6 +20,13 @@ public class DiscoveryPopup {
         topRow.pack_start (greetingWidget.getLabel(), false);
         popoverLayout.pack_start (topRow, false);
 
+        var dummyWidget = new Gtk.Box(Gtk.Orientation.HORIZONTAL, 0);
+        popoverLayout.pack_start(dummyWidget, true);
+
+        var powerWidget = new PowerWidget();
+        popoverLayout.pack_start(powerWidget, false);
+        powerWidget.invoke_action.connect(popover.hide);
+
         var g = screen.get_display().get_primary_monitor().get_geometry();
         var popupWidth = g.width / 3;
         var popupHeight = (g.height / 3) * 2;

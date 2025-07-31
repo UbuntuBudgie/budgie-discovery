@@ -46,7 +46,8 @@ namespace DiscoveryApplet {
             get_style_context ().add_class ("discovery-applet");
 
             // Create popup
-            popover = new DiscoveryPopup(widget).getPopover();
+            var popup = new DiscoveryPopup(widget);
+            popover = popup.getPopover();
 
             widget.button_press_event.connect ((e)=> {
                 if (e.button != 1) {

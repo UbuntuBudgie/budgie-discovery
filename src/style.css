@@ -6,3 +6,14 @@
     font-size: 1.2em;
     font-weight: bold;
 }
+
+.discovery-popup .power-widget {
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid #ccc;
+}
+
+.discovery-popup .power-widget button {
+    border-radius: 0;
+    box-shadow: none
+}

@@ -25,15 +25,17 @@ discovery_applet_sources = [
     'DiscoveryPopup.vala',
     'GreetingWidget.vala',
     'FeedService.vala', 
+    'PowerWidget.vala',
     'WeatherService.vala'
 ]
 
 discovery_applet_deps = [
     dependency('gtk+-3.0', version: '>=3.18'),
-    dependency('budgie-1.0', version: '>=2')
+    dependency('budgie-1.0', version: '>=2'),
+    dependency('webkit2gtk-4.1', version: '>=2.48')
 ]
 
-discovery_applet_vala_args = ['--target-glib=2.50', '--pkg', 'posix', config_header]
+discovery_applet_vala_args = ['--target-glib=2.50', '--pkg', 'posix', '--pkg', 'webkit2gtk-4.1', config_header]
 
 shared_library('discoveryapplet', discovery_applet_sources,
                dependencies: discovery_applet_deps,
