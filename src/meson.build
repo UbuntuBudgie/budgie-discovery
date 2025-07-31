@@ -12,6 +12,7 @@ conf_data.set_quoted('PACKAGE_VERSION', project_version)
 conf_data.set_quoted('GETTEXT_PACKAGE', project_name)
 conf_data.set_quoted('DATA_DIR', join_paths(prefix, datadir))
 conf_data.set_quoted('LOCALE_DIR', join_paths(prefix, localedir))
+conf_data.set_quoted('PLUGIN_DIR', lib_install_dir)
 
 config_header = configure_file(
     input: 'config.vala.in',
@@ -19,12 +20,19 @@ config_header = configure_file(
     configuration: conf_data
 )
 
-discovery_applet_sources = ['Applet.vala']
+discovery_applet_sources = [
+    'Applet.vala', 
+    'DiscoveryPopup.vala', 
+    'FeedService.vala', 
+    'WeatherService.vala'
+]
 
-discovery_applet_deps = [dependency('gtk+-3.0', version: '>=3.18'),
-            dependency('budgie-1.0', version: '>=2')]
+discovery_applet_deps = [
+    dependency('gtk+-3.0', version: '>=3.18'),
+    dependency('budgie-1.0', version: '>=2')
+]
 
-discovery_applet_vala_args = ['--target-glib=2.50', config_header]
+discovery_applet_vala_args = ['--target-glib=2.50', '--pkg', 'posix', config_header]
 
 shared_library('discoveryapplet', discovery_applet_sources,
                dependencies: discovery_applet_deps,

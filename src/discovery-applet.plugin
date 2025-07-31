@@ -4,5 +4,5 @@ Name=Discovery Plugin
 Description=Discovery Applet
 Authors=Andreas Bratfisch
 Copyright=Copyright © 2025 Andreas Bratfisch
-Website=https://github.com/k8scloud-io/discovery-applet
+Website=https://github.com/k8scloud-io/budgie-discovery
 Icon=x-office-calendar-symbolic

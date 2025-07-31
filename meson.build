@@ -20,3 +20,5 @@ subdir('src')
 install_data('src/discovery-applet.plugin',
   install_dir : join_paths(get_option('libdir'), 'budgie-desktop', 'plugins', 'discovery-applet')
 )
+
+install_data('src/style.css', install_dir: lib_install_dir)

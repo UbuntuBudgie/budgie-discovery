@@ -39,18 +39,14 @@ namespace DiscoveryApplet {
             layout = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 0);
             widget.add (layout);
 
-            label = new Gtk.Label ("");
+            label = new Gtk.Label ("APPLET");
             layout.pack_start (label, false, false, 0);
             add(widget);
 
             get_style_context ().add_class ("discovery-applet");
 
-            // Create popup content
-            popover = new Budgie.Popover (widget);
-            var main_grid = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
-            main_grid.margin = 6;
-            main_grid.get_style_context ().add_class ("discovery-popup");
-            popover.add (main_grid);
+            // Create popup
+            popover = new DiscoveryPopup(widget).getPopover();
 
             widget.button_press_event.connect ((e)=> {
                 if (e.button != 1) {
