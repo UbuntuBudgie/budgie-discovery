@@ -3,6 +3,7 @@ using WebKit;
 
 public class DiscoveryPopupContent: Gtk.Box {
     private Gtk.Box navigationBox;
+    private Gtk.Stack stackView;
     private int activeTabIndex = 0;
 
     public DiscoveryPopupContent() {
@@ -15,20 +16,26 @@ public class DiscoveryPopupContent: Gtk.Box {
         navigationBox.get_style_context().add_class("navigation-box");
         pack_start(navigationBox, false, false, 0);
 
-        var stack = new Gtk.Stack();
-        stack.get_style_context().add_class("content-stack");
-        pack_start(stack, true, true, 0);
+        stackView = new Gtk.Stack();
+        stackView.get_style_context().add_class("content-stack");
+        stackView.set_transition_type(Gtk.StackTransitionType.CROSSFADE);
+        stackView.set_transition_duration(150);
+        pack_start(stackView, true, true, 0);
 
-        var scrollView = new Gtk.ScrolledWindow(null, null);
-        scrollView.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC);
-        scrollView.get_style_context().add_class("content-scrollview");
-        scrollView.set_shadow_type(Gtk.ShadowType.NONE);
+        var feedWidget = new FeedWidget();
+        stackView.add_named(feedWidget, "feed");
 
-        var webView = new WebKit.WebView();
-        webView.get_style_context().add_class("webview");
-        webView.load_uri("https://www.chatgpt.com");
-        scrollView.add(webView);
-        stack.add_titled(scrollView, "webview", "Web View");
+        var weatherWidget = new WeatherWidget();
+        stackView.add_named(weatherWidget, "weather");
+
+        var chatGptWidget = new ChatGptWidget();
+        stackView.add_named(chatGptWidget, "chat-gpt");
+
+        var applicationsWidget = new ApplicationsWidget();
+        stackView.add_named(applicationsWidget, "applications");
+
+        var settingsWidget = new SettingsWidget();
+        stackView.add_named(settingsWidget, "settings");
 
         // Add tabs to the navigation box
         add_tab(0, ICONS_DIR + "/feed-64.png");
@@ -44,7 +51,7 @@ public class DiscoveryPopupContent: Gtk.Box {
             tabButton.set_size_request(24, 24);
             tabButton.set_halign(Gtk.Align.START);
             tabButton.clicked.connect(() => {
-                print("INDEX CLICKED: %d\n", index);
+                set_active_index(index);
             });
 
             var icon = new Gtk.Image.from_gicon(Icon.new_for_string(iconName), Gtk.IconSize.LARGE_TOOLBAR);
@@ -57,5 +64,27 @@ public class DiscoveryPopupContent: Gtk.Box {
             warning("Failed to create tab button: %s", e.message);
         }
     }
-    
+
+    public void set_active_index(int index) {
+        if (index < 0 || index >= stackView.get_children().length()) {
+            warning("Invalid index: %d", index);
+            return;
+        }
+
+        if (activeTabIndex == index) {
+            return; // No change needed
+        }
+
+        var widget = (Gtk.Widget) stackView.get_children().nth(index).data;
+        if(widget == null) {
+            warning("Widget at index %d is null", index);
+            return;
+        }
+        if (!widget.get_visible()) {
+            warning("Widget at index %d is not visible", index);
+            return;
+        }
+        activeTabIndex = index;
+        stackView.set_visible_child( widget );
+    }
 }

@@ -2,7 +2,6 @@ project_name = meson.project_name()
 project_version = meson.project_version()
 
 prefix = get_option('prefix')
-bindir = get_option('bindir')
 datadir = get_option('datadir')
 localedir = get_option('localedir')
 
@@ -24,9 +23,15 @@ config_header = configure_file(
 discovery_applet_sources = [
     'Applet.vala', 
     'DiscoveryPopup.vala',
+    'widgets/ApplicationsWidget.vala',
+    'widgets/SettingsWidget.vala',
+    'widgets/ChatGptWidget.vala',
     'widgets/DiscoveryPopupContent.vala',
+    'widgets/FeedWidget.vala',
     'widgets/GreetingWidget.vala',
     'widgets/PowerWidget.vala',
+    'widgets/SettingsWidget.vala',
+    'widgets/WeatherWidget.vala',
 
     'services/FeedService.vala', 
     'services/WeatherService.vala'
@@ -38,18 +43,24 @@ discovery_applet_deps = [
     dependency('webkit2gtk-4.1', version: '>=2.48')
 ]
 
-discovery_applet_vala_args = ['--target-glib=2.50', '--pkg', 'posix', '--pkg', 'webkit2gtk-4.1', config_header]
+discovery_applet_vala_args = [
+    '--target-glib=2.50', 
+    '--pkg', 'posix', 
+    '--pkg', 'webkit2gtk-4.1', 
+    config_header
+]
 
 subdir('resources')
 
 shared_library('discoveryapplet', discovery_applet_sources,
-               dependencies: discovery_applet_deps,
-               vala_args: discovery_applet_vala_args,
-               c_args: [
-                    '-Wno-unused-variable',
-                    '-Wunused-but-set-variable',
-                    '-Wno-unused-function',
-                    '-Wno-unused-label'
-               ],
-               install: true,
-               install_dir: lib_install_dir)
+    dependencies: discovery_applet_deps,
+    vala_args: discovery_applet_vala_args,
+    c_args: [
+        '-Wno-unused-variable',
+        '-Wunused-but-set-variable',
+        '-Wno-unused-function',
+        '-Wno-unused-label'
+    ],
+    install: true,
+    install_dir: lib_install_dir
+)
