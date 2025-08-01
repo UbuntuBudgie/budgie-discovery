@@ -7,13 +7,27 @@
     font-weight: bold;
 }
 
+.discovery-popup .top-row {
+    padding-bottom: 10px;
+}
+
 .discovery-popup .power-widget {
     margin-top: 10px;
     padding-top: 10px;
     border-top: 1px solid #ccc;
 }
 
-.discovery-popup .power-widget button {
+.discovery-popup .navigation-box {
+    padding: 0;
+    margin: 0;
+}
+
+.discovery-popup .power-widget button,
+.discovery-popup .discovery-popup-content .navigation-box button{
     border-radius: 0;
-    box-shadow: none
+    box-shadow: none;
+}
+
+.content-stack {
+    margin-left: 10px;
 }

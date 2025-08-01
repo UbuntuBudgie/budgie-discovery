@@ -13,6 +13,7 @@ conf_data.set_quoted('GETTEXT_PACKAGE', project_name)
 conf_data.set_quoted('DATA_DIR', join_paths(prefix, datadir))
 conf_data.set_quoted('LOCALE_DIR', join_paths(prefix, localedir))
 conf_data.set_quoted('PLUGIN_DIR', lib_install_dir)
+conf_data.set_quoted('ICONS_DIR', join_paths(lib_install_dir, 'resources', 'icons'))
 
 config_header = configure_file(
     input: 'config.vala.in',
@@ -23,6 +24,7 @@ config_header = configure_file(
 discovery_applet_sources = [
     'Applet.vala', 
     'DiscoveryPopup.vala',
+    'DiscoveryPopupContent.vala',
     'GreetingWidget.vala',
     'FeedService.vala', 
     'PowerWidget.vala',
@@ -36,6 +38,8 @@ discovery_applet_deps = [
 ]
 
 discovery_applet_vala_args = ['--target-glib=2.50', '--pkg', 'posix', '--pkg', 'webkit2gtk-4.1', config_header]
+
+subdir('resources')
 
 shared_library('discoveryapplet', discovery_applet_sources,
                dependencies: discovery_applet_deps,

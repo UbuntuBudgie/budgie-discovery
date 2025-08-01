@@ -5,23 +5,27 @@ public class DiscoveryPopup {
     private GreetingWidget greetingWidget;
     private Gdk.Screen screen;
 
+    private static Gtk.Menu powerMenu;
+    private static Gtk.Button powerButton;
+
     public DiscoveryPopup(Gtk.Widget parentWidget) {
         screen = parentWidget.get_screen();
-        this.popover = new Budgie.Popover(parentWidget);
-        this.popover.get_style_context ().add_class ("discovery-popup");
+        popover = new Budgie.Popover(parentWidget);
+        popover.get_style_context ().add_class ("discovery-popup");
 
         var popoverLayout = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
         popoverLayout.get_style_context ().add_class ("popup-content");
-        this.popover.add(popoverLayout);
+        popover.add(popoverLayout);
 
         var topRow = new Gtk.Box(Gtk.Orientation.HORIZONTAL, 0);
+        topRow.get_style_context().add_class("top-row");
 
         greetingWidget = new GreetingWidget();
         topRow.pack_start (greetingWidget.getLabel(), false);
         popoverLayout.pack_start (topRow, false);
 
-        var dummyWidget = new Gtk.Box(Gtk.Orientation.HORIZONTAL, 0);
-        popoverLayout.pack_start(dummyWidget, true);
+        var contentWidget = new DiscoveryPopupContent();
+        popoverLayout.pack_start(contentWidget, true);
 
         var powerWidget = new PowerWidget();
         popoverLayout.pack_start(powerWidget, false);
@@ -36,7 +40,7 @@ public class DiscoveryPopup {
     }
 
     public Budgie.Popover getPopover() {
-        return this.popover;
+        return popover;
     }
 
     private void load_style_sheet() {
