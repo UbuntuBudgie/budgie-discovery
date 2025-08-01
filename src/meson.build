@@ -24,11 +24,12 @@ config_header = configure_file(
 discovery_applet_sources = [
     'Applet.vala', 
     'DiscoveryPopup.vala',
-    'DiscoveryPopupContent.vala',
-    'GreetingWidget.vala',
-    'FeedService.vala', 
-    'PowerWidget.vala',
-    'WeatherService.vala'
+    'widgets/DiscoveryPopupContent.vala',
+    'widgets/GreetingWidget.vala',
+    'widgets/PowerWidget.vala',
+
+    'services/FeedService.vala', 
+    'services/WeatherService.vala'
 ]
 
 discovery_applet_deps = [
@@ -44,5 +45,11 @@ subdir('resources')
 shared_library('discoveryapplet', discovery_applet_sources,
                dependencies: discovery_applet_deps,
                vala_args: discovery_applet_vala_args,
+               c_args: [
+                    '-Wno-unused-variable',
+                    '-Wunused-but-set-variable',
+                    '-Wno-unused-function',
+                    '-Wno-unused-label'
+               ],
                install: true,
                install_dir: lib_install_dir)

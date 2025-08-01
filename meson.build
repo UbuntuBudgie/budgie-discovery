@@ -5,7 +5,11 @@ project('discovery-applet',
         license: 'GPL2')
 
 add_project_arguments([
-    '-DGETTEXT_PACKAGE="@0@"'.format(meson.project_name())
+    '-DGETTEXT_PACKAGE="@0@"'.format(meson.project_name()),
+    '-Wno-unused-variable',
+    '-Wunused-but-set-variable',
+    '-Wno-unused-function',
+    '-Wno-unused-label'
 ],
     language: 'c',
 )

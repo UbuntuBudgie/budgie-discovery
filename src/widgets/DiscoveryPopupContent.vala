@@ -39,18 +39,23 @@ public class DiscoveryPopupContent: Gtk.Box {
     }
 
     private void add_tab(int index, string iconName) {
-        var tabButton = new Gtk.Button();
-        tabButton.set_size_request(24, 24);
-        tabButton.set_halign(Gtk.Align.START);
-        tabButton.clicked.connect(() => {
-            print("INDEX CLICKED: %d\n", index);
-        });
+        try {
+            var tabButton = new Gtk.Button();
+            tabButton.set_size_request(24, 24);
+            tabButton.set_halign(Gtk.Align.START);
+            tabButton.clicked.connect(() => {
+                print("INDEX CLICKED: %d\n", index);
+            });
 
-        var icon = new Gtk.Image.from_gicon(Icon.new_for_string(iconName), Gtk.IconSize.LARGE_TOOLBAR);
-        icon.set_pixel_size(36);
-        tabButton.set_image(icon);
+            var icon = new Gtk.Image.from_gicon(Icon.new_for_string(iconName), Gtk.IconSize.LARGE_TOOLBAR);
+            icon.set_pixel_size(36);
+            tabButton.set_image(icon);
 
-        navigationBox.pack_start(tabButton, false, false, 5);
+            navigationBox.pack_start(tabButton, false, false, 5);
+        }
+        catch (Error e) {
+            warning("Failed to create tab button: %s", e.message);
+        }
     }
     
 }

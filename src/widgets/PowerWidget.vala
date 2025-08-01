@@ -71,11 +71,7 @@ public class PowerWidget : Gtk.Box {
 
             invoke_action();
             Timeout.add(100, ()=> {
-                try {
-                    session.Shutdown.begin();
-                } catch (Error e) {
-                    warning("Cannot shutdown: %s", e.message);
-                }
+                session.Shutdown.begin();
                 return false;
             });
         });
@@ -86,11 +82,7 @@ public class PowerWidget : Gtk.Box {
 
             invoke_action();
             Timeout.add(100, ()=> {
-                try {
-                    session.Reboot.begin();
-                } catch (Error e) {
-                    warning("Cannot reboot: %s", e.message);
-                }
+                session.Reboot.begin();
                 return false;
             });
         });
@@ -116,11 +108,7 @@ public class PowerWidget : Gtk.Box {
 
             invoke_action();
             Timeout.add(100, ()=> {    
-                try {
-                    session.Logout.begin(0);
-                } catch (Error e) {
-                    warning("Cannot logout: %s", e.message);
-                }
+                session.Logout.begin(0);
                 return false;
             });
         });

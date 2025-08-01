@@ -5,9 +5,6 @@ public class DiscoveryPopup {
     private GreetingWidget greetingWidget;
     private Gdk.Screen screen;
 
-    private static Gtk.Menu powerMenu;
-    private static Gtk.Button powerButton;
-
     public DiscoveryPopup(Gtk.Widget parentWidget) {
         screen = parentWidget.get_screen();
         popover = new Budgie.Popover(parentWidget);
