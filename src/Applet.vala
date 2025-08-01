@@ -62,6 +62,9 @@ namespace DiscoveryApplet {
                 return Gdk.EVENT_STOP;
             });
 
+            var weatherService = new WeatherService ();
+            weatherService.start_service ();
+
             popover.get_child ().show_all ();
             show_all ();
         }
