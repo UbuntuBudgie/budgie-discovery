@@ -35,6 +35,7 @@ public class DiscoveryPopupContent: Gtk.Box {
         add_tab(1, ICONS_DIR + "/weather-64.png");
         add_tab(2, ICONS_DIR + "/chatgpt-64.png");
         add_tab(3, ICONS_DIR + "/apps-64.png");
+        add_tab(4, ICONS_DIR + "/settings-64.png");
     }
 
     private void add_tab(int index, string iconName) {
