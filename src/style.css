@@ -29,10 +29,12 @@
     background: none;
 }
 
+.discovery-popup .power-widget button:hover,
 .discovery-popup .navigation-box button:hover {
     background: #f6f6f6;
 }
 
+.discovery-popup .power-widget button:active,
 .discovery-popup .navigation-box button.active {
     background: #e6e6e6;
 }
