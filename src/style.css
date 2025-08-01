@@ -23,9 +23,18 @@
 }
 
 .discovery-popup .power-widget button,
-.discovery-popup .discovery-popup-content .navigation-box button{
+.discovery-popup .navigation-box button {
     border-radius: 0;
     box-shadow: none;
+    background: none;
+}
+
+.discovery-popup .navigation-box button:hover {
+    background: #f6f6f6;
+}
+
+.discovery-popup .navigation-box button.active {
+    background: #e6e6e6;
 }
 
 .content-stack {

@@ -2,6 +2,7 @@ using Config;
 
 public class DiscoveryPopup {
     private Budgie.Popover popover;
+    private DiscoveryPopupContent popupContentWidget;
     private GreetingWidget greetingWidget;
     private Gdk.Screen screen;
 
@@ -21,8 +22,8 @@ public class DiscoveryPopup {
         topRow.pack_start (greetingWidget.getLabel(), false);
         popoverLayout.pack_start (topRow, false);
 
-        var contentWidget = new DiscoveryPopupContent();
-        popoverLayout.pack_start(contentWidget, true);
+        popupContentWidget = new DiscoveryPopupContent();
+        popoverLayout.pack_start(popupContentWidget, true);
 
         var powerWidget = new PowerWidget();
         popoverLayout.pack_start(powerWidget, false);
@@ -38,6 +39,10 @@ public class DiscoveryPopup {
 
     public Budgie.Popover getPopover() {
         return popover;
+    }
+
+    public void set_active_index(int index) {
+        popupContentWidget.set_active_index(index);
     }
 
     private void load_style_sheet() {

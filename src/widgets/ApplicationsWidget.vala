@@ -9,7 +9,7 @@ public class ApplicationsWidget: Gtk.Box {
 
         applicationsLabel = new Gtk.Label("FeApplications content will be displayed here.");
         applicationsLabel.set_halign(Gtk.Align.CENTER);
-        applicationsLabel.set_valign(Gtk.Align.CENTER);
+        applicationsLabel.set_valign(Gtk.Align.START);
         pack_start(applicationsLabel, true, true, 0);
     }
 }

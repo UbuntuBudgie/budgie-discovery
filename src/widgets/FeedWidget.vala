@@ -9,7 +9,7 @@ public class FeedWidget: Gtk.Box {
 
         feedLabel = new Gtk.Label("Feed content will be displayed here.");
         feedLabel.set_halign(Gtk.Align.CENTER);
-        feedLabel.set_valign(Gtk.Align.CENTER);
+        feedLabel.set_valign(Gtk.Align.START);
         pack_start(feedLabel, true, true, 0);
     }
 

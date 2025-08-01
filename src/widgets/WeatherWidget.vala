@@ -9,7 +9,7 @@ public class WeatherWidget: Gtk.Box {
 
         weatherLabel = new Gtk.Label("Weather information will be displayed here.");
         weatherLabel.set_halign(Gtk.Align.CENTER);
-        weatherLabel.set_valign(Gtk.Align.CENTER);
+        weatherLabel.set_valign(Gtk.Align.START);
         pack_start(weatherLabel, true, true, 0);
     }
 

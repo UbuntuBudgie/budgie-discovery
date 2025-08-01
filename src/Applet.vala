@@ -56,6 +56,7 @@ namespace DiscoveryApplet {
                 if (popover.get_visible ()) {
                     popover.hide ();
                 } else {
+                    popup.set_active_index(0); // Reset to first ta
                     this.manager.show_popover (widget);
                 }
                 return Gdk.EVENT_STOP;

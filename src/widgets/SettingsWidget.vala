@@ -9,7 +9,7 @@ public class SettingsWidget: Gtk.Box {
 
         settingsLabel = new Gtk.Label("Settings will be displayed here.");
         settingsLabel.set_halign(Gtk.Align.CENTER);
-        settingsLabel.set_valign(Gtk.Align.CENTER);
+        settingsLabel.set_valign(Gtk.Align.START);
         pack_start(settingsLabel, true, true, 0);
     }
 
