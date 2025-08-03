@@ -5,6 +5,7 @@ public class WeatherService: IService {
     Session session;
     Json.Parser jsonParser;
     private static string API_KEY = "320846ac29674a36ac491420250603";
+    private WeatherRepository? weatherRepository = null;
 
     public WeatherService() {
         session = new Session();
@@ -12,26 +13,27 @@ public class WeatherService: IService {
         session.add_feature(new Soup.ContentSniffer());
 
         jsonParser = new Json.Parser();
+        weatherRepository = new WeatherRepository();
     }
 
-    public override void start_service() {
+    public void start_service() {
         string url = "https://api.worldweatheronline.com/premium/v1/weather.ashx?num_of_days=5&fx24=yes&format=json&key=" + API_KEY + "&q=Miesbach,Germany";
-        fetch_weather_data("GET", url);
+        fetch_weather_data.begin("GET", url);
 
         // Set up a periodic fetch every hour
         Timeout.add_seconds(60 * 60, () => {
-            fetch_weather_data("GET", url);
+            fetch_weather_data.begin("GET", url);
             return true; // Continue the timeout
         });
     }
 
-    public override void stop_service() {
+    public void stop_service() {
         // Clean up resources if necessary
         session = null;
         jsonParser = null;
     }
 
-    public override void update_service() {
+    public void update_service() {
         // do nothing
     }
 
@@ -40,8 +42,6 @@ public class WeatherService: IService {
         try {
             var bytes = yield session.send_and_read_async(message, 0, null);
             if (bytes != null) {
-                
-                size_t size = 0;
                 uint8[] data = bytes.get_data();
                 var builder = new StringBuilder.sized(data.length);
                 for(int i=0; i<data.length; i++) {
@@ -53,6 +53,12 @@ public class WeatherService: IService {
                 Json.Node node = jsonParser.get_root ();
 	            Json.Reader reader = new Json.Reader (node);
                 
+                string temp_C = "";
+                string weatherDesc = "";
+                string weatherCode = "";
+                string humidity = "";
+                string pressure = "";
+
                 foreach (string member in reader.list_members ()) {
                     if (member == "data") {
                         if (reader.read_member(member)) {
@@ -61,10 +67,9 @@ public class WeatherService: IService {
                                     reader.read_element(0);
 
                                     reader.read_member("temp_C");
-                                    string temp_C = reader.get_string_value();
+                                    temp_C = reader.get_string_value();
                                     reader.end_member();
 
-                                    string weatherDesc = "";
                                     if(reader.read_member("weatherDesc") && reader.is_array()) {
                                         reader.read_element(0);
                                         reader.read_member("value");
@@ -73,9 +78,23 @@ public class WeatherService: IService {
                                         reader.end_element();
                                     }
                                     reader.end_member(); // end weatherDesc
+
+                                    reader.read_member("weatherCode");
+                                    weatherCode = reader.get_string_value();
+                                    reader.end_member(); // end weatherCode
+
+                                    reader.read_member("humidity");
+                                    humidity = reader.get_string_value();
+                                    reader.end_member(); // end humidity
+
+                                    reader.read_member("pressure");
+                                    pressure = reader.get_string_value();
+                                    reader.end_member(); // end pressure
+
                                     reader.end_element(); // end first array element (current_condition)
 
-                                    print("Current temperature: %s°C, Condition: %s\n", temp_C, weatherDesc);
+                                    print("Current temperature: %s°C, Condition: %s, weatherCode: %s, humidity: %s, pressure: %s\n", 
+                                    temp_C, weatherDesc, weatherCode, humidity, pressure);
                                 }
                                 reader.end_member(); // end current_condition
                             }

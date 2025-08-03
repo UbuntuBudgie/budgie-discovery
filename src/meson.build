@@ -23,6 +23,10 @@ config_header = configure_file(
 discovery_applet_sources = [
     'Applet.vala', 
     'DiscoveryPopup.vala',
+
+    'core/IService.vala',
+    'core/WeatherRespository.vala',
+
     'widgets/ApplicationsWidget.vala',
     'widgets/SettingsWidget.vala',
     'widgets/ChatGptWidget.vala',
@@ -31,9 +35,9 @@ discovery_applet_sources = [
     'widgets/GreetingWidget.vala',
     'widgets/PowerWidget.vala',
     'widgets/SettingsWidget.vala',
+    'widgets/WeatherForecastDayWidget.vala',
     'widgets/WeatherWidget.vala',
 
-    'services/IService.vala',
     'services/FeedService.vala', 
     'services/WeatherService.vala'
 ]

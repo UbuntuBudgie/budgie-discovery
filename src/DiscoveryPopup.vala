@@ -30,7 +30,7 @@ public class DiscoveryPopup {
         powerWidget.invoke_action.connect(popover.hide);
 
         var g = screen.get_display().get_primary_monitor().get_geometry();
-        var popupWidth = g.width / 3;
+        var popupWidth = (g.width / 3) + 200;
         var popupHeight = (g.height / 3) * 2;
         popoverLayout.set_size_request(popupWidth, popupHeight);
 

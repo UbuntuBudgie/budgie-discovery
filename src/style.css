@@ -42,3 +42,19 @@
 .content-stack {
     margin-left: 10px;
 }
+
+.weather-forecast-day {
+    background-color: #EBF2FE;
+    padding: 5px 10px;
+    border-radius: 5px;
+}
+
+.weather-forecast-day .forecast-day-details{
+    margin-right: 20px;
+    margin-left: 5px;
+}
+
+.weather-forecast-day .forecast-day-details .condition-label {
+    color: #666;
+    font-size: 0.9em;
+}
