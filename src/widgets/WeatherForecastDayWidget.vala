@@ -52,11 +52,11 @@ public class WeatherForecastDayWidget: Gtk.Box {
     }
 
     public void setTemperatureHigh(string temperatureHigh) {
-        temperatureHighLabel.set_text(temperatureHigh);
+        temperatureHighLabel.set_text(temperatureHigh + "°C");
     }
 
     public void setTemperatureLow(string temperatureLow) {
-        temperatureLowLabel.set_text(temperatureLow);
+        temperatureLowLabel.set_text(temperatureLow + "°C");
     }
 
     public void setWeatherIcon(string iconName) {
