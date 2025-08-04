@@ -1,4 +1,5 @@
-public class WeatherCurrent: Object {
+public class WeatherCondition {
+    public DateTime date { get; set; }
     public string tempC { get; set; }
     public string weatherDesc { get; set; }
     public string weatherCode { get; set; }

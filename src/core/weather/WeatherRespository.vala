@@ -31,8 +31,6 @@ public class WeatherRepository {
         
         try {
             FileUtils.set_contents(filePath, data);
-            message("Weather data saved to %s\n", filePath);
-
             load(); // Load the data after saving
         } catch (Error e) {
             warning("Failed to save weather data: %s\n", e.message);
