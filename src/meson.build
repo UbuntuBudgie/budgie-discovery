@@ -25,7 +25,10 @@ discovery_applet_sources = [
     'DiscoveryPopup.vala',
 
     'core/IService.vala',
-    'core/WeatherRespository.vala',
+    'core/weather/Weather.vala',
+    'core/weather/WeatherCurrent.vala',
+    'core/weather/WeatherForecast.vala',
+    'core/weather/WeatherRespository.vala',
 
     'widgets/ApplicationsWidget.vala',
     'widgets/SettingsWidget.vala',
@@ -48,7 +51,6 @@ discovery_applet_deps = [
     dependency('webkit2gtk-4.1', version: '>=2.48'),
     dependency('json-glib-1.0', version: '>=1.10'),
     dependency('libsoup-3.0', version: '>=2.4'),
-    dependency('sqlite3', version: '>=3.46'),
     dependency('libpeas-1.0', version: '>=1.36')
 ]
 

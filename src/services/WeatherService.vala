@@ -48,61 +48,17 @@ public class WeatherService: IService {
                     builder.append_c((char)data[i]);
                 }
                 string response = builder.str;
-                jsonParser.load_from_data(response);
+                weatherRepository.save(response);
 
-                Json.Node node = jsonParser.get_root ();
-	            Json.Reader reader = new Json.Reader (node);
-                
-                string temp_C = "";
-                string weatherDesc = "";
-                string weatherCode = "";
-                string humidity = "";
-                string pressure = "";
-
-                foreach (string member in reader.list_members ()) {
-                    if (member == "data") {
-                        if (reader.read_member(member)) {
-                            if (reader.read_member("current_condition")) {
-                                if (reader.is_array()) {
-                                    reader.read_element(0);
-
-                                    reader.read_member("temp_C");
-                                    temp_C = reader.get_string_value();
-                                    reader.end_member();
-
-                                    if(reader.read_member("weatherDesc") && reader.is_array()) {
-                                        reader.read_element(0);
-                                        reader.read_member("value");
-                                        weatherDesc = reader.get_string_value();
-                                        reader.end_member();
-                                        reader.end_element();
-                                    }
-                                    reader.end_member(); // end weatherDesc
-
-                                    reader.read_member("weatherCode");
-                                    weatherCode = reader.get_string_value();
-                                    reader.end_member(); // end weatherCode
-
-                                    reader.read_member("humidity");
-                                    humidity = reader.get_string_value();
-                                    reader.end_member(); // end humidity
-
-                                    reader.read_member("pressure");
-                                    pressure = reader.get_string_value();
-                                    reader.end_member(); // end pressure
-
-                                    reader.end_element(); // end first array element (current_condition)
-
-                                    print("Current temperature: %s°C, Condition: %s, weatherCode: %s, humidity: %s, pressure: %s\n", 
-                                    temp_C, weatherDesc, weatherCode, humidity, pressure);
-                                }
-                                reader.end_member(); // end current_condition
-                            }
-                            reader.end_member(); // end data
-                        } else {
-                            warning("Expected 'data' to be an element.");
-                        }
+                var weather = new Weather();
+                List<WeatherForecast> foreCasts = weather.getForecast();
+                if (foreCasts != null) {
+                    foreach (var forecast in foreCasts) {
+                        print("Forecast for %s: Max Temp: %s, Min Temp: %s\n",
+                                forecast.date, forecast.maxtempC, forecast.mintempC);
                     }
+                } else {
+                    warning("No forecasts available.");
                 }
 
             } else {
