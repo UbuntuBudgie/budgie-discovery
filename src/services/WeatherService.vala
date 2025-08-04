@@ -55,7 +55,7 @@ public class WeatherService: IService {
                 if (foreCasts != null) {
                     foreach (var forecast in foreCasts) {
                         print("Forecast for %s: Max Temp: %s, Min Temp: %s\n",
-                                forecast.date, forecast.maxtempC, forecast.mintempC);
+                                forecast.date.format("%d.%m.%Y"), forecast.maxtempC, forecast.mintempC);
                     }
                 } else {
                     warning("No forecasts available.");

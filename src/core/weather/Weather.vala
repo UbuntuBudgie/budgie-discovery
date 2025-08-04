@@ -92,7 +92,7 @@ public class Weather {
             WeatherForecast forecast = new WeatherForecast();
 
             reader.read_member("date");
-            forecast.date = reader.get_string_value();
+            forecast.date = new DateTime.from_iso8601(reader.get_string_value() + "T00:00:00Z", null);
             reader.end_member();
 
             reader.read_member("maxtempC");
