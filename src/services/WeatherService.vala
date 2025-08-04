@@ -2,18 +2,15 @@ using Soup;
 using GLib;
 
 public class WeatherService: IService {
-    Session session;
-    Json.Parser jsonParser;
+    private static Session session = new Session();
+    private static Json.Parser jsonParser = new Json.Parser();
     private static string API_KEY = "320846ac29674a36ac491420250603";
-    private WeatherRepository? weatherRepository = null;
+    private static WeatherRepository weatherRepository;
 
     public WeatherService() {
-        session = new Session();
         session.timeout = 10; // Set a timeout for the session
         session.add_feature(new Soup.ContentSniffer());
-
-        jsonParser = new Json.Parser();
-        weatherRepository = new WeatherRepository();
+        weatherRepository = WeatherRepository.getInstance();
     }
 
     public void start_service() {

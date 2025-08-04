@@ -1,3 +1,6 @@
+using GLib;
+using Gdk;
+
 public class WeatherForecastDayWidget: Gtk.Box {
     private Gtk.Image weatherIcon;
     private Gtk.Label dayLabel;
@@ -13,6 +16,7 @@ public class WeatherForecastDayWidget: Gtk.Box {
 
         weatherIcon = new Gtk.Image();
         weatherIcon.set_pixel_size(48);
+        weatherIcon.set_size_request(48, 48);
         pack_start(weatherIcon, false, false, 0);
 
         var vBox1 = new Gtk.Box(Gtk.Orientation.VERTICAL, 0);
@@ -59,7 +63,26 @@ public class WeatherForecastDayWidget: Gtk.Box {
         temperatureLowLabel.set_text(temperatureLow + "°C");
     }
 
-    public void setWeatherIcon(string iconName) {
-        weatherIcon.set_from_icon_name(iconName, Gtk.IconSize.BUTTON);
+    public void setWeatherIcon(string fileName) {
+        if (fileName == null) {
+            weatherIcon.set_from_icon_name("weather-clear", Gtk.IconSize.BUTTON);
+            return;
+        }
+    
+        try {
+            File file = File.new_for_path (fileName);
+		    InputStream ios = file.read(null);
+
+            if (ios != null) {
+                var pixbuf = new Gdk.Pixbuf.from_stream(ios, null).scale_simple(48, 48, InterpType.HYPER);
+                weatherIcon.set_from_pixbuf(pixbuf);   
+            } else {
+                warning("Failed to load weather icon: empty response\n");
+                weatherIcon.set_from_icon_name("weather-clear", Gtk.IconSize.BUTTON);  
+            }
+        } catch (Error e) {
+            warning("Failed to load weather icon: %s\n", e.message);
+            weatherIcon.set_from_icon_name("weather-clear", Gtk.IconSize.BUTTON);  
+        }
     }
 }   
