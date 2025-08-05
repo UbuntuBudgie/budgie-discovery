@@ -21,7 +21,6 @@ public class WeatherForecastDayWidget: Gtk.Box {
 
         var vBox1 = new Gtk.Box(Gtk.Orientation.VERTICAL, 0);
         vBox1.get_style_context().add_class("forecast-day-details");
-        //vBox1.set_baseline_position(Gtk.BaselinePosition.CENTER);
         vBox1.set_halign(Gtk.Align.START);
         vBox1.set_valign(Gtk.Align.CENTER);
         pack_start(vBox1, true, true, 0);
@@ -32,10 +31,12 @@ public class WeatherForecastDayWidget: Gtk.Box {
 
         conditionLabel = new Gtk.Label("");
         conditionLabel.set_halign(Gtk.Align.START);
-        conditionLabel.get_style_context().add_class("condition-label");
+        conditionLabel.get_style_context().add_class("text-secondary");
         vBox1.pack_start(conditionLabel, false, false, 0);
         
-        var vBox2 = new Gtk.Box(Gtk.Orientation.VERTICAL, 5);
+        var vBox2 = new Gtk.Box(Gtk.Orientation.VERTICAL, 0);
+        vBox2.set_halign(Gtk.Align.START);
+        vBox2.set_valign(Gtk.Align.CENTER);
         pack_start(vBox2, false, false, 0);
 
         temperatureHighLabel = new Gtk.Label("");
@@ -43,7 +44,8 @@ public class WeatherForecastDayWidget: Gtk.Box {
         vBox2.pack_start(temperatureHighLabel, false, false, 0);
 
         temperatureLowLabel = new Gtk.Label("");
-        temperatureLowLabel.set_halign(Gtk.Align.START);
+        temperatureLowLabel.get_style_context().add_class("text-secondary");
+        temperatureLowLabel.set_halign(Gtk.Align.END);
         vBox2.pack_start(temperatureLowLabel, false, false, 0);
     }
 

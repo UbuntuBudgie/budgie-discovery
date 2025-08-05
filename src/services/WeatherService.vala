@@ -17,7 +17,7 @@ public class WeatherService: IService {
     }
 
     public void start_service() {
-        string url = "https://api.worldweatheronline.com/premium/v1/weather.ashx?tp=1&date_format=iso8601&extra=utcDateTime&num_of_days=5&fx24=yes&format=json&key=" + API_KEY + "&q=Miesbach,Germany";
+        string url = "https://api.worldweatheronline.com/premium/v1/weather.ashx?lang=de&tp=1&date_format=iso8601&extra=utcDateTime&num_of_days=5&fx24=yes&format=json&key=" + API_KEY + "&q=Miesbach,Germany";
         fetch_weather_data.begin("GET", url);
 
         // Set up a periodic fetch every minute

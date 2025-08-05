@@ -1,5 +1,6 @@
 .discovery-popup .popup-content {
     margin: 15px;
+    font-size: 1em;
 }
 
 .discovery-popup .greeting-label {
@@ -9,6 +10,20 @@
 
 .discovery-popup .top-row {
     padding-bottom: 10px;
+}
+
+.discovery-popup .popup-content .text-secondary {
+    color: #777;
+    font-size: 0.9em;
+}
+
+.discovery-popup .popup-content .text-blue {
+    color: #2D5C8C;
+    font-size: 0.9em;
+}
+
+.discovery-popup .popup-content .text-small {
+    font-size: 0.8em;
 }
 
 .discovery-popup .power-widget {
@@ -46,7 +61,7 @@
 .weather-forecast-day {
     background-color: #EBF2FE;
     padding: 5px 10px;
-    border-radius: 5px;
+    border-radius: 8px;
 }
 
 .weather-forecast-day .forecast-day-details{
@@ -54,7 +69,12 @@
     margin-left: 5px;
 }
 
-.weather-forecast-day .forecast-day-details .condition-label {
-    color: #666;
-    font-size: 0.9em;
+.discovery-popup .weather-current {
+    border-radius: 8px;
+    background-color: #EBF2FE;
+    padding: 10px;
+}
+
+.discovery-popup .weather-current .weather-current-temp {
+    font-size: 4em;
 }

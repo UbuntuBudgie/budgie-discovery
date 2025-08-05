@@ -103,7 +103,7 @@ public class WeatherRepository {
         temp_C = reader.get_string_value();
         reader.end_member();
 
-        if (reader.read_member("weatherDesc") && reader.is_array()) {
+        if (reader.read_member("lang_de") && reader.is_array()) {
             reader.read_element(0);
             reader.read_member("value");
             weatherDesc = reader.get_string_value();
@@ -242,7 +242,7 @@ public class WeatherRepository {
                         hourlyCondition.tempC = reader.get_string_value();
                         reader.end_member();
 
-                        if (reader.read_member("weatherDesc") && reader.is_array()) {
+                        if (reader.read_member("lang_de") && reader.is_array()) {
                             reader.read_element(0);
                             reader.read_member("value");
                             hourlyCondition.weatherDesc = reader.get_string_value();
