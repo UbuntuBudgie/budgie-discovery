@@ -12,25 +12,27 @@ public class WeatherWidget: Gtk.Box {
 
         forecastDaysLayout = new Gtk.Box(Gtk.Orientation.VERTICAL, 5);
         pack_start(forecastDaysLayout, false, false, 5);
+
+        for(var i = 0; i < 5; i++) {
+            var widget = new WeatherForecastDayWidget();
+            forecastDaysLayout.pack_start(widget, false, false, 0);
+        }
+        forecastDaysLayout.show_all();
         
         weather = WeatherRepository.getInstance();
         weather.weatherUpdated.connect(onWeatherUpdated);
     }
 
     public void onWeatherUpdated() {
-        foreach (Gtk.Widget child in forecastDaysLayout.get_children()) {
-            forecastDaysLayout.remove(child);
-        }
-
         List<WeatherForecast> weatherForecast = weather.getForecast();
         var weatherCurrent = weather.getCurrent();
 
-        foreach(WeatherForecast forecastData in weatherForecast) {
-            var widget = new WeatherForecastDayWidget();
+        for(var i = 0; i < 5; i++) {
+            WeatherForecast forecastData = weatherForecast.nth_data(i);
+            WeatherForecastDayWidget widget = (WeatherForecastDayWidget)forecastDaysLayout.get_children().nth_data(i);
             widget.setDayName(forecastData.date.format("%A"));
             widget.setTemperatureHigh(forecastData.mintempC);
             widget.setTemperatureLow(forecastData.maxtempC);
-            forecastDaysLayout.pack_start(widget, false, false, 0);
 
             foreach(WeatherCondition f in forecastData.hourlyForecast) {
                 if(f.date.format("%H") == "12") {
@@ -42,7 +44,5 @@ public class WeatherWidget: Gtk.Box {
                 }
             }
         }
-
-        show_all();
     }
 }
