@@ -62,6 +62,5 @@ public class WeatherService: IService {
             }
             fetching = false;
         });
-        fetching = false;
     }
 }
