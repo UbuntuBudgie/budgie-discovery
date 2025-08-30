@@ -1,5 +1,6 @@
+using Xml;
+
 public class FeedWidget: Gtk.Box {
-    private Gtk.Label feedLabel;
     private GreetingWidget greetingWidget;
 
     public FeedWidget() {

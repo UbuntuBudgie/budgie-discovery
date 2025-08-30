@@ -64,6 +64,7 @@ discovery_applet_deps = [
     dependency('libsoup-3.0', version: '>=2.4'),
     dependency('libpeas-1.0', version: '>=1.36'),
     dependency('gee-0.8', version: '>=0.8'),
+    dependency('libxml-2.0', version: '>=2.9'),
     cc.find_library('m', required: true),
     vala.find_library('posix', required: true),
 ]
