@@ -75,6 +75,9 @@ namespace DiscoveryApplet {
             var weatherService = new WeatherService();
             weatherService.start_service ();
 
+            var feedService = new FeedService();
+            feedService.start_service ();
+
             popover.get_child ().show_all ();
             show_all ();
         }
