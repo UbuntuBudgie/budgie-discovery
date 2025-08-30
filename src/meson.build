@@ -31,6 +31,7 @@ discovery_applet_sources = [
     'DiscoveryPopup.vala',
 
     'core/IService.vala',
+    'core/feed/FeedRepository.vala',
     'core/weather/WeatherRespository.vala',
     'core/weather/WeatherForecastItem.vala',
 

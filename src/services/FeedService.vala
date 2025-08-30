@@ -3,7 +3,7 @@ public class FeedService: IService {
     private static DateTime lastFetched;
 
     public void start_service() {
-        string url = "https://api.open-meteo.com/v1/forecast?latitude=47.789&longitude=11.8338&daily=weather_code,temperature_2m_max,temperature_2m_min&current=temperature_2m,weather_code,rain,showers,snowfall,wind_speed_10m,wind_direction_10m,is_day&timezone=Europe%2FBerlin&forecast_hours=6";
+        string url = "https://news.google.com/rss/search?hl=de&gl=DE&ceid=DE:de&oc=11&q=news";
         fetch_data.begin("GET", url);
 
         // Set up a periodic fetch every minute
@@ -40,7 +40,7 @@ public class FeedService: IService {
 
                 file.load_contents_async.end (res, out contents, out etag_out);
                 string response = (string) contents;
-                
+                message(response);
                 lastFetched = current;
             } catch(Error e) {
                 warning("Error initiating fetch: %s", e.message);

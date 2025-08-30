@@ -33,9 +33,14 @@ public class FeedWidget: Gtk.Box {
                 child.set_size_request(size, size);
             });
         });
+
+        var feedRepository = FeedRepository.getInstance();
+        feedRepository.feedUpdated.connect((feedContent) => {
+            update_feed(feedContent);
+        });
     }
 
     public void update_feed(string feedContent) {
-        feedLabel.set_text(feedContent);
+        
     }
 }
