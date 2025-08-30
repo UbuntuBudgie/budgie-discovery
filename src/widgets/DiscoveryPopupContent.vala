@@ -11,6 +11,7 @@ public class DiscoveryPopupContent: Gtk.Box {
         set_orientation(Gtk.Orientation.HORIZONTAL);
         set_spacing(5);
         get_style_context().add_class("discovery-popup-content");
+        set_hexpand(false);
 
         navigationBox = new Gtk.Box(Gtk.Orientation.VERTICAL, 0);
         navigationBox.get_style_context().add_class("navigation-box");
@@ -26,10 +27,6 @@ public class DiscoveryPopupContent: Gtk.Box {
         feedWidget.set_name("feed");
         stackView.add_named(feedWidget, "feed");
 
-        var weatherWidget = new WeatherWidget();
-        weatherWidget.set_name("weather");
-        stackView.add_named(weatherWidget, "weather");
-
         var chatGptWidget = new ChatGptWidget();
         chatGptWidget.set_name("chat-gpt");
         stackView.add_named(chatGptWidget, "chat-gpt");
@@ -44,10 +41,17 @@ public class DiscoveryPopupContent: Gtk.Box {
 
         // Add tabs to the navigation box
         add_tab(0, "feed", ICONS_DIR + "/feed-64.png");
-        add_tab(1, "weather", ICONS_DIR + "/weather-64.png");
-        add_tab(2, "chat-gpt", ICONS_DIR + "/chatgpt-64.png");
-        add_tab(3, "applications", ICONS_DIR + "/apps-64.png");
-        add_tab(4, "settings", ICONS_DIR + "/settings-64.png");
+        add_tab(1, "chat-gpt", ICONS_DIR + "/chatgpt-64.png");
+        add_tab(2, "applications", ICONS_DIR + "/apps-64.png");
+        add_tab(3, "settings", ICONS_DIR + "/settings-64.png");
+    }
+
+    public override void get_preferred_width(out int minimum_width, out int natural_width) {
+        int w = 0;
+        stackView.get_preferred_width(out w, out w);
+
+        minimum_width = w;
+        natural_width = w;
     }
 
     private void add_tab(int index, string name, string iconName) {

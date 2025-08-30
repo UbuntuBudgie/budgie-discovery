@@ -4,7 +4,6 @@ public interface ScreenSaver : Object
     public abstract async void lock() throws Error;
 }
 
-/* logind */
 [DBus (name = "org.freedesktop.login1.Manager")]
 public interface LogindInterface : Object {
     public abstract void suspend(bool interactive) throws Error;
@@ -113,8 +112,6 @@ public class PowerWidget : Gtk.Box {
             });
         });
 
-        setup_dbus.begin((obj,res)=> {
-            print ("DBUS SETUP OK\n");
-        });
+        setup_dbus.begin((obj,res)=> {});
     }
 }

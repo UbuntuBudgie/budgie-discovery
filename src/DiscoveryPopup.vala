@@ -3,36 +3,32 @@ using Config;
 public class DiscoveryPopup {
     private Budgie.Popover popover;
     private DiscoveryPopupContent popupContentWidget;
-    private GreetingWidget greetingWidget;
     private Gdk.Screen screen;
 
     public DiscoveryPopup(Gtk.Widget parentWidget) {
         screen = parentWidget.get_screen();
+        var g = screen.get_display().get_primary_monitor().get_geometry();
+        int popupWidth = (g.width / 3) + 150;
+        int popupHeight = (g.height / 3) * 2;
+
         popover = new Budgie.Popover(parentWidget);
         popover.get_style_context ().add_class ("discovery-popup");
+        popover.set_halign(Gtk.Align.START);
+        popover.set_size_request(popupWidth, popupHeight);
 
         var popoverLayout = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
         popoverLayout.get_style_context ().add_class ("popup-content");
+        popoverLayout.set_hexpand(false);
+        popoverLayout.set_halign(Gtk.Align.START);
+        popoverLayout.set_size_request(popupWidth, popupHeight);
         popover.add(popoverLayout);
 
-        var topRow = new Gtk.Box(Gtk.Orientation.HORIZONTAL, 0);
-        topRow.get_style_context().add_class("top-row");
-
-        greetingWidget = new GreetingWidget();
-        topRow.pack_start (greetingWidget.getLabel(), false);
-        popoverLayout.pack_start (topRow, false);
-
         popupContentWidget = new DiscoveryPopupContent();
-        popoverLayout.pack_start(popupContentWidget, true);
+        popoverLayout.pack_start(popupContentWidget, true, true);
 
         var powerWidget = new PowerWidget();
         popoverLayout.pack_start(powerWidget, false);
         powerWidget.invoke_action.connect(popover.hide);
-
-        var g = screen.get_display().get_primary_monitor().get_geometry();
-        var popupWidth = (g.width / 3) + 200;
-        var popupHeight = (g.height / 3) * 2;
-        popoverLayout.set_size_request(popupWidth, popupHeight);
 
         load_style_sheet();
     }

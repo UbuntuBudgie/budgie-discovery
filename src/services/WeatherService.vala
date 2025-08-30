@@ -1,35 +1,34 @@
-using Soup;
 using GLib;
+using Gee;
+using Config;
 
 public class WeatherService: IService {
-    private static Session session = new Session();
     private static Json.Parser jsonParser = new Json.Parser();
-    private static string API_KEY = "320846ac29674a36ac491420250603";
     private static WeatherRepository weatherRepository;
 
     private static bool fetching = false;
     private static DateTime lastFetched;
 
     public WeatherService() {
-        session.timeout = 10; // Set a timeout for the session
-        session.add_feature(new Soup.ContentSniffer());
         weatherRepository = WeatherRepository.getInstance();
     }
 
+    public static WeatherRepository getWeatherRepository() {
+        return weatherRepository;
+    }
+
     public void start_service() {
-        string url = "https://api.worldweatheronline.com/premium/v1/weather.ashx?lang=de&tp=1&date_format=iso8601&extra=utcDateTime&num_of_days=5&fx24=yes&format=json&key=" + API_KEY + "&q=Miesbach,Germany";
+        string url = "https://api.open-meteo.com/v1/forecast?latitude=47.789&longitude=11.8338&daily=weather_code,temperature_2m_max,temperature_2m_min&current=temperature_2m,weather_code,rain,showers,snowfall,wind_speed_10m,wind_direction_10m,is_day&timezone=Europe%2FBerlin&forecast_hours=6";
         fetch_weather_data.begin("GET", url);
 
         // Set up a periodic fetch every minute
-        Timeout.add_seconds(60, () => {
+        Timeout.add_seconds(5, () => {
             fetch_weather_data.begin("GET", url);
             return true; // Continue the timeout
         });
     }
 
     public void stop_service() {
-        // Clean up resources if necessary
-        session = null;
         jsonParser = null;
     }
 
@@ -48,26 +47,21 @@ public class WeatherService: IService {
         }
 
         fetching = true;
-        var message = new Message (method, location);
-        try {
-            var bytes = yield session.send_and_read_async(message, 0, null);
-            if (bytes != null) {
-                uint8[] data = bytes.get_data();
-                var builder = new StringBuilder.sized(data.length);
-                for(int i=0; i<data.length; i++) {
-                    builder.append_c((char)data[i]);
-                }
-                string response = builder.str;
+        var file = File.new_for_uri (location);
+        file.load_contents_async.begin (null, (obj, res) => {
+            try {
+                uint8[] contents;
+                string etag_out;
+
+                file.load_contents_async.end (res, out contents, out etag_out);
+                string response = (string) contents;
                 weatherRepository.save(response);
-
-            } else {
-                warning("No data received from weather service.");
+                lastFetched = current;
+            } catch(Error e) {
+                warning("Error initiating fetch: %s", e.message);
             }
-        } catch (Error e) {
-            warning("Error fetching weather data: %s", e.message);
-        }
-
-        lastFetched = current;
+            fetching = false;
+        });
         fetching = false;
     }
 }

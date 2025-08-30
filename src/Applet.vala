@@ -8,6 +8,8 @@
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
  */
+using Config;
+using Gdk;
 
 namespace DiscoveryApplet {
     public class Plugin : Budgie.Plugin, Peas.ExtensionBase {
@@ -20,6 +22,7 @@ namespace DiscoveryApplet {
         protected Gtk.EventBox widget;
         protected Gtk.Box layout;
         protected Gtk.Label label;
+        protected Gtk.Image weatherIcon;
 
         Budgie.Popover ? popover = null;
         Gtk.Orientation orient = Gtk.Orientation.HORIZONTAL;
@@ -35,11 +38,18 @@ namespace DiscoveryApplet {
         }
 
         public Applet () {
+            
+
+            Intl.setlocale (LocaleCategory.ALL, "");
+            Intl.bindtextdomain (GETTEXT_PACKAGE, GETTEXT_DIR);
+            Intl.bind_textdomain_codeset (GETTEXT_PACKAGE, "UTF-8");
+            Intl.textdomain (GETTEXT_PACKAGE);
+
             widget = new Gtk.EventBox ();
             layout = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 0);
             widget.add (layout);
 
-            label = new Gtk.Label ("APPLET");
+            label = new Gtk.Label ("Start");
             layout.pack_start (label, false, false, 0);
             add(widget);
 
@@ -61,8 +71,8 @@ namespace DiscoveryApplet {
                 }
                 return Gdk.EVENT_STOP;
             });
-
-            var weatherService = new WeatherService ();
+            
+            var weatherService = new WeatherService();
             weatherService.start_service ();
 
             popover.get_child ().show_all ();

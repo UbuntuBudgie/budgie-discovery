@@ -1,0 +1,80 @@
+# German translations for PACKAGE package
+# German messages for PACKAGE.
+# Copyright (C) 2025 THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# Andreas Bratfisch <andreas@hp-andy>, 2025.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-08-12 13:57+0200\n"
+"PO-Revision-Date: 2025-08-12 14:16+0200\n"
+"Last-Translator: Andreas Bratfisch <andreas@hp-andy>\n"
+"Language-Team: German <translation-team-de@lists.sourceforge.net>\n"
+"Language: de\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Poedit 3.6\n"
+
+#: src/widgets/HumidityWidget.vala:6
+msgid "Humidity"
+msgstr "Luftfeuchtigkeit"
+
+#: src/widgets/MoonRiseWidget.vala:7
+msgid "Moonrise / Moonset"
+msgstr "Mondauf- und Untergang"
+
+#: src/widgets/MoonRiseWidget.vala:18
+msgid "Moonrise"
+msgstr "Mondaufgang"
+
+#: src/widgets/MoonRiseWidget.vala:19
+msgid "Moonset"
+msgstr "Monduntergang"
+
+#: src/widgets/PressureWidget.vala:6
+msgid "Pressure"
+msgstr "Luftdruck"
+
+#: src/widgets/SunRiseWidget.vala:7
+msgid "Sunrise / Sunset"
+msgstr "Sonnenauf- und Untergang"
+
+#: src/widgets/SunRiseWidget.vala:18
+msgid "Sunrise"
+msgstr "Sonnenaufgang"
+
+#: src/widgets/SunRiseWidget.vala:19
+msgid "Sunset"
+msgstr "Sonnenuntergang"
+
+#: src/widgets/WeatherWidget.vala:140
+msgid "Current Conditions"
+msgstr "Aktuelle Wetterlage"
+
+#: src/widgets/WeatherWidget.vala:188
+msgid "Feels like"
+msgstr "Gefühlte Temperatur"
+
+#: src/widgets/WeatherWidget.vala:197
+msgid "High"
+msgstr "Höchstwert"
+
+#: src/widgets/WeatherWidget.vala:197
+msgid "Low"
+msgstr "Tiefstwert"
+
+msgid "Good morning"
+msgstr "Guten Morgen"
+
+msgid "Good day"
+msgstr "Guten Tag"
+
+msgid "Good afternoon"
+msgstr "Guten Tag"
+
+msgid "Good evening"
+msgstr "Guten Abend"

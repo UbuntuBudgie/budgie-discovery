@@ -6,4 +6,6 @@ namespace Config {
     public const string LOCALE_DIR = @LOCALE_DIR@;
     public const string PLUGIN_DIR = @PLUGIN_DIR@;
     public const string ICONS_DIR = @ICONS_DIR@;
+    public const string GETTEXT_DIR = @GETTEXT_DIR@;
+    public const string RESOURCES_DIR = @RESOURCES_DIR@;
 }

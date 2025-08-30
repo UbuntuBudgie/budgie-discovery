@@ -46,13 +46,13 @@ public class GreetingWidget {
         var greetingText = "";
 
         if(h >= 0 && h <= 10) {
-            greetingText = "Good morning";
+            greetingText = _("Good morning");
         } else if(h > 10 && h <= 14) {
-            greetingText = "Good day";
+            greetingText = _("Good day");
         } else if(h > 14 && h <= 18) {
-            greetingText = "Good afternoon";
+            greetingText = _("Good afternoon");
         } else if(h > 18) {
-            greetingText = "Good evening";
+            greetingText = _("Good evening");
         }
 
         var real_name = get_real_name();

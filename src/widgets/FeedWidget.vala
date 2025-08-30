@@ -1,5 +1,6 @@
 public class FeedWidget: Gtk.Box {
     private Gtk.Label feedLabel;
+    private GreetingWidget greetingWidget;
 
     public FeedWidget() {
         Object();
@@ -7,10 +8,31 @@ public class FeedWidget: Gtk.Box {
         set_spacing(5);
         get_style_context().add_class("feed-widget");
 
-        feedLabel = new Gtk.Label("Feed content will be displayed here.");
-        feedLabel.set_halign(Gtk.Align.CENTER);
-        feedLabel.set_valign(Gtk.Align.START);
-        pack_start(feedLabel, true, true, 0);
+        greetingWidget = new GreetingWidget();
+        pack_start (greetingWidget.getLabel(), false);
+
+        var layout = new Gtk.Grid();
+        layout.set_hexpand(true);
+        layout.set_column_homogeneous(true);
+        layout.set_column_spacing(10);
+        layout.set_row_spacing(10);
+        pack_start(layout, true, true);
+
+        var weatherWidget = new WeatherWidget();
+        layout.attach(weatherWidget, 0, 0);
+
+        var dummy1 = new Card();
+        layout.attach(dummy1, 1, 0);
+
+        var dummy2 = new Card();
+        layout.attach(dummy2, 2, 0);
+
+        this.map.connect(() => {
+            int size = (get_allocated_width() / 3) - 20;
+            layout.get_children ().foreach((child) => {
+                child.set_size_request(size, size);
+            });
+        });
     }
 
     public void update_feed(string feedContent) {
