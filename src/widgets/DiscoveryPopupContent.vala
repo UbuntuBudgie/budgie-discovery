@@ -12,6 +12,7 @@ public class DiscoveryPopupContent: Gtk.Box {
         set_spacing(5);
         get_style_context().add_class("discovery-popup-content");
         set_hexpand(false);
+        set_vexpand(false);
 
         navigationBox = new Gtk.Box(Gtk.Orientation.VERTICAL, 0);
         navigationBox.get_style_context().add_class("navigation-box");
@@ -25,7 +26,13 @@ public class DiscoveryPopupContent: Gtk.Box {
 
         var feedWidget = new FeedWidget();
         feedWidget.set_name("feed");
-        stackView.add_named(feedWidget, "feed");
+
+        var scrollView = new Gtk.ScrolledWindow(null, null);
+        scrollView.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC);
+        scrollView.add(feedWidget);
+        scrollView.overlay_scrolling = false;
+        scrollView.shadow_type = Gtk.ShadowType.NONE;
+        stackView.add_named(scrollView, "feed");
 
         var chatGptWidget = new ChatGptWidget();
         chatGptWidget.set_name("chat-gpt");

@@ -1,7 +1,10 @@
+.discovery-popup {
+    background-color: rgba(255, 255, 255, .975);
+}
 .discovery-popup .popup-content {
     margin: 15px;
     font-size: 1em;
-    font-family: "Noto Sans", sans-serif;
+    font-family: "Roboto Regular", sans-serif;
     font-weight: 400;
     color: #444;
 }
@@ -80,6 +83,18 @@
 
 .discovery-popup .p-0 {
     padding: 0;
+}
+
+.discovery-popup .p-1 {
+    padding: .125em;
+}
+
+.discovery-popup .p-2 {
+    padding: .25em;
+}
+
+.discovery-popup .p-3 {
+    padding: .5em;
 }
 
 .discovery-popup .ps-1 {
@@ -161,30 +176,50 @@
 
 .discovery-popup .card {
     border-radius: 10px;
-    border: 1px solid #ccc;
+    border: 1px solid rgba(222, 222, 222, .5);
+    box-shadow: 2px 2px 2px rgba(222, 222, 222, .5);
 }
 
 .discovery-popup .card .card-title {
-    padding: 10px 10px 5px 10px;
+    margin: 10px;
     font-weight: 600;
+    font-size: .9em;
+}
+
+.card-image {
+    border-radius: 5px;
+    background-color: #eee;
+    margin: 10px;
 }
 
 .discovery-popup .card.no-border {
     border: none
 }
 
+.discovery-popup .card.no-shadow {
+    box-shadow: none
+}
+
 .discovery-popup .content-stack {
     margin-left: 10px;
 }
 
+.discovery-popup .feed-widget {
+    margin-right: 10px;
+}
+
+.discovery-popup .feed-widget .card {
+    background-color: #fff;
+}
+
 .discovery-popup .weather-widget-day {
-    background-image: linear-gradient(180deg, #f3faff, #e8f5ff);
+    background-image: linear-gradient(180deg, #f0f9ff, #d1eeff);
     color: #444;
 }
 
 .discovery-popup .weather-widget {
     padding-top: 15px;
-    padding-bottom: 15px;
+    padding-bottom: 5px;
     padding-left: 8px;
     padding-right: 8px;
 }

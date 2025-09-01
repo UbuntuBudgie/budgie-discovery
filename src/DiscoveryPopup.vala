@@ -9,12 +9,14 @@ public class DiscoveryPopup {
         screen = parentWidget.get_screen();
         var g = screen.get_display().get_primary_monitor().get_geometry();
         int popupWidth = (g.width / 3) + 150;
-        int popupHeight = (g.height / 3) * 2;
+        int popupHeight = ((g.height / 3) * 2) + 100;
 
         popover = new Budgie.Popover(parentWidget);
         popover.get_style_context ().add_class ("discovery-popup");
         popover.set_halign(Gtk.Align.START);
         popover.set_size_request(popupWidth, popupHeight);
+        popover.set_hexpand(false);
+        popover.set_vexpand(false);
 
         var popoverLayout = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
         popoverLayout.get_style_context ().add_class ("popup-content");
@@ -23,6 +25,7 @@ public class DiscoveryPopup {
         popoverLayout.set_size_request(popupWidth, popupHeight);
         popover.add(popoverLayout);
 
+        
         popupContentWidget = new DiscoveryPopupContent();
         popoverLayout.pack_start(popupContentWidget, true, true);
 

@@ -9,6 +9,7 @@ public class WeatherForecastWidget: Card {
     public WeatherForecastWidget(WeatherForecastItem item) {
         base();
         get_style_context().add_class("no-border");
+        get_style_context().add_class("no-shadow");
         get_style_context().add_class("weather-forecast-widget");
         set_spacing (3);
 

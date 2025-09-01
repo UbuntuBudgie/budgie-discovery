@@ -69,9 +69,6 @@ public class WeatherWidget: Card {
         var forecastBox = new Gtk.Box(Gtk.Orientation.HORIZONTAL, 3);
         layout.pack_start(forecastBox, true);
 
-        // TODO load weather-codes.json
-        // TODO resolve weather icons when weather is updated
-
         var weatherCodes = weatherCodesJson.get_object();
 
         weatherRepository = WeatherRepository.getInstance();

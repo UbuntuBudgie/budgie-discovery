@@ -32,7 +32,7 @@ public class WeatherService: IService {
         jsonParser = null;
     }
 
-    public void update_service() {
+    public void update_service(bool force) {
         // do nothing
     }
 

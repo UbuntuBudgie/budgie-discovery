@@ -24,6 +24,8 @@ public class PowerWidget : Gtk.Box {
     private LogindInterface? logind_interface = null;
     private const string LOGIND_LOGIN = "org.freedesktop.login1";
     private const string UNABLE_CONTACT = "Unable to contact ";
+    private static FeedService service;
+
     public signal void invoke_action();
 
     async void setup_dbus()
@@ -52,15 +54,20 @@ public class PowerWidget : Gtk.Box {
             spacing: 5
         );
 
+        service = new FeedService(); 
+
         var powerButton = new Gtk.Button.from_icon_name("system-shutdown-symbolic", Gtk.IconSize.SMALL_TOOLBAR);
         var rebootButton = new Gtk.Button.from_icon_name("system-restart-symbolic", Gtk.IconSize.SMALL_TOOLBAR);
         var suspendButton = new Gtk.Button.from_icon_name("system-suspend-symbolic", Gtk.IconSize.SMALL_TOOLBAR);
         var logoutButton = new Gtk.Button.from_icon_name("system-log-out-symbolic", Gtk.IconSize.SMALL_TOOLBAR);
 
+        var reloadButton = new Gtk.Button.from_icon_name("view-refresh-symbolic", Gtk.IconSize.SMALL_TOOLBAR);
+
         this.pack_start(powerButton, false);
         this.pack_start(rebootButton, false);
         this.pack_start(suspendButton, false);
         this.pack_start(logoutButton, false);
+        this.pack_start(reloadButton, false);
         this.get_style_context().add_class("power-widget");
 
         powerButton.clicked.connect(() => {
@@ -110,6 +117,10 @@ public class PowerWidget : Gtk.Box {
                 session.Logout.begin(0);
                 return false;
             });
+        });
+
+        reloadButton.clicked.connect(() => {
+            service.update_service(true);
         });
 
         setup_dbus.begin((obj,res)=> {});
