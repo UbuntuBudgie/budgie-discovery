@@ -46,45 +46,39 @@ public class FeedRepository {
             warning("File path is not set. Cannot load data.\n");
             return;
         }
-        
-        try {
-            if(FileUtils.test(filePath, FileTest.IS_REGULAR)) {
-                var feedList = new ArrayList<FeedItem>();
-                Xml.Doc* doc = Xml.Parser.parse_file (filePath);
-                Xml.Node *root = doc->get_root_element ();
-                Xml.Node* channel = root->first_element_child();
-                if (channel->name == "channel") {
-                    for (Xml.Node* item = channel->children; item != null; item = item->next) {
-                        if (item->name == "item") {
-                            FeedItem feedItem = new FeedItem();
-                            for (Xml.Node *itemChild = item->children; itemChild != null; itemChild = itemChild->next) {
-                                if (itemChild->name == "title") {
-                                    var titleData = itemChild->get_content ();
-                                    var title = titleData.substring(0, titleData.last_index_of(" - "))
-                                        .chomp().chug();
 
-                                    var publisher = titleData.substring(titleData.last_index_of(" - ")+3);
-                                    feedItem.title = title;
-                                    feedItem.publisher = publisher;
-                                }
+        if(FileUtils.test(filePath, FileTest.IS_REGULAR)) {
+            var feedList = new ArrayList<FeedItem>();
+            Xml.Doc* doc = Xml.Parser.parse_file (filePath);
+            Xml.Node *root = doc->get_root_element ();
+            Xml.Node* channel = root->first_element_child();
+            if (channel->name == "channel") {
+                for (Xml.Node* item = channel->children; item != null; item = item->next) {
+                    if (item->name == "item") {
+                        FeedItem feedItem = new FeedItem();
+                        for (Xml.Node *itemChild = item->children; itemChild != null; itemChild = itemChild->next) {
+                            if (itemChild->name == "title") {
+                                var titleData = itemChild->get_content ();
+                                var title = titleData.substring(0, titleData.last_index_of(" - "))
+                                .chomp().chug();
 
-                                if(itemChild->name == "pubDate") {
-                                    DateTime? result = parseDate (itemChild->get_content ());
-                                    feedItem.pubDate = result.format("%Y-%m-%d %H:%M");
-                                }
+                                var publisher = titleData.substring(titleData.last_index_of(" - ")+3);
+                                feedItem.title = title;
+                                feedItem.publisher = publisher;
                             }
 
-                            message("%s - %s", feedItem.title, feedItem.pubDate);
-                            feedList.add (feedItem);
-                        } else {
-                            message("item name = " + item->name); // Debug output
+                            if(itemChild->name == "pubDate") {
+                                DateTime? result = parseDate (itemChild->get_content ());
+                                feedItem.pubDate = result.format("%Y-%m-%d %H:%M");
+                            }
                         }
+                        feedList.add (feedItem);
+                    } else {
+                        message("item name = " + item->name); // Debug output
                     }
                 }
-                feedUpdated(feedList);
             }
-        } catch (Error e) {
-            warning("Failed to load weather data: %s\n", e.message);
+            feedUpdated(feedList);
         }
     }
 
