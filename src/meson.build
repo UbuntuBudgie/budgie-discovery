@@ -42,6 +42,8 @@ discovery_applet_sources = [
     'widgets/ChatGptWidget.vala',
     'widgets/DiscoveryPopupContent.vala',
     'widgets/FeedWidget.vala',
+    'widgets/FeedItemWidget.vala',
+    'widgets/FeedItemImageWidget.vala',
     'widgets/GreetingWidget.vala',
     'widgets/PowerWidget.vala',
     'widgets/SettingsWidget.vala',

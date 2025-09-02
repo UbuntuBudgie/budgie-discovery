@@ -100,27 +100,7 @@ public class FeedWidget: Gtk.Box {
 
         int size = (get_allocated_width() / 3) - 20 - 10;
         foreach(var feedItem in feedList) {
-            var card = new Card();
-
-            var image = new Gtk.Image();
-            card.pack_start(image, false);
-            image.get_style_context().add_class("card-image");
-            image.set_size_request(120, 120);
-
-            Gtk.Label label = new Gtk.Label("");
-            label.get_style_context().add_class("card-title");
-            label.set_label(feedItem.title);
-            label.set_line_wrap(true);
-            label.set_line_wrap_mode(Pango.WrapMode.WORD);
-            label.set_lines(3);
-            label.set_ellipsize(Pango.EllipsizeMode.END);
-            label.set_justify(Gtk.Justification.LEFT);
-            label.set_halign(Gtk.Align.START);
-            label.set_valign(Gtk.Align.START);
-            label.hexpand = true;
-            label.xalign = 0;
-            card.pack_start(label,true);
-
+            var card = new FeedItemWidget(feedItem);
             feedLayout.attach(card, currentColumn, currentRow);
 
             if(currentColumn == 1) {
