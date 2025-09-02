@@ -27,12 +27,8 @@ public class DiscoveryPopupContent: Gtk.Box {
         var feedWidget = new FeedWidget();
         feedWidget.set_name("feed");
 
-        var scrollView = new Gtk.ScrolledWindow(null, null);
-        scrollView.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC);
-        scrollView.add(feedWidget);
-        scrollView.overlay_scrolling = false;
-        scrollView.shadow_type = Gtk.ShadowType.NONE;
-        stackView.add_named(scrollView, "feed");
+
+        stackView.add_named(feedWidget, "feed");
 
         var chatGptWidget = new ChatGptWidget();
         chatGptWidget.set_name("chat-gpt");

@@ -11,9 +11,10 @@
 
 .discovery-popup .greeting-label {
     font-size: 1.1em;
-    font-weight: 400;
-    padding-top: 5px;
-    padding-bottom: 10px;
+    font-family: "Roboto Light", sans-serif;
+    font-weight: bolder;
+    padding-top: 3px;
+    padding-bottom: 20px;
 }
 
 .discovery-popup .top-row {
@@ -182,7 +183,8 @@
 
 .discovery-popup .card .card-title {
     margin: 10px;
-    font-weight: 600;
+    font-family: "Roboto Light", sans-serif;
+    font-weight: bold;
     font-size: .9em;
 }
 

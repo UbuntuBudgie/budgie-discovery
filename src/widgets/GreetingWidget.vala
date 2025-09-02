@@ -10,7 +10,8 @@ public class GreetingWidget {
         greetingLabel = new Gtk.Label("");
         greetingLabel.get_style_context().add_class("greeting-label");
         greetingLabel.set_halign(Gtk.Align.START);
-        greetingLabel.set_valign(Gtk.Align.CENTER);
+        greetingLabel.set_valign(Gtk.Align.START);
+        greetingLabel.set_lines(1);
 
         // Set the greeting text
         updateTime();
