@@ -182,16 +182,18 @@
 }
 
 .discovery-popup .card .card-title {
-    margin: 10px;
     font-family: "Roboto Light", sans-serif;
     font-weight: bold;
     font-size: .9em;
 }
 
-.card-image {
+.discovery-popup .card .card-image {
     border-radius: 5px;
     background-color: #eee;
-    margin: 10px;
+}
+
+.discovery-popup .card .card-body {
+    padding: 10px;
 }
 
 .discovery-popup .card.no-border {

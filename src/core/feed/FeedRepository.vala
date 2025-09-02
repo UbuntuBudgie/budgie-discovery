@@ -59,10 +59,13 @@ public class FeedRepository {
                             FeedItem feedItem = new FeedItem();
                             for (Xml.Node *itemChild = item->children; itemChild != null; itemChild = itemChild->next) {
                                 if (itemChild->name == "title") {
-                                    var title = itemChild->get_content ();
-                                    title = title.substring(0, title.last_index_of(" - "))
+                                    var titleData = itemChild->get_content ();
+                                    var title = titleData.substring(0, titleData.last_index_of(" - "))
                                         .chomp().chug();
+
+                                    var publisher = titleData.substring(titleData.last_index_of(" - ")+3);
                                     feedItem.title = title;
+                                    feedItem.publisher = publisher;
                                 }
                             }
                             feedList.add (feedItem);
