@@ -99,11 +99,11 @@ public class WeatherWidget: Card {
                     if(isDay) {
                         get_style_context ().remove_class ("weather-widget-night");
                         get_style_context ().add_class ("weather-widget-day");
-                        currentDescriptionLabel.set_text(dayObject.get_member("description").get_string());
+                        currentDescriptionLabel.set_text(_(dayObject.get_member("description").get_string()));
                     } else {
                         get_style_context ().remove_class ("weather-widget-day");
                         get_style_context ().add_class ("weather-widget-night");
-                        currentDescriptionLabel.set_text(nightObject.get_member("description").get_string());
+                        currentDescriptionLabel.set_text(_(nightObject.get_member("description").get_string()));
                     }
                 }
 

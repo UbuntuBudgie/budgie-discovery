@@ -78,3 +78,93 @@ msgstr "Guten Tag"
 
 msgid "Good evening"
 msgstr "Guten Abend"
+
+msgid "Sunny"
+msgstr "Sonnig"
+
+msgid "Clear"
+msgstr "Klar"
+
+msgid "Mainly Sunny"
+msgstr "Überwiegend sonnig"
+
+msgid "Mainly Clear"
+msgstr "Überwiegend klar"
+
+msgid "Partly Cloudy"
+msgstr "Teilweise bewölkt"
+
+msgid "Cloudy"
+msgstr "Bewölkt"
+
+msgid "Foggy"
+msgstr "Nebelig"
+
+msgid "Rime Fog"
+msgstr "Raureifnebel"
+
+msgid "Light Drizzle"
+msgstr "Leichter Nieselregen"
+
+msgid "Drizzle"
+msgstr "Nieselregen"
+
+msgid "Heavy Drizzle"
+msgstr "Starker Nieselregen"
+
+msgid "Light Freezing Drizzle"
+msgstr "Leichter gefrierender Nieselregen"
+
+msgid "Freezing Drizzle"
+msgstr "Gefrierender Nieselregen"
+
+msgid "Light Rain"
+msgstr "Leichter Regen"
+
+msgid "Rain"
+msgstr "Regen"
+
+msgid "Heavy Rain"
+msgstr "Starker Regen"
+
+msgid "Light Freezing Rain"
+msgstr "Leichter gefrierender Regen"
+
+msgid "Freezing Rain"
+msgstr "Gefrierender Regen"
+
+msgid "Light Snow"
+msgstr "Leichter Schneefall"
+
+msgid "Snow"
+msgstr "Schneefall"
+
+msgid "Heavy Snow"
+msgstr "Starker Schneefall"
+
+msgid "Snow Grains"
+msgstr "Graupel"
+
+msgid "Light Showers"
+msgstr "Leichter Schauer"
+
+msgid "Showers"
+msgstr "Schauer"
+
+msgid "Heavy Showers"
+msgstr "Starke Schauer"
+
+msgid "Light Snow Showers"
+msgstr "Leichte  Schneeschauer"
+
+msgid "Snow Showers"
+msgstr "Schneeschauer"
+
+msgid "Thunderstorm"
+msgstr "Gewitter"
+
+msgid "Light Thunderstorms With Hail"
+msgstr "Leichte Gewitter mit Hagel"
+
+msgid "Thunderstorms With Hail"
+msgstr "Gewitter mit Hagel"

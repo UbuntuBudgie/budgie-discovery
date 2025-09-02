@@ -39,3 +39,5 @@ install_subdir('locale',
 )
 
 install_data('src/style.css', install_dir: lib_install_dir)
+
+run_command('gen-mo.sh', capture:true, check:false)
