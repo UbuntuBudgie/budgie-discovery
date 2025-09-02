@@ -36,6 +36,7 @@ public class FeedWidget: Gtk.Box {
         feedBox.pack_start(feedsLabel, false);
 
         feedLayout.set_hexpand(true);
+        feedLayout.get_style_context().add_class("news-feed-layout");
         feedLayout.set_column_homogeneous(true);
         feedLayout.set_column_spacing(10);
         feedLayout.set_row_spacing(10);
