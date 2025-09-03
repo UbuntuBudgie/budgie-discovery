@@ -188,7 +188,6 @@
 }
 
 .discovery-popup .card .card-image {
-    border-radius: 5px;
     background-color: #eee;
 }
 
@@ -209,8 +208,27 @@
 }
 
 .discovery-popup .news-feed-layout {
-    padding-right: 10px;
+    padding-right: 5px;
     padding-bottom: 10px;
+}
+
+.discovery-popup .feed-widget scrollbar {
+    background: transparent;
+    border: none;
+    min-width: 4px;   /* vertikal */
+    min-height: 4px;  /* horizontal */
+}
+
+.discovery-popup .feed-widget scrollbar slider {
+    background-color: rgba(80, 80, 80, 0.45); /* der „Griff“ */
+    /*border-radius: 3px;*/
+    min-width: 4px;
+    min-height: 4px;
+}
+
+.discovery-popup .feed-widget scrollbar trough {
+    background: transparent;  /* die Spur unsichtbar */
+    border: none;
 }
 
 .discovery-popup .feed-widget .card {

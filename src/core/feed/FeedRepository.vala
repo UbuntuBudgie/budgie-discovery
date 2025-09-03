@@ -8,6 +8,9 @@ public class FeedRepository {
     private static FeedRepository instance = null;
     private static string filePath = null;
 
+    private Soup.Session session = new Soup.Session ();
+    private static GLib.Regex regex;
+
     public signal void feedUpdated(ArrayList<FeedItem>? feedList);
 
     public static FeedRepository getInstance() {
@@ -58,28 +61,44 @@ public class FeedRepository {
                         FeedItem feedItem = new FeedItem();
                         for (Xml.Node *itemChild = item->children; itemChild != null; itemChild = itemChild->next) {
                             if (itemChild->name == "title") {
-                                var titleData = itemChild->get_content ();
-                                var title = titleData.substring(0, titleData.last_index_of(" - "))
-                                .chomp().chug();
-
-                                var publisher = titleData.substring(titleData.last_index_of(" - ")+3);
+                                var title = itemChild->get_content ();
                                 feedItem.title = title;
-                                feedItem.publisher = publisher;
                             }
 
                             if(itemChild->name == "pubDate") {
                                 DateTime? result = parseDate (itemChild->get_content ());
                                 feedItem.pubDate = result.format("%Y-%m-%d %H:%M");
                             }
+                            
+                            if(itemChild->name == "link") {
+                                feedItem.link = itemChild->get_content ();
+                            }
                         }
+
+                        feedItem.image = loadFeedSource(feedItem.link);
                         feedList.add (feedItem);
-                    } else {
-                        message("item name = " + item->name); // Debug output
                     }
                 }
             }
             feedUpdated(feedList);
         }
+    }
+
+    private string? loadFeedSource(string url) {
+        try {
+            var msg = new Message ("GET", url);
+            var bytes = session.send_and_read (msg, null);
+            string html = (string) bytes.get_data ();
+
+            MatchInfo info;
+            if (regex.match (html, 0, out info)) {
+                string? img = info.fetch (1);
+                return img;
+            }
+        } catch(Error e) {
+            // not handled
+        }
+        return null;
     }
 
     private DateTime parseDate(string date) {
@@ -153,5 +172,15 @@ public class FeedRepository {
         
         var formattedDate = "%4d-%02d-%02d %02d:%02d:%02d".printf(year,month,day, hour, minute, second);
         return new DateTime.from_iso8601(formattedDate, new TimeZone.local());
+    }
+
+    private FeedRepository() {
+        try {
+            regex = new GLib.Regex (
+                    "<meta[^>]+property=['\"]og:image['\"][^>]+content=['\"]([^'\"]+)['\"]",
+                    GLib.RegexCompileFlags.CASELESS | GLib.RegexCompileFlags.DOTALL,
+                    0
+            );
+        } catch(Error e) {}
     }
 }

@@ -22,7 +22,7 @@ public class FeedService: IService {
     }
 
     public void update_service(bool force) {
-        string url = "https://news.google.com/rss/search?hl=de&gl=DE&ceid=DE:de&oc=11&q=news";
+        string url = "https://www.n-tv.de/rss";
         fetch_data.begin("GET", url, force);
     }
 
@@ -45,6 +45,9 @@ public class FeedService: IService {
 
                 file.load_contents_async.end (res, out contents, out etag_out);
                 string response = (string) contents;
+
+                // TODO check RSS GUID field and compare with existing
+
                 feedRepository.save(response);
                 lastFetched = current;
             } catch(Error e) {

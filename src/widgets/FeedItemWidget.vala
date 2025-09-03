@@ -6,10 +6,11 @@ public class FeedItemWidget: Card {
         cardBody.get_style_context ().add_class ("card-body");
         pack_start(cardBody);
 
-        var image = new FeedItemImageWidget();
+        var image = new FeedItemImageWidget(feedItem.image);
         image.set_size_request(120, 100);
         cardBody.pack_start(image, false);
-        
+
+        /*
         var publisherLabel = new Gtk.Label("");
         publisherLabel.get_style_context().add_class("text-size-small");
         publisherLabel.get_style_context().add_class("text-secondary");
@@ -22,6 +23,9 @@ public class FeedItemWidget: Card {
         publisherLabel.set_halign(Gtk.Align.START);
         publisherLabel.set_valign(Gtk.Align.START);
         cardBody.pack_start(publisherLabel, false);
+        */
+
+        message(feedItem.image);
 
         Gtk.Label label = new Gtk.Label("");
         label.get_style_context().add_class("card-title");
