@@ -6,7 +6,7 @@ public class DiscoveryPopupContent: Gtk.Box {
     private Gtk.Stack stackView;
     private int activeTabIndex = 0;
 
-    public DiscoveryPopupContent() {
+    public DiscoveryPopupContent(Budgie.Popover? parent = null) {
         Object();
         set_orientation(Gtk.Orientation.HORIZONTAL);
         set_spacing(5);
@@ -26,8 +26,6 @@ public class DiscoveryPopupContent: Gtk.Box {
 
         var feedWidget = new FeedWidget();
         feedWidget.set_name("feed");
-
-
         stackView.add_named(feedWidget, "feed");
 
         var chatGptWidget = new ChatGptWidget();
@@ -47,6 +45,47 @@ public class DiscoveryPopupContent: Gtk.Box {
         add_tab(1, "chat-gpt", ICONS_DIR + "/chatgpt-64.png");
         add_tab(2, "applications", ICONS_DIR + "/apps-64.png");
         add_tab(3, "settings", ICONS_DIR + "/settings-64.png");
+
+        // TODO separate code for that
+        var buttonBox = new Gtk.Box(Gtk.Orientation.HORIZONTAL, 5);
+        var menuButton = new Gtk.MenuButton();
+        menuButton.set_image(new Gtk.Image.from_icon_name("system-shutdown-symbolic", Gtk.IconSize.SMALL_TOOLBAR));
+        menuButton.valign = Gtk.Align.END;
+        
+        buttonBox.pack_start(menuButton, false);
+        navigationBox.pack_start(buttonBox, true);
+
+        var menu = new Gtk.Menu ();
+        var item1 = new Gtk.MenuItem.with_label ("Lock Screen");
+        item1.activate.connect (() => {
+            print ("Option 1 gewählt\n");
+            parent.hide();
+        });
+        menu.append (item1);
+
+        var item2 = new Gtk.MenuItem.with_label ("Sleep");
+        item2.activate.connect (() => {
+            print ("Option 2 gewählt\n");
+            parent.hide();
+        });
+        menu.append (item2);
+
+        var item3 = new Gtk.MenuItem.with_label ("Shut down");
+        item3.activate.connect (() => {
+            print ("Option 3 gewählt\n");
+            parent.hide();
+        });
+        menu.append (item3);
+
+        var item4 = new Gtk.MenuItem.with_label ("Restart");
+        item4.activate.connect (() => {
+            print ("Option 4 gewählt\n");
+            parent.hide();
+        });
+        menu.append (item4);
+
+        menuButton.set_popup (menu);
+        menu.show_all();
     }
 
     public override void get_preferred_width(out int minimum_width, out int natural_width) {

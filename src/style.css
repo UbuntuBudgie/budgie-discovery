@@ -14,7 +14,6 @@
     font-family: "Roboto Light", sans-serif;
     font-weight: bolder;
     padding-top: 3px;
-    padding-bottom: 20px;
 }
 
 .discovery-popup .top-row {
@@ -158,15 +157,21 @@
     margin: 0;
 }
 
+.discovery-popup .greeting-widget {
+    padding-bottom: 20px;
+}
+
 .discovery-popup .power-widget button,
-.discovery-popup .navigation-box button {
+.discovery-popup .navigation-box button,
+.discovery-popup .greeting-widget button {
     border-radius: 0;
     box-shadow: none;
     background: none;
 }
 
 .discovery-popup .power-widget button:hover,
-.discovery-popup .navigation-box button:hover {
+.discovery-popup .navigation-box button:hover,
+.discovery-popup .greeting-widget button:hover {
     background: #f6f6f6;
 }
 

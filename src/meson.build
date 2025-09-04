@@ -68,6 +68,7 @@ discovery_applet_deps = [
     dependency('libpeas-1.0', version: '>=1.36'),
     dependency('gee-0.8', version: '>=0.20'),
     dependency('libxml-2.0', version: '>=2.9'),
+    dependency('goa-1.0', version: '>=3.54'),
     cc.find_library('m', required: true),
     vala.find_library('posix', required: true),
 ]

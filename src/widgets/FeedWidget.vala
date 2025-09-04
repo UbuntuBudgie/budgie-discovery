@@ -9,25 +9,27 @@ public class FeedWidget: Gtk.Box {
     private int currentColumn = 0;
     private int currentRow = 0;
 
-    private Gtk.Label currentDateLabel = new Gtk.Label("");
-
     public FeedWidget() {
         Object();
         set_orientation(Gtk.Orientation.VERTICAL);
         set_spacing(0);
         get_style_context().add_class("feed-widget");
 
-        pack_start(currentDateLabel, false);
-        currentDateLabel.set_halign(Gtk.Align.START);
-        currentDateLabel.get_style_context().add_class("text-size-small");
-
         greetingWidget = new GreetingWidget();
-        pack_start (greetingWidget.getLabel(), false);
+        pack_start (greetingWidget, false);
 
         var mainLayout = new Gtk.Box(Gtk.Orientation.HORIZONTAL, 10);
         pack_start(mainLayout, true);
 
         mainLayout.pack_start(widgetLayout, true, true);
+
+        var reloadButton = new Gtk.Button.from_icon_name("view-refresh-symbolic", Gtk.IconSize.SMALL_TOOLBAR);
+        greetingWidget.addButton(reloadButton);
+
+        var feedService = new FeedService(); 
+        reloadButton.clicked.connect(() => {
+            feedService.update_service(true);
+        });
 
         var feedBox = new Gtk.Box(Gtk.Orientation.VERTICAL, 10);
         var feedsLabel = new Gtk.Label("Feed");
@@ -49,12 +51,6 @@ public class FeedWidget: Gtk.Box {
         feedBox.pack_start(feedView);
 
         mainLayout.pack_start(feedBox, true, true);
-
-        Timeout.add_seconds(1, () => {
-            var now = new DateTime.now_local();
-            currentDateLabel.set_label(now.format("%A, %d. %B"));
-            return true;
-        });
 
         var widgetsLabel = new Gtk.Label("Widgets");
         widgetsLabel.get_style_context().add_class("text-size-small");

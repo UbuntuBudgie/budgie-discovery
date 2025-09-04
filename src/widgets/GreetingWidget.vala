@@ -1,17 +1,31 @@
-public class GreetingWidget {
+public class GreetingWidget: Gtk.Box {
     private Gtk.Label greetingLabel;
-
-    public Gtk.Label getLabel() {
-        return greetingLabel;
-    }
+    private Gtk.Label currentDateLabel = new Gtk.Label("");
+    private Gtk.Box rightLayout = new Gtk.Box(Gtk.Orientation.HORIZONTAL, 5);
 
     public GreetingWidget() {
+        Object();
+        set_orientation(Gtk.Orientation.HORIZONTAL);
+        get_style_context().add_class("greeting-widget");
+
+        var leftLayout = new Gtk.Box(Gtk.Orientation.VERTICAL, 0);
+        pack_start(leftLayout, true);
+
+        rightLayout.set_halign(Gtk.Align.END);
+        rightLayout.set_valign(Gtk.Align.START);
+        pack_start(rightLayout, false);
+
+        leftLayout.pack_start(currentDateLabel, false);
+        currentDateLabel.set_halign(Gtk.Align.START);
+        currentDateLabel.get_style_context().add_class("text-size-small");
+
         // Initialize the widget
         greetingLabel = new Gtk.Label("");
         greetingLabel.get_style_context().add_class("greeting-label");
         greetingLabel.set_halign(Gtk.Align.START);
         greetingLabel.set_valign(Gtk.Align.START);
         greetingLabel.set_lines(1);
+        leftLayout.pack_start(greetingLabel, false);
 
         // Set the greeting text
         updateTime();
@@ -19,6 +33,11 @@ public class GreetingWidget {
             updateTime();
             return true;
         });
+    }
+
+    public void addButton(Gtk.Widget button) {
+        button.set_valign(Gtk.Align.START);
+        rightLayout.pack_start(button, false);
     }
 
     private string get_real_name() {
@@ -45,6 +64,8 @@ public class GreetingWidget {
         var now = new DateTime.now_local ();
         var h = now.get_hour();
         var greetingText = "";
+
+        currentDateLabel.set_label(now.format("%A, %d. %B"));
 
         if(h >= 0 && h <= 10) {
             greetingText = _("Good morning");

@@ -26,12 +26,8 @@ public class DiscoveryPopup {
         popover.add(popoverLayout);
 
         
-        popupContentWidget = new DiscoveryPopupContent();
+        popupContentWidget = new DiscoveryPopupContent(popover);
         popoverLayout.pack_start(popupContentWidget, true, true);
-
-        var powerWidget = new PowerWidget();
-        popoverLayout.pack_start(powerWidget, false);
-        powerWidget.invoke_action.connect(popover.hide);
 
         load_style_sheet();
     }
