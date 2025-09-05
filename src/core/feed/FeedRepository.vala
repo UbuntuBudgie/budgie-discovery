@@ -1,15 +1,11 @@
 using Config;
 using GLib;
 using Posix;
-using Soup;
 using Gee;
 
 public class FeedRepository {
     private static FeedRepository instance = null;
     private static string filePath = null;
-
-    private Soup.Session session = new Soup.Session ();
-    private static GLib.Regex regex;
 
     public signal void feedUpdated(ArrayList<FeedItem>? feedList);
 
