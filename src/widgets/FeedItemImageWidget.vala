@@ -4,8 +4,12 @@ using Soup;
 public class FeedItemImageWidget : Gtk.DrawingArea {
     private Soup.Session session = new Soup.Session ();
     private Gdk.Pixbuf? pixbuf = null;
+    private Gdk.Pixbuf scaled = null;
     private string imageUrl;
     private static GLib.Regex regex;
+
+    private int last_width = 0;
+    private int last_height = 0;
 
     public FeedItemImageWidget (FeedItem feedItem) {
         get_style_context ().add_class ("card-image");
@@ -73,13 +77,13 @@ public class FeedItemImageWidget : Gtk.DrawingArea {
         int height = get_allocated_height ();
 
         if (pixbuf != null && width > 0 && height > 0) {
-            // Pixbuf auf Widgetgröße skalieren
-            var scaled = pixbuf.scale_simple (width, height, Gdk.InterpType.BILINEAR);
+            if (scaled == null || width != last_width || height != last_height) {
+                scaled = pixbuf.scale_simple (width, height, Gdk.InterpType.BILINEAR);
+                last_width = width;
+                last_height = height;
+            }
 
-            // Radius (z.B. 12px wie in CSS)
             double radius = 10.0;
-
-            // Abgerundetes Rechteck zeichnen
             cr.new_sub_path ();
             cr.arc (width - radius, radius, radius, -90 * (Math.PI/180.0), 0);
             cr.arc (width - radius, height - radius, radius, 0, 90 * (Math.PI/180.0));
@@ -88,11 +92,21 @@ public class FeedItemImageWidget : Gtk.DrawingArea {
             cr.close_path ();
             cr.clip ();
 
-            // Bild zeichnen
             Gdk.cairo_set_source_pixbuf (cr, scaled, 0, 0);
             cr.paint ();
+            
         } else {
 
+            double radius = 10.0;
+            cr.new_sub_path ();
+            cr.arc (width - radius, radius, radius, -90 * (Math.PI/180.0), 0);
+            cr.arc (width - radius, height - radius, radius, 0, 90 * (Math.PI/180.0));
+            cr.arc (radius, height - radius, radius, 90 * (Math.PI/180.0), 180 * (Math.PI/180.0));
+            cr.arc (radius, radius, radius, 180 * (Math.PI/180.0), 270 * (Math.PI/180.0));
+            cr.close_path ();
+
+            cr.set_source_rgb (0.9, 0.9, 0.9); // hellgrau
+            cr.fill ();
         }
 
         return true;
