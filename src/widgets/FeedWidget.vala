@@ -31,7 +31,7 @@ public class FeedWidget: Gtk.Box {
 
         var feedService = new FeedService(); 
         reloadButton.clicked.connect(() => {
-            Timeout.add(100, () => {
+            Idle.add(() => {
                 feedService.update_service(true);
                 return false;
             });

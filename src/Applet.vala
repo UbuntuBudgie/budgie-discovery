@@ -73,10 +73,16 @@ namespace DiscoveryApplet {
             });
             
             var weatherService = new WeatherService();
-            weatherService.start_service ();
+            Idle.add(() => {
+                weatherService.start_service ();
+                return false;
+            });
 
             var feedService = new FeedService();
-            feedService.start_service ();
+            Idle.add(() => {
+                feedService.start_service ();
+                return false;
+            });
 
             popover.get_child ().show_all ();
             show_all ();

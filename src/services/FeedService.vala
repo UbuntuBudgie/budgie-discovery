@@ -52,25 +52,5 @@ public class FeedService: IService {
             warning ("Fehler: %s", e.message);
         }
         fetching = false;
-
-        /*
-        file.load_contents_async.begin (null, (obj, res) => {
-            try {
-                uint8[] contents;
-                string etag_out;
-
-                file.load_contents_async.end (res, out contents, out etag_out);
-                string response = (string) contents;
-
-                // TODO check RSS GUID field and compare with existing
-
-                feedRepository.save(response);
-                lastFetched = current;
-            } catch(Error e) {
-                warning("Error initiating fetch: %s", e.message);
-            }
-            fetching = false;
-        });
-        */
     }
 }
