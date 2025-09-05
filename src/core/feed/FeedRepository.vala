@@ -75,30 +75,12 @@ public class FeedRepository {
                             }
                         }
 
-                        feedItem.image = loadFeedSource(feedItem.link);
                         feedList.add (feedItem);
                     }
                 }
             }
             feedUpdated(feedList);
         }
-    }
-
-    private string? loadFeedSource(string url) {
-        try {
-            var msg = new Message ("GET", url);
-            var bytes = session.send_and_read (msg, null);
-            string html = (string) bytes.get_data ();
-
-            MatchInfo info;
-            if (regex.match (html, 0, out info)) {
-                string? img = info.fetch (1);
-                return img;
-            }
-        } catch(Error e) {
-            // not handled
-        }
-        return null;
     }
 
     private DateTime parseDate(string date) {
@@ -172,15 +154,5 @@ public class FeedRepository {
         
         var formattedDate = "%4d-%02d-%02d %02d:%02d:%02d".printf(year,month,day, hour, minute, second);
         return new DateTime.from_iso8601(formattedDate, new TimeZone.local());
-    }
-
-    private FeedRepository() {
-        try {
-            regex = new GLib.Regex (
-                    "<meta[^>]+property=['\"]og:image['\"][^>]+content=['\"]([^'\"]+)['\"]",
-                    GLib.RegexCompileFlags.CASELESS | GLib.RegexCompileFlags.DOTALL,
-                    0
-            );
-        } catch(Error e) {}
     }
 }

@@ -1,3 +1,5 @@
+using GLib;
+
 public class FeedService: IService {
     private static bool fetching = false;
     private static DateTime lastFetched;
@@ -23,10 +25,10 @@ public class FeedService: IService {
 
     public void update_service(bool force) {
         string url = "https://www.n-tv.de/rss";
-        fetch_data.begin("GET", url, force);
+        fetch_data(url, force);
     }
 
-    private async void fetch_data(string method, string location, bool force) {
+    private void fetch_data(string location, bool force) {
         if(fetching) return;
 
         DateTime current = new DateTime.now_local();
@@ -38,6 +40,20 @@ public class FeedService: IService {
 
         fetching = true;
         var file = File.new_for_uri (location);
+
+        try {
+            string etag_out;
+            uint8[]? contents;
+            file.load_contents (null, out contents, out etag_out);
+            
+            feedRepository.save((string) contents);
+            lastFetched = current;
+        } catch (Error e) {
+            warning ("Fehler: %s", e.message);
+        }
+        fetching = false;
+
+        /*
         file.load_contents_async.begin (null, (obj, res) => {
             try {
                 uint8[] contents;
@@ -55,5 +71,6 @@ public class FeedService: IService {
             }
             fetching = false;
         });
+        */
     }
 }

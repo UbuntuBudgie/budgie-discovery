@@ -23,7 +23,7 @@ config_header = configure_file(
     configuration: conf_data
 )
 
-vapi_dir = meson.current_source_dir() / 'vapi'
+vapi_dir = meson.current_build_dir() / 'vapi'
 add_project_arguments(['--vapidir', vapi_dir], language: 'vala')
 
 discovery_applet_sources = [
@@ -59,7 +59,8 @@ vala = meson.get_compiler('vala')
 
 discovery_applet_deps = [
     dependency('gtk+-3.0', version: '>=3.18'),
-    dependency('glib-2.0', version: '>=2.80'),
+    #dependency('glib-2.0', version: '>=2.80'),
+    #dependency('gio-2.0', version: '>=2.80'),
     dependency('budgie-1.0', version: '>=2'),
     dependency('webkit2gtk-4.1', version: '>=2.48'),
     dependency('json-glib-1.0', version: '>=1.10'),
@@ -74,10 +75,11 @@ discovery_applet_deps = [
 
 
 discovery_applet_vala_args = [
-    '--target-glib=2.80', 
+    '--target-glib=2.56', 
     '--pkg', 'posix', 
     '--pkg', 'webkit2gtk-4.1',
     '--pkg', 'glib-2.0',
+    '--pkg', 'gio-2.0',
 ]
 
 subdir('resources')

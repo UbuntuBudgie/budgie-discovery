@@ -1,22 +1,49 @@
 using Gdk;
+using Soup;
 
 public class FeedItemImageWidget : Gtk.DrawingArea {
     private Soup.Session session = new Soup.Session ();
     private Gdk.Pixbuf? pixbuf = null;
-    private string image_url;
+    private string imageUrl;
+    private static GLib.Regex regex;
 
-    public FeedItemImageWidget (string imageUrl) {
-        this.image_url = imageUrl;
+    public FeedItemImageWidget (FeedItem feedItem) {
         get_style_context ().add_class ("card-image");
 
-        load_image ();
+        if(regex == null) {
+            try {
+                regex = new GLib.Regex (
+                    "<meta[^>]+property=['\"]og:image['\"][^>]+content=['\"]([^'\"]+)['\"]",
+                    GLib.RegexCompileFlags.CASELESS | GLib.RegexCompileFlags.DOTALL,
+                    0
+                );
+            } catch(Error e) {}
+        }
+
+        loadFeedSource(feedItem.link);
     }
 
-    private void load_image () {
-        if (!(image_url.has_prefix ("http://") || image_url.has_prefix ("https://")))
+    private void loadFeedSource(string url) {
+        try {
+            var msg = new Message ("GET", url);
+            var bytes = session.send_and_read (msg, null);
+            string html = (string) bytes.get_data ();
+
+            MatchInfo info;
+            if (regex.match (html, 0, out info)) {
+                imageUrl = info.fetch (1);
+                loadImage ();
+            }
+        } catch(Error e) {
+            // not handled
+        }
+    }
+
+    private void loadImage () {
+        if (!(imageUrl.has_prefix ("http://") || imageUrl.has_prefix ("https://")))
             return;
 
-        var msg = new Soup.Message ("GET", image_url);
+        var msg = new Soup.Message ("GET", imageUrl);
 
         session.send_and_read_async.begin (msg, GLib.Priority.DEFAULT, null, (obj, res) => {
             try {
@@ -35,7 +62,7 @@ public class FeedItemImageWidget : Gtk.DrawingArea {
                     });
                 }
             } catch (Error e) {
-                warning ("Fehler beim Laden von Bild %s: %s", image_url, e.message);
+                warning ("Fehler beim Laden von Bild %s: %s", imageUrl, e.message);
             }
         });
     }
@@ -63,6 +90,8 @@ public class FeedItemImageWidget : Gtk.DrawingArea {
             // Bild zeichnen
             Gdk.cairo_set_source_pixbuf (cr, scaled, 0, 0);
             cr.paint ();
+        } else {
+
         }
 
         return true;
