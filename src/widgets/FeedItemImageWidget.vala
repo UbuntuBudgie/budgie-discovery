@@ -20,51 +20,52 @@ public class FeedItemImageWidget : Gtk.DrawingArea {
             } catch(Error e) {}
         }
 
-        loadFeedSource(feedItem.link);
+        Idle.add (() => {
+            loadFeedSource.begin(feedItem.link);
+            return false;
+        });
     }
 
-    private void loadFeedSource(string url) {
+    private async void loadFeedSource(string url) {
         try {
             var msg = new Message ("GET", url);
-            var bytes = session.send_and_read (msg, null);
-            string html = (string) bytes.get_data ();
+            Bytes body = yield session.send_and_read_async (msg, Priority.DEFAULT, null);
+
+            string html = (string) body.get_data ();
 
             MatchInfo info;
             if (regex.match (html, 0, out info)) {
                 imageUrl = info.fetch (1);
-                loadImage ();
+                loadImage.begin();
             }
         } catch(Error e) {
             // not handled
         }
     }
 
-    private void loadImage () {
+    private async void loadImage () {
         if (!(imageUrl.has_prefix ("http://") || imageUrl.has_prefix ("https://")))
             return;
 
         var msg = new Soup.Message ("GET", imageUrl);
+        try {
+            var bytes = yield session.send_and_read_async(msg, Priority.DEFAULT, null);
+            uint8[] data = bytes.get_data ();
 
-        session.send_and_read_async.begin (msg, GLib.Priority.DEFAULT, null, (obj, res) => {
-            try {
-                var bytes = session.send_and_read_async.end (res);
-                uint8[] data = bytes.get_data ();
+            var loader = new Gdk.PixbufLoader ();
+            loader.write (data);
+            loader.close ();
+            pixbuf = loader.get_pixbuf ();
 
-                var loader = new Gdk.PixbufLoader ();
-                loader.write (data);
-                loader.close ();
-                pixbuf = loader.get_pixbuf ();
-
-                if (pixbuf != null) {
-                    Idle.add (() => {
-                        queue_draw (); // neu rendern
-                        return false;
-                    });
-                }
-            } catch (Error e) {
-                warning ("Fehler beim Laden von Bild %s: %s", imageUrl, e.message);
+            if (pixbuf != null) {
+                Idle.add (() => {
+                    queue_draw (); // neu rendern
+                    return false;
+                });
             }
-        });
+        } catch (Error e) {
+            warning ("Fehler beim Laden von Bild %s: %s", imageUrl, e.message);
+        }
     }
 
     protected override bool draw (Cairo.Context cr) {
