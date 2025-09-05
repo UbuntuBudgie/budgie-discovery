@@ -28,23 +28,13 @@ public class DiscoveryPopupContent: Gtk.Box {
         feedWidget.set_name("feed");
         stackView.add_named(feedWidget, "feed");
 
-        var chatGptWidget = new ChatGptWidget();
-        chatGptWidget.set_name("chat-gpt");
-        stackView.add_named(chatGptWidget, "chat-gpt");
-
         var applicationsWidget = new ApplicationsWidget();
         applicationsWidget.set_name("applications");
         stackView.add_named(applicationsWidget, "applications");
 
-        var settingsWidget = new SettingsWidget();
-        settingsWidget.set_name("settings");
-        stackView.add_named(settingsWidget, "settings");
-
         // Add tabs to the navigation box
-        add_tab(0, "feed", ICONS_DIR + "/feed-64.png");
-        add_tab(1, "chat-gpt", ICONS_DIR + "/chatgpt-64.png");
-        add_tab(2, "applications", ICONS_DIR + "/apps-64.png");
-        add_tab(3, "settings", ICONS_DIR + "/settings-64.png");
+        add_tab(0, "feed", "accessories-dictionary-symbolic");
+        add_tab(1, "applications", "system-software-install-symbolic");
 
         // TODO separate code for that
         var buttonBox = new Gtk.Box(Gtk.Orientation.HORIZONTAL, 5);
@@ -97,32 +87,29 @@ public class DiscoveryPopupContent: Gtk.Box {
     }
 
     private void add_tab(int index, string name, string iconName) {
-        try {
-            var tabButton = new Gtk.Button();
-            tabButton.set_size_request(24, 24);
-            tabButton.set_halign(Gtk.Align.START);
-            tabButton.set_name(name);
-            tabButton.clicked.connect(() => {
-                set_active_index(index);
-            });
+        var tabButton = new Gtk.Button();
+        tabButton.set_size_request(24, 24);
+        tabButton.margin_end = 10;
+        tabButton.margin_bottom = 5;
+        tabButton.set_halign(Gtk.Align.START);
+        tabButton.set_name(name);
+        tabButton.clicked.connect(() => {
+            set_active_index(index);
+        });
 
-            var icon = new Gtk.Image.from_gicon(Icon.new_for_string(iconName), Gtk.IconSize.LARGE_TOOLBAR);
-            icon.set_pixel_size(36);
-            tabButton.set_image(icon);
+        var icon = new Gtk.Image.from_icon_name(iconName, Gtk.IconSize.SMALL_TOOLBAR);
+        // icon.set_pixel_size(24);
+        tabButton.set_image(icon);
 
-            if(index == 0) {
-                // Highlight the first tab as active
-                tabButton.set_state_flags(Gtk.StateFlags.ACTIVE, true);
-                tabButton.get_style_context().add_class("active");
-            } else {
-                tabButton.set_state_flags(Gtk.StateFlags.NORMAL, true);
-            }
-
-            navigationBox.pack_start(tabButton, false, false, 5);
+        if(index == 0) {
+            // Highlight the first tab as active
+            tabButton.set_state_flags(Gtk.StateFlags.ACTIVE, true);
+            tabButton.get_style_context().add_class("active");
+        } else {
+            tabButton.set_state_flags(Gtk.StateFlags.NORMAL, true);
         }
-        catch (Error e) {
-            warning("Failed to create tab button: %s", e.message);
-        }
+
+        navigationBox.pack_start(tabButton, false, false, 0);
     }
 
     public void set_active_index(int index) {
@@ -138,12 +125,10 @@ public class DiscoveryPopupContent: Gtk.Box {
 
         // reset button states
         navigationBox.get_children().foreach((child) => {
-            if (child is Gtk.Button) {
+            if (child is Gtk.Button) { // ignore power buttons
                 var button = (Gtk.Button) child;
                 button.set_state_flags(Gtk.StateFlags.NORMAL, true);
                 button.get_style_context().remove_class("active");
-            } else {
-                warning("Child is not a Gtk.Button: %s", child.get_name());
             }
         });
 
@@ -160,7 +145,7 @@ public class DiscoveryPopupContent: Gtk.Box {
         stackView.set_visible_child( widget );
 
         navigationBox.get_children().foreach((child) => {
-            if (child is Gtk.Button) {
+            if (child is Gtk.Button) { // ignore power buttons
                 var button = (Gtk.Button) child;
                 if (child.get_name() == widget.get_name()) {
                     // Highlight the active tab button
@@ -170,8 +155,6 @@ public class DiscoveryPopupContent: Gtk.Box {
                     button.set_state_flags(Gtk.StateFlags.NORMAL, true);
                     button.get_style_context().remove_class("active");
                 }
-            } else {
-                warning("Child is not a Gtk.Button: %s", child.get_name());
             }
         });
     }

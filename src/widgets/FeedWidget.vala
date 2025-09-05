@@ -26,9 +26,15 @@ public class FeedWidget: Gtk.Box {
         var reloadButton = new Gtk.Button.from_icon_name("view-refresh-symbolic", Gtk.IconSize.SMALL_TOOLBAR);
         greetingWidget.addButton(reloadButton);
 
+        var settingsButton = new Gtk.Button.from_icon_name("preferences-system-symbolic", Gtk.IconSize.SMALL_TOOLBAR);
+        greetingWidget.addButton(settingsButton);
+
         var feedService = new FeedService(); 
         reloadButton.clicked.connect(() => {
-            feedService.update_service(true);
+            Timeout.add(100, () => {
+                feedService.update_service(true);
+                return false;
+            });
         });
 
         var feedBox = new Gtk.Box(Gtk.Orientation.VERTICAL, 10);

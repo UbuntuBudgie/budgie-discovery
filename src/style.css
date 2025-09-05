@@ -9,6 +9,11 @@
     color: #444;
 }
 
+.navigation-box {
+    padding-right: 20px;
+    border-right: 1px solid #dedede;
+}
+
 .discovery-popup .greeting-label {
     font-size: 1.1em;
     font-family: "Roboto Light", sans-serif;
