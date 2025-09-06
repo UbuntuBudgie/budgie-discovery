@@ -1,23 +1,19 @@
-public class FeedItemWidget: Gtk.Box {
+public class FeedItemWidget: Card {
     private FeedItem itemData;
 
     public signal void clicked();
 
     public FeedItemWidget(FeedItem feedItem) {
-        Object();
-        set_orientation(Gtk.Orientation.VERTICAL);
-        set_spacing(0);
+        base();
         itemData = feedItem;
-        
-        var eventBox = new Gtk.EventBox ();
-        get_style_context().add_class("card");
-        eventBox.set_visible_window(true);
-        eventBox.set_above_child(true);
-        pack_start(eventBox, true);
 
         var cardBody = new Gtk.Box(Gtk.Orientation.VERTICAL, 6);
         cardBody.get_style_context ().add_class ("card-body");
+        
+        var eventBox = new Gtk.EventBox ();
+        eventBox.set_visible_window(true);
         eventBox.add (cardBody);
+        pack_start(eventBox, true);
 
         var image = new FeedItemImageWidget(feedItem);
         image.set_size_request(120, 100);
