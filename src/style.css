@@ -189,6 +189,7 @@
     border-radius: 10px;
     border: 1px solid rgba(222, 222, 222, .5);
     box-shadow: 2px 2px 2px rgba(222, 222, 222, .5);
+    transition: box-shadow 250ms ease-in;
 }
 
 .discovery-popup .card .card-title {

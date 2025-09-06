@@ -8,9 +8,11 @@ public class FeedWidget: Gtk.Box {
     private Gtk.Box widgetLayout = new Gtk.Box(Gtk.Orientation.VERTICAL, 10);
     private int currentColumn = 0;
     private int currentRow = 0;
+    private Budgie.Popover popup;
 
-    public FeedWidget() {
+    public FeedWidget(Budgie.Popover popover) {
         Object();
+        popup = popover;
         set_orientation(Gtk.Orientation.VERTICAL);
         set_spacing(0);
         get_style_context().add_class("feed-widget");
@@ -104,6 +106,10 @@ public class FeedWidget: Gtk.Box {
         foreach(var feedItem in feedList) {
             var card = new FeedItemWidget(feedItem);
             feedLayout.attach(card, currentColumn, currentRow);
+
+            card.clicked.connect(() => {
+                popup.hide();
+            });
 
             if(currentColumn == 1) {
                 currentColumn = 0;

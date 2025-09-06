@@ -24,7 +24,7 @@ public class DiscoveryPopupContent: Gtk.Box {
         stackView.set_transition_duration(0);
         pack_start(stackView, true, true, 0);
 
-        var feedWidget = new FeedWidget();
+        var feedWidget = new FeedWidget(parent);
         feedWidget.set_name("feed");
         stackView.add_named(feedWidget, "feed");
 
