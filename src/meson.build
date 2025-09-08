@@ -31,11 +31,13 @@ discovery_applet_sources = [
     'DiscoveryPopup.vala',
 
     'core/IService.vala',
+    'core/applications/ApplicationItem.vala',
     'core/feed/FeedItem.vala',
     'core/feed/FeedRepository.vala',
     'core/weather/WeatherRespository.vala',
     'core/weather/WeatherForecastItem.vala',
 
+    'widgets/ApplicationItemWidget.vala',
     'widgets/ApplicationsWidget.vala',
     'widgets/Card.vala',
     'widgets/SettingsWidget.vala',
@@ -49,6 +51,7 @@ discovery_applet_sources = [
     'widgets/WeatherForecastWidget.vala',
     'widgets/WeatherWidget.vala',
 
+    'services/ApplicationService.vala',
     'services/FeedService.vala', 
     'services/WeatherService.vala',
     config_header
