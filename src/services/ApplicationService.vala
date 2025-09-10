@@ -1,12 +1,15 @@
 using Gee;
 
 public class ApplicationService: IService {
+    public signal void change(ArrayList<ApplicationItem> apps);
     public void start_service () {
         update_service (false);
     }
+
     public void stop_service () {
         assert_not_reached ();
     }
+
     public void update_service (bool force) {
         ArrayList<ApplicationItem> apps = new ArrayList<ApplicationItem>();
         ArrayList<string> files = new ArrayList<string>();
@@ -95,9 +98,8 @@ public class ApplicationService: IService {
                 } catch (Error e) {
                     print ("Error: %s\n", e.message);
                 }
-
-                // TODO trigger apps event: apps updated
             }
+            change (apps);
             
         } catch(Error e) {
             error("Error in Discovery applet: %s", e.message);
