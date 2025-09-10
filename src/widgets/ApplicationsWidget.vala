@@ -10,17 +10,25 @@ public class ApplicationsWidget: Gtk.Box {
         get_style_context().add_class("applications-widget");
 
         var scrollView = new Gtk.ScrolledWindow(null, null);
-        pack_start(scrollView, true);
+        scrollView.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC);
+        scrollView.set_hexpand(true);
+        scrollView.set_vexpand(true);
+        pack_start(scrollView, true, true, 0);
 
         layout = new Gtk.FlowBox ();
-        layout.max_children_per_line = 4;
+        layout.max_children_per_line = 7;
         scrollView.add(layout);
 
-        layout.map.connect(() => {
-            var itemWidth = get_allocated_width() / 4;
-            message("layout map event");
-            foreach(var widget in layout.get_children()) {
-                widget.set_size_request (itemWidth, -1);
+        this.size_allocate.connect((allocation) => {
+            int per = allocation.width / 6;
+            foreach (var w in layout.get_children()) {
+                w.set_size_request(per, -1);
+
+                var item = w as ApplicationItemWidget;
+                if (item != null) {
+                    item.set_size_request(per, -1);
+                    item.label.set_size_request(per - 10, -1); // Label direkt beschränken
+                }
             }
         });
 
@@ -42,6 +50,7 @@ public class ApplicationsWidget: Gtk.Box {
         foreach(var item in items) {
             var iconWidget = new ApplicationItemWidget();
             iconWidget.setLabel(item.label);
+            iconWidget.setIcon(item.icon);
             layout.add(iconWidget);
         }
 
