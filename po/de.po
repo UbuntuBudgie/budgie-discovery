@@ -168,3 +168,6 @@ msgstr "Leichte Gewitter mit Hagel"
 
 msgid "Thunderstorms With Hail"
 msgstr "Gewitter mit Hagel"
+
+msgid "Applications"
+msgstr "Anwendungen"

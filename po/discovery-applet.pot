@@ -64,3 +64,6 @@ msgstr ""
 #: src/widgets/WeatherWidget.vala:197
 msgid "Low"
 msgstr ""
+
+msgid "Applications"
+msgstr ""

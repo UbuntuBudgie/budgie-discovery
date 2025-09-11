@@ -6,7 +6,7 @@ public class GreetingWidget: Gtk.Box {
     public GreetingWidget() {
         Object();
         set_orientation(Gtk.Orientation.HORIZONTAL);
-        get_style_context().add_class("greeting-widget");
+        get_style_context().add_class("header-widget");
 
         var leftLayout = new Gtk.Box(Gtk.Orientation.VERTICAL, 0);
         pack_start(leftLayout, true);
@@ -21,7 +21,7 @@ public class GreetingWidget: Gtk.Box {
 
         // Initialize the widget
         greetingLabel = new Gtk.Label("");
-        greetingLabel.get_style_context().add_class("greeting-label");
+        greetingLabel.get_style_context().add_class("header-label");
         greetingLabel.set_halign(Gtk.Align.START);
         greetingLabel.set_valign(Gtk.Align.START);
         greetingLabel.set_lines(1);

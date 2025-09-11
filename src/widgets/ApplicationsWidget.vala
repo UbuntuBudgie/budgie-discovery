@@ -5,9 +5,14 @@ public class ApplicationsWidget: Gtk.Box {
 
     public ApplicationsWidget() {
         Object();
-        set_orientation(Gtk.Orientation.HORIZONTAL);
-        set_spacing(5);
-        get_style_context().add_class("applications-widget");
+        set_orientation(Gtk.Orientation.VERTICAL);
+        set_spacing(10);
+
+        var headerLabel = new Gtk.Label(_("Applications"));
+        headerLabel.set_halign(Gtk.Align.START);
+        headerLabel.get_style_context().add_class ("header-label");
+        headerLabel.get_style_context().add_class ("header-widget");
+        pack_start(headerLabel, false, true);
 
         var scrollView = new Gtk.ScrolledWindow(null, null);
         scrollView.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC);
@@ -46,6 +51,10 @@ public class ApplicationsWidget: Gtk.Box {
         foreach(var widget in layout.get_children()) {
             layout.remove(widget);
         }
+
+        items.sort((left, right) => {
+            return left.label.ascii_casecmp(right.label);
+        });
 
         foreach(var item in items) {
             var iconWidget = new ApplicationItemWidget();
