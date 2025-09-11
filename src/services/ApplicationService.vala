@@ -1,4 +1,5 @@
 using Gee;
+using GLib;
 
 public class ApplicationService: IService {
     public signal void change(ArrayList<ApplicationItem> apps);
@@ -31,7 +32,7 @@ public class ApplicationService: IService {
             dir = Dir.open (shareDirName, 0);
             name = null;
             while((name = dir.read_name ()) != null) {
-                if(name.index_of (".desktop", 0) > 0) {
+                if(name.has_suffix (".desktop")) {
                     var path = Path.build_filename (shareDirName, name);
                     if(FileUtils.test (path, GLib.FileTest.IS_REGULAR)) {
                         files.add (path);
@@ -39,12 +40,23 @@ public class ApplicationService: IService {
                 }
             }
 
+            var locale = GLib.Intl.get_language_names ()[0];
+            if(locale != null && locale != "C") {
+                locale = locale.split(".")[0].split("_")[0];
+            } else {
+                locale = "en";
+            }
+
+            message("FOUND LOCALE = %s", locale);
+
             foreach(var fileName in files) {
                 bool isDesktopEntry = false;
                 bool isTerminal = false;
                 bool ignore = false;
                 string icon = null;
                 string applicationName = null;
+                string localeName = null;
+                string genericName = null;
 
                 File file = File.new_for_path (fileName);
                 try {
@@ -56,25 +68,22 @@ public class ApplicationService: IService {
                     DataInputStream dis = new DataInputStream (@is);
 
                     string lineContent;
-                    int line = 0;
                     while ((lineContent = dis.read_line ()) != null) {
                         if(lineContent.index_of("#") == 0) continue;
-                        if(line == 0) {
-                            if(lineContent.index_of("[Desktop Entry]") >= 0 || lineContent.index_of("[desktop entry]") >= 0) {
-                                isDesktopEntry = true;
-                                line++;
-                                continue;
-                            } else {
-                                break;
-                            }
+                        if(lineContent == "[Desktop Entry]") {
+                            isDesktopEntry = true;
+                            continue;
                         }
 
-                        if(lineContent.index_of("[Desktop Action]") == 0) {
-                            message("ignore desktop actions: %s", fileName);
+                        if(lineContent.index_of("[Desktop ") == 0 && isDesktopEntry) {
                             break;
                         }
                         
+                        if(!isDesktopEntry) continue;
+
                         string[] lineParts = lineContent.split("=");
+                        if(lineParts.length != 2) continue;
+
                         if(lineParts[0] == "Terminal") {
                             isTerminal = bool.parse(lineParts[1]);
                         }
@@ -84,8 +93,14 @@ public class ApplicationService: IService {
                         if(lineParts[0] == "Icon") {
                             icon = lineParts[1];
                         }
-                        if(lineParts[0] == "Name") {
+                        if(lineParts[0] == "Name" && applicationName == null) {
                             applicationName = lineParts[1];
+                        }
+                        if(lineParts[0] == "Name[%s]".printf(locale)) {
+                            localeName = lineParts[1];
+                        }
+                        if(lineParts[0] == "GenericName[%s]".printf(locale)) {
+                            genericName = lineParts[1];
                         }
                     }
 
@@ -93,8 +108,16 @@ public class ApplicationService: IService {
                     var app = new ApplicationItem();
                     app.icon = icon;
                     app.label = applicationName;
+                    if(genericName != null) {
+                        app.label = genericName;
+                    }
+                    if(applicationName != null) {
+                        app.label = applicationName;
+                    }
+                    if(localeName != null) {
+                        app.label = localeName;
+                    }
                     apps.add(app);
-
                 } catch (Error e) {
                     print ("Error: %s\n", e.message);
                 }

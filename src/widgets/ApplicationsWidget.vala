@@ -11,7 +11,7 @@ public class ApplicationsWidget: Gtk.Box {
         set_orientation(Gtk.Orientation.VERTICAL);
         set_spacing(10);
 
-        var headerWidget = new Gtk.Box(Gtk.Orientation.HORIZONTAL, 0);
+        var headerWidget = new Gtk.Box(Gtk.Orientation.HORIZONTAL, 5);
         headerWidget.get_style_context().add_class ("header-widget");
         pack_start(headerWidget, false, true);
 
@@ -19,6 +19,9 @@ public class ApplicationsWidget: Gtk.Box {
         headerLabel.set_halign(Gtk.Align.START);
         headerLabel.get_style_context().add_class ("header-label");
         headerWidget.pack_start(headerLabel, true);
+
+        var addButton = new Gtk.Button.from_icon_name("list-add-symbolic", Gtk.IconSize.SMALL_TOOLBAR);
+        headerWidget.pack_end(addButton, false); 
 
         sortButton = new Gtk.Button.from_icon_name("go-down-symbolic", Gtk.IconSize.SMALL_TOOLBAR);
         headerWidget.pack_end(sortButton, false);
@@ -41,7 +44,7 @@ public class ApplicationsWidget: Gtk.Box {
                 var item = w as ApplicationItemWidget;
                 if (item != null) {
                     item.set_size_request(per, -1);
-                    item.label.set_size_request(per - 10, -1); // Label direkt beschränken
+                    item.label.set_size_request(per - 10, -1);
                 }
             }
         });
