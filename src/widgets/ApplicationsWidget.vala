@@ -2,17 +2,26 @@ using Gee;
 
 public class ApplicationsWidget: Gtk.Box {
     private Gtk.FlowBox layout;
+    private ArrayList<ApplicationItem> items;
+    private SortDirection sortDirection = SortDirection.ASCENDING;
+    private Gtk.Button sortButton;
 
     public ApplicationsWidget() {
         Object();
         set_orientation(Gtk.Orientation.VERTICAL);
         set_spacing(10);
 
+        var headerWidget = new Gtk.Box(Gtk.Orientation.HORIZONTAL, 0);
+        headerWidget.get_style_context().add_class ("header-widget");
+        pack_start(headerWidget, false, true);
+
         var headerLabel = new Gtk.Label(_("Applications"));
         headerLabel.set_halign(Gtk.Align.START);
         headerLabel.get_style_context().add_class ("header-label");
-        headerLabel.get_style_context().add_class ("header-widget");
-        pack_start(headerLabel, false, true);
+        headerWidget.pack_start(headerLabel, true);
+
+        sortButton = new Gtk.Button.from_icon_name("go-down-symbolic", Gtk.IconSize.SMALL_TOOLBAR);
+        headerWidget.pack_end(sortButton, false);
 
         var scrollView = new Gtk.ScrolledWindow(null, null);
         scrollView.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC);
@@ -37,6 +46,40 @@ public class ApplicationsWidget: Gtk.Box {
             }
         });
 
+        sortButton.button_press_event.connect(() => {
+            sortDirection = sortDirection == SortDirection.ASCENDING ? SortDirection.DESCENDING : 
+                SortDirection.ASCENDING;
+
+            if(sortDirection == SortDirection.ASCENDING) {
+                var icon = new Gtk.Image.from_icon_name ("go-up-symbolic", Gtk.IconSize.SMALL_TOOLBAR);
+                this.sortButton.image = icon;
+                this.items.sort((left, right) => {
+                    return left.label.ascii_casecmp(right.label);
+                });
+            } else {
+                var icon = new Gtk.Image.from_icon_name ("go-down-symbolic", Gtk.IconSize.SMALL_TOOLBAR);
+                this.sortButton.image = icon;
+                this.items.sort((left, right) => {
+                    return right.label.ascii_casecmp(left.label);
+                });
+            }
+
+            foreach(var widget in layout.get_children()) {
+                layout.remove(widget);
+            }
+
+            foreach(var item in this.items) {
+                var iconWidget = new ApplicationItemWidget();
+                iconWidget.setLabel(item.label);
+                iconWidget.setIcon(item.icon);
+                layout.add(iconWidget);
+            }
+
+            layout.show_all();
+
+            return true;
+        });
+
         var service = new ApplicationService ();
 
         service.change.connect(onAppsChange);
@@ -47,16 +90,18 @@ public class ApplicationsWidget: Gtk.Box {
         });
     }
 
-    private void onAppsChange(ArrayList<ApplicationItem> items) {
+    private void onAppsChange(ArrayList<ApplicationItem> list) {
         foreach(var widget in layout.get_children()) {
             layout.remove(widget);
         }
 
-        items.sort((left, right) => {
-            return left.label.ascii_casecmp(right.label);
+        this.items = list;
+        this.items.sort((left, right) => {
+            return sortDirection == SortDirection.ASCENDING ? left.label.ascii_casecmp(right.label) :
+                right.label.ascii_casecmp(right.label);
         });
 
-        foreach(var item in items) {
+        foreach(var item in this.items) {
             var iconWidget = new ApplicationItemWidget();
             iconWidget.setLabel(item.label);
             iconWidget.setIcon(item.icon);
