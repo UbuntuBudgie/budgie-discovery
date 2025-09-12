@@ -33,13 +33,13 @@ public class ApplicationsWidget: Gtk.Box {
         var buttonBox = new Gtk.Box(Gtk.Orientation.HORIZONTAL, 0);
         pack_start(buttonBox, false);
 
-        pinnedLabel = new Gtk.Label("Pinned");
+        pinnedLabel = new Gtk.Label(_("Pinned"));
         pinnedLabel.get_style_context().add_class("text-size-normal");
         pinnedLabel.get_style_context().add_class("fw-300");
         buttonBox.pack_start(pinnedLabel, false);
 
         allAppsButton.margin_end = 10;
-        allAppsButton.label = "All Apps";
+        allAppsButton.label = _("All Apps");
         buttonBox.pack_end(allAppsButton, false);
 
         allAppsButton.button_press_event.connect(() => {
