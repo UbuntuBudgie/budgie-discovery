@@ -171,3 +171,15 @@ msgstr "Gewitter mit Hagel"
 
 msgid "Applications"
 msgstr "Anwendungen"
+
+msgid "Pinned"
+msgstr "Angeheftet"
+
+msgid "All Apps"
+msgstr "Alle"
+
+msgid "All Applications"
+msgstr "Alle Anwendungen"
+
+msgid "Back"
+msgstr "Zurück"

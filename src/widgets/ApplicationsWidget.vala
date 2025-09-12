@@ -5,6 +5,8 @@ public class ApplicationsWidget: Gtk.Box {
     private ArrayList<ApplicationItem> allApps;
     private SortDirection sortDirection = SortDirection.ASCENDING;
     private Gtk.Button sortButton;
+    private Gtk.Label pinnedLabel;
+    private Gtk.Button allAppsButton = new Gtk.Button();
     private Gtk.Stack stackSwitcher = new Gtk.Stack();
     private ApplicationViewMode viewMode = ApplicationViewMode.PINNED_APPS_MODE;
 
@@ -31,12 +33,11 @@ public class ApplicationsWidget: Gtk.Box {
         var buttonBox = new Gtk.Box(Gtk.Orientation.HORIZONTAL, 0);
         pack_start(buttonBox, false);
 
-        var pinnedLabel = new Gtk.Label("Pinned");
+        pinnedLabel = new Gtk.Label("Pinned");
         pinnedLabel.get_style_context().add_class("text-size-normal");
         pinnedLabel.get_style_context().add_class("fw-300");
         buttonBox.pack_start(pinnedLabel, false);
 
-        var allAppsButton = new Gtk.Button();
         allAppsButton.margin_end = 10;
         allAppsButton.label = "All Apps";
         buttonBox.pack_end(allAppsButton, false);
@@ -44,12 +45,12 @@ public class ApplicationsWidget: Gtk.Box {
         allAppsButton.button_press_event.connect(() => {
             if(viewMode == ApplicationViewMode.PINNED_APPS_MODE) {
                 viewMode = ApplicationViewMode.ALL_APPS_MODE;
-                pinnedLabel.set_text("All Applications");
-                allAppsButton.set_label("Back");
+                pinnedLabel.set_text(_("All Applications"));
+                allAppsButton.set_label(_("Back"));
             } else {
                 viewMode = ApplicationViewMode.PINNED_APPS_MODE;
-                pinnedLabel.set_text("Pinned");
-                allAppsButton.set_label("All Apps");
+                pinnedLabel.set_text(_("Pinned"));
+                allAppsButton.set_label(_("All Apps"));
             }
             updateAppsLayout();
             return true;
@@ -75,6 +76,9 @@ public class ApplicationsWidget: Gtk.Box {
 
         map.connect(() => {
             viewMode = ApplicationViewMode.PINNED_APPS_MODE;
+            pinnedLabel.set_text(_("Pinned"));
+            allAppsButton.set_label(_("All Apps"));
+
             updateAppsLayout();
         });
 
@@ -108,19 +112,7 @@ public class ApplicationsWidget: Gtk.Box {
                     return right.label.ascii_casecmp(left.label);
                 });
             }
-
-            foreach(var widget in appsLayout.get_children()) {
-                appsLayout.remove(widget);
-            }
-
-            foreach(var item in this.allApps) {
-                var iconWidget = new ApplicationItemWidget();
-                iconWidget.setLabel(item.label);
-                iconWidget.setIcon(item.icon);
-                appsLayout.add(iconWidget);
-            }
-
-            appsLayout.show_all();
+            updateAppsLayout();
 
             return true;
         });

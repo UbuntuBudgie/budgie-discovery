@@ -67,3 +67,12 @@ msgstr ""
 
 msgid "Applications"
 msgstr ""
+
+msgid "Pinned"
+msgstr ""
+
+msgid "All Applications"
+msgstr ""
+
+msgid "Back"
+msgstr ""
