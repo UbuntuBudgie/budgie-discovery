@@ -6,6 +6,7 @@ public class ApplicationsWidget: Gtk.Box {
     private SortDirection sortDirection = SortDirection.ASCENDING;
     private Gtk.Button sortButton;
     private Gtk.Stack stackSwitcher = new Gtk.Stack();
+    private ApplicationViewMode viewMode = ApplicationViewMode.PINNED_APPS_MODE;
 
     public ApplicationsWidget() {
         Object();
@@ -36,8 +37,23 @@ public class ApplicationsWidget: Gtk.Box {
         buttonBox.pack_start(pinnedLabel, false);
 
         var allAppsButton = new Gtk.Button();
+        allAppsButton.margin_end = 10;
         allAppsButton.label = "All Apps";
         buttonBox.pack_end(allAppsButton, false);
+
+        allAppsButton.button_press_event.connect(() => {
+            if(viewMode == ApplicationViewMode.PINNED_APPS_MODE) {
+                viewMode = ApplicationViewMode.ALL_APPS_MODE;
+                pinnedLabel.set_text("All Applications");
+                allAppsButton.set_label("Back");
+            } else {
+                viewMode = ApplicationViewMode.PINNED_APPS_MODE;
+                pinnedLabel.set_text("Pinned");
+                allAppsButton.set_label("All Apps");
+            }
+            updateAppsLayout();
+            return true;
+        });
 
         stackSwitcher.set_vexpand(true);
         stackSwitcher.set_hexpand(true);
@@ -55,6 +71,11 @@ public class ApplicationsWidget: Gtk.Box {
         scrollView.map.connect(() => {
             scrollView.hadjustment.value = 0;
             scrollView.vadjustment.value = 0;
+        });
+
+        map.connect(() => {
+            viewMode = ApplicationViewMode.PINNED_APPS_MODE;
+            updateAppsLayout();
         });
 
         this.size_allocate.connect((allocation) => {
@@ -115,23 +136,28 @@ public class ApplicationsWidget: Gtk.Box {
     }
 
     private void onAppsChange(ArrayList<ApplicationItem> list) {
-        foreach(var widget in appsLayout.get_children()) {
-            appsLayout.remove(widget);
-        }
-
         this.allApps = list;
         this.allApps.sort((left, right) => {
             return sortDirection == SortDirection.ASCENDING ? left.label.ascii_casecmp(right.label) :
                 right.label.ascii_casecmp(right.label);
         });
 
-        foreach(var item in this.allApps) {
-            var iconWidget = new ApplicationItemWidget();
-            iconWidget.setLabel(item.label);
-            iconWidget.setIcon(item.icon);
-            appsLayout.add(iconWidget);
+        updateAppsLayout();
+    }
+
+    private void updateAppsLayout() {
+        foreach(var widget in appsLayout.get_children()) {
+            appsLayout.remove(widget);
         }
 
+        if(viewMode == ApplicationViewMode.ALL_APPS_MODE) {
+            foreach(var item in this.allApps) {
+                var iconWidget = new ApplicationItemWidget();
+                iconWidget.setLabel(item.label);
+                iconWidget.setIcon(item.icon);
+                appsLayout.add(iconWidget);
+            }
+        }
         appsLayout.show_all();
     }
 }
