@@ -68,7 +68,11 @@ public class FeedWidget: Gtk.Box {
         var weatherWidget = new WeatherWidget();
         widgetLayout.pack_start(weatherWidget, false);
 
-        this.map.connect(resizeChildren);
+        this.map.connect(() => {
+            resizeChildren();
+            feedView.hadjustment.value = 0;
+            feedView.vadjustment.value = 0;
+        });
 
         var feedRepository = FeedRepository.getInstance();
         feedRepository.feedUpdated.connect(update_feed);

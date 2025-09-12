@@ -1,10 +1,11 @@
 using Gee;
 
 public class ApplicationsWidget: Gtk.Box {
-    private Gtk.FlowBox layout;
-    private ArrayList<ApplicationItem> items;
+    private Gtk.FlowBox appsLayout;
+    private ArrayList<ApplicationItem> allApps;
     private SortDirection sortDirection = SortDirection.ASCENDING;
     private Gtk.Button sortButton;
+    private Gtk.Stack stackSwitcher = new Gtk.Stack();
 
     public ApplicationsWidget() {
         Object();
@@ -26,19 +27,39 @@ public class ApplicationsWidget: Gtk.Box {
         sortButton = new Gtk.Button.from_icon_name("go-down-symbolic", Gtk.IconSize.SMALL_TOOLBAR);
         headerWidget.pack_end(sortButton, false);
 
+        var buttonBox = new Gtk.Box(Gtk.Orientation.HORIZONTAL, 0);
+        pack_start(buttonBox, false);
+
+        var pinnedLabel = new Gtk.Label("Pinned");
+        pinnedLabel.get_style_context().add_class("text-size-normal");
+        pinnedLabel.get_style_context().add_class("fw-300");
+        buttonBox.pack_start(pinnedLabel, false);
+
+        var allAppsButton = new Gtk.Button();
+        allAppsButton.label = "All Apps";
+        buttonBox.pack_end(allAppsButton, false);
+
+        stackSwitcher.set_vexpand(true);
+        stackSwitcher.set_hexpand(true);
         var scrollView = new Gtk.ScrolledWindow(null, null);
         scrollView.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC);
         scrollView.set_hexpand(true);
         scrollView.set_vexpand(true);
+        scrollView.add(stackSwitcher);
         pack_start(scrollView, true, true, 0);
 
-        layout = new Gtk.FlowBox ();
-        layout.max_children_per_line = 7;
-        scrollView.add(layout);
+        appsLayout = new Gtk.FlowBox ();
+        appsLayout.max_children_per_line = 7;
+        stackSwitcher.add(appsLayout);
+
+        scrollView.map.connect(() => {
+            scrollView.hadjustment.value = 0;
+            scrollView.vadjustment.value = 0;
+        });
 
         this.size_allocate.connect((allocation) => {
             int per = allocation.width / 6;
-            foreach (var w in layout.get_children()) {
+            foreach (var w in appsLayout.get_children()) {
                 w.set_size_request(per, -1);
 
                 var item = w as ApplicationItemWidget;
@@ -56,29 +77,29 @@ public class ApplicationsWidget: Gtk.Box {
             if(sortDirection == SortDirection.ASCENDING) {
                 var icon = new Gtk.Image.from_icon_name ("go-up-symbolic", Gtk.IconSize.SMALL_TOOLBAR);
                 this.sortButton.image = icon;
-                this.items.sort((left, right) => {
+                this.allApps.sort((left, right) => {
                     return left.label.ascii_casecmp(right.label);
                 });
             } else {
                 var icon = new Gtk.Image.from_icon_name ("go-down-symbolic", Gtk.IconSize.SMALL_TOOLBAR);
                 this.sortButton.image = icon;
-                this.items.sort((left, right) => {
+                this.allApps.sort((left, right) => {
                     return right.label.ascii_casecmp(left.label);
                 });
             }
 
-            foreach(var widget in layout.get_children()) {
-                layout.remove(widget);
+            foreach(var widget in appsLayout.get_children()) {
+                appsLayout.remove(widget);
             }
 
-            foreach(var item in this.items) {
+            foreach(var item in this.allApps) {
                 var iconWidget = new ApplicationItemWidget();
                 iconWidget.setLabel(item.label);
                 iconWidget.setIcon(item.icon);
-                layout.add(iconWidget);
+                appsLayout.add(iconWidget);
             }
 
-            layout.show_all();
+            appsLayout.show_all();
 
             return true;
         });
@@ -94,23 +115,23 @@ public class ApplicationsWidget: Gtk.Box {
     }
 
     private void onAppsChange(ArrayList<ApplicationItem> list) {
-        foreach(var widget in layout.get_children()) {
-            layout.remove(widget);
+        foreach(var widget in appsLayout.get_children()) {
+            appsLayout.remove(widget);
         }
 
-        this.items = list;
-        this.items.sort((left, right) => {
+        this.allApps = list;
+        this.allApps.sort((left, right) => {
             return sortDirection == SortDirection.ASCENDING ? left.label.ascii_casecmp(right.label) :
                 right.label.ascii_casecmp(right.label);
         });
 
-        foreach(var item in this.items) {
+        foreach(var item in this.allApps) {
             var iconWidget = new ApplicationItemWidget();
             iconWidget.setLabel(item.label);
             iconWidget.setIcon(item.icon);
-            layout.add(iconWidget);
+            appsLayout.add(iconWidget);
         }
 
-        layout.show_all();
+        appsLayout.show_all();
     }
 }
