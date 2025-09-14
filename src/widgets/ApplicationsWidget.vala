@@ -144,10 +144,12 @@ public class ApplicationsWidget: Gtk.Box {
 
         if(viewMode == ApplicationViewMode.ALL_APPS_MODE) {
             foreach(var item in this.allApps) {
-                var iconWidget = new ApplicationItemWidget();
-                iconWidget.setLabel(item.label);
-                iconWidget.setIcon(item.icon);
+                var iconWidget = new ApplicationItemWidget(item);
                 appsLayout.add(iconWidget);
+
+                iconWidget.onContextMenu.connect(widget => {
+                    message("DETECTED RIGHT CLICK ON ICON WIDGET");
+                });
             }
         }
         appsLayout.show_all();

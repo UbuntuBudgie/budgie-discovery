@@ -4,11 +4,12 @@ public class ApplicationItemWidget: Gtk.EventBox {
     private Gtk.Image icon;
     public Gtk.Label label {get; set;}
 
-    public ApplicationItemWidget() {
+    public signal void onContextMenu(ApplicationItemWidget widget);
+
+    public ApplicationItemWidget(ApplicationItem item) {
         Object();
-
         var layout = new Gtk.Box(Gtk.Orientation.VERTICAL, 5);
-
+        
         icon = new Gtk.Image();
         icon.set_pixel_size(48);
 
@@ -27,14 +28,22 @@ public class ApplicationItemWidget: Gtk.EventBox {
         layout.pack_start(label, true, true, 0);
 
         this.button_press_event.connect((event) => {
-            message("BUTTON: %d", (int)event.button);
+            if(event.button == Gdk.BUTTON_SECONDARY) {
+                onContextMenu(this);
+            }
+            if(event.button == Gdk.BUTTON_PRIMARY) {
+                message("BUTTON EVENT NOT HANDLED");
+            }
             return true;
         });
 
         add(layout);
+
+        setIcon(item.icon);
+        setLabel(item.label);
     }
 
-    public void setIcon(string value) {
+    private void setIcon(string value) {
         if(value == null) {
             message("Unable to set icon for app %s", label.get_text());
             return;
@@ -53,7 +62,7 @@ public class ApplicationItemWidget: Gtk.EventBox {
         icon.icon_name = value;
     }
 
-    public void setLabel(string value) {
+    private void setLabel(string value) {
         label.set_text(value);
     }
 }
