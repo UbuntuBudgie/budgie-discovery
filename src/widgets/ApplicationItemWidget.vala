@@ -1,13 +1,13 @@
 using Gdk;
 
-public class ApplicationItemWidget: Gtk.Box {
+public class ApplicationItemWidget: Gtk.EventBox {
     private Gtk.Image icon;
     public Gtk.Label label {get; set;}
 
     public ApplicationItemWidget() {
         Object();
-        set_orientation (Gtk.Orientation.VERTICAL);
-        set_spacing (5);
+
+        var layout = new Gtk.Box(Gtk.Orientation.VERTICAL, 5);
 
         icon = new Gtk.Image();
         icon.set_pixel_size(48);
@@ -23,8 +23,15 @@ public class ApplicationItemWidget: Gtk.Box {
         label.set_lines(2);
         label.get_style_context().add_class("text-size-small");
 
-        pack_start(icon, false, false, 0);
-        pack_start(label, true, true, 0);
+        layout.pack_start(icon, false, false, 0);
+        layout.pack_start(label, true, true, 0);
+
+        this.button_press_event.connect((event) => {
+            message("BUTTON: %d", (int)event.button);
+            return true;
+        });
+
+        add(layout);
     }
 
     public void setIcon(string value) {
