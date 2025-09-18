@@ -113,6 +113,7 @@ public class ApplicationService: IService {
                     app.icon = icon;
                     app.label = applicationName;
                     app.action = action;
+                    app.desktopFilePath = fileName;
 
                     if(genericName != null) {
                         app.label = genericName;
