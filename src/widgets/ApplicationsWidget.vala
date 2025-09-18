@@ -9,9 +9,11 @@ public class ApplicationsWidget: Gtk.Box {
     private Gtk.Button allAppsButton = new Gtk.Button();
     private Gtk.Stack stackSwitcher = new Gtk.Stack();
     private ApplicationViewMode viewMode = ApplicationViewMode.PINNED_APPS_MODE;
+    private Budgie.Popover popover;
 
-    public ApplicationsWidget() {
+    public ApplicationsWidget(Budgie.Popover parent) {
         Object();
+        popover = parent;
         set_orientation(Gtk.Orientation.VERTICAL);
         set_spacing(10);
 
@@ -149,6 +151,10 @@ public class ApplicationsWidget: Gtk.Box {
 
                 iconWidget.onContextMenu.connect(widget => {
                     message("DETECTED RIGHT CLICK ON ICON WIDGET");
+                });
+
+                iconWidget.onPrimaryClick.connect(() => {
+                    popover.hide();
                 });
             }
         }

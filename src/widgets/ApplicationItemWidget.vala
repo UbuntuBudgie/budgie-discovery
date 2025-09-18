@@ -5,6 +5,7 @@ public class ApplicationItemWidget: Gtk.EventBox {
     public Gtk.Label label {get; set;}
 
     public signal void onContextMenu(ApplicationItemWidget widget);
+    public signal void onPrimaryClick();
 
     public ApplicationItemWidget(ApplicationItem item) {
         Object();
@@ -32,13 +33,20 @@ public class ApplicationItemWidget: Gtk.EventBox {
                 onContextMenu(this);
             }
             if(event.button == Gdk.BUTTON_PRIMARY) {
-                message("BUTTON EVENT NOT HANDLED");
+                onPrimaryClick();
+                Idle.add(() => {
+                    try {
+                        GLib.Process.spawn_command_line_async(item.action);
+                    } catch(Error e) {
+                        error(e.message);
+                    }
+                    return false;
+                });
             }
             return true;
         });
 
         add(layout);
-
         setIcon(item.icon);
         setLabel(item.label);
     }

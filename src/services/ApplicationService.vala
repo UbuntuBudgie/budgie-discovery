@@ -53,6 +53,7 @@ public class ApplicationService: IService {
                 bool isDesktopEntry = false;
                 bool isTerminal = false;
                 bool ignore = false;
+                string action = null;
                 string icon = null;
                 string applicationName = null;
                 string localeName = null;
@@ -102,12 +103,17 @@ public class ApplicationService: IService {
                         if(lineParts[0] == "GenericName[%s]".printf(locale)) {
                             genericName = lineParts[1];
                         }
+                        if(lineParts[0] == "Exec") {
+                            action = lineParts[1];
+                        }
                     }
 
                     if(!isDesktopEntry || isTerminal || ignore) continue;
                     var app = new ApplicationItem();
                     app.icon = icon;
                     app.label = applicationName;
+                    app.action = action;
+
                     if(genericName != null) {
                         app.label = genericName;
                     }
