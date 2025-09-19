@@ -161,22 +161,18 @@
     padding-bottom: 20px;
 }
 
-.discovery-popup .power-widget button,
-.discovery-popup .navigation-box button,
-.discovery-popup .header-widget button {
+.discovery-popup button {
     border-radius: 0;
     box-shadow: none;
     background: none;
+    border: 0 none;
 }
 
-.discovery-popup .power-widget button:hover,
-.discovery-popup .navigation-box button:hover,
-.discovery-popup .header-widget button:hover {
+.discovery-popup button:hover {
     background: #f6f6f6;
 }
 
-.discovery-popup .power-widget button:active,
-.discovery-popup .navigation-box button.active {
+.discovery-popup button.active {
     background: #e6e6e6;
 }
 
