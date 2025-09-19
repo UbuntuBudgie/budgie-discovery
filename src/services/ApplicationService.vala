@@ -120,6 +120,7 @@ public class ApplicationService: IService {
                     app.label = applicationName;
                     app.action = action;
                     app.desktopFilePath = fileName;
+                    app.id = Uuid.string_random ();
                     apps.add (app);
                     json.add (app.toString ());
                 }
