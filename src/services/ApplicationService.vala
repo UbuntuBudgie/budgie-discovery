@@ -4,7 +4,15 @@ using GLib;
 /* TODO generate applications cache file: generate appId to support favorites */
 
 public class ApplicationService: IService {
+    private static string cachePath;
+
     public signal void change(ArrayList<ApplicationItem> apps);
+
+    public ApplicationService() {
+        cachePath = "%s/cache".printf(Environment.get_user_runtime_dir ());
+        GLib.DirUtils.create_with_parents (cachePath, 0700);
+    }
+
     public void start_service () {
         update_service (false);
     }
@@ -14,8 +22,14 @@ public class ApplicationService: IService {
     }
 
     public void update_service (bool force) {
+        if (!GLib.FileUtils.test(cachePath, GLib.FileTest.IS_DIR)) {
+            return;
+        }
+
+        var cacheFile = "%s/appications.json".printf(cachePath);
         ArrayList<ApplicationItem> apps = new ArrayList<ApplicationItem>();
         ArrayList<string> files = new ArrayList<string>();
+        ArrayList<string> json = new ArrayList<string>();
 
         try {
             var localDirName = Environment.get_user_data_dir () + "/applications";
@@ -107,8 +121,11 @@ public class ApplicationService: IService {
                     app.action = action;
                     app.desktopFilePath = fileName;
                     apps.add (app);
+                    json.add (app.toString ());
                 }
             }
+
+            FileUtils.set_contents (cacheFile, string.joinv(",",json.to_array ()));
             change (apps);
             
         } catch(Error e) {

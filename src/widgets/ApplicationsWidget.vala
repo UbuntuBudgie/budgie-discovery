@@ -120,7 +120,6 @@ public class ApplicationsWidget: Gtk.Box {
         });
 
         var service = new ApplicationService ();
-
         service.change.connect(onAppsChange);
         
         Idle.add(() => {
