@@ -47,86 +47,64 @@ public class ApplicationService: IService {
                 locale = "en";
             }
 
-            message("FOUND LOCALE = %s", locale);
-
             foreach(var fileName in files) {
-                bool isDesktopEntry = false;
-                bool isTerminal = false;
-                bool ignore = false;
                 string action = null;
                 string icon = null;
                 string applicationName = null;
-                string localeName = null;
-                string genericName = null;
 
-                File file = File.new_for_path (fileName);
-                try {
-                    FileInputStream @is = file.read ();
-                    if(is == null) {
-                        error("Unable to read from file %s", fileName);
-                    }
+                KeyFile file = new KeyFile ();
+                file.load_from_file (fileName, GLib.KeyFileFlags.NONE);
 
-                    DataInputStream dis = new DataInputStream (@is);
-
-                    string lineContent;
-                    while ((lineContent = dis.read_line ()) != null) {
-                        if(lineContent.index_of("#") == 0) continue;
-                        if(lineContent == "[Desktop Entry]") {
-                            isDesktopEntry = true;
+                if(file.has_group ("Desktop Entry")) {
+                    if(file.has_key ("Desktop Entry", "Terminal")) {
+                        if(file.get_boolean ("Desktop Entry", "Terminal")) {
                             continue;
                         }
-
-                        if(lineContent.index_of("[Desktop ") == 0 && isDesktopEntry) {
-                            break;
-                        }
-                        
-                        if(!isDesktopEntry) continue;
-
-                        string[] lineParts = lineContent.split("=");
-                        if(lineParts.length != 2) continue;
-
-                        if(lineParts[0] == "Terminal") {
-                            isTerminal = bool.parse(lineParts[1]);
-                        }
-                        if(lineParts[0] == "NoDisplay") {
-                            ignore = bool.parse(lineParts[1]);
-                        }
-                        if(lineParts[0] == "Icon") {
-                            icon = lineParts[1];
-                        }
-                        if(lineParts[0] == "Name" && applicationName == null) {
-                            applicationName = lineParts[1];
-                        }
-                        if(lineParts[0] == "Name[%s]".printf(locale)) {
-                            localeName = lineParts[1];
-                        }
-                        if(lineParts[0] == "GenericName[%s]".printf(locale)) {
-                            genericName = lineParts[1];
-                        }
-                        if(lineParts[0] == "Exec") {
-                            action = lineParts[1];
+                    }
+                    if(file.has_key ("Desktop Entry", "NoDisplay")) {
+                        if(file.get_boolean ("Desktop Entry", "NoDisplay")) {
+                            continue;
                         }
                     }
+                    if(file.has_key ("Desktop Entry", "Type")) {
+                        if(file.get_string  ("Desktop Entry", "Type") != "Application") {
+                            continue;
+                        }
+                    }
+                    if(
+                        !file.has_key ("Desktop Entry", "Name") && 
+                        !file.has_key ("Desktop Entry", "Name[%s]".printf(locale)) && 
+                        !file.has_key ("Desktop Entry", "GenericName") && 
+                        !file.has_key ("Desktop Entry", "GenericName[%s]".printf (locale))
+                    ) {
+                        continue;
+                    }
+                    if(!file.has_key ("Desktop Entry", "Exec")) {
+                        continue;
+                    }
 
-                    if(!isDesktopEntry || isTerminal || ignore) continue;
+                    if(file.has_key ("Desktop Entry", "GenericName")) {
+                        applicationName = file.get_string ("Desktop Entry", "GenericName");
+                    }
+                    if(file.has_key ("Desktop Entry", "GenericName[%s]".printf(locale))) {
+                        applicationName = file.get_string ("Desktop Entry", "GenericName[%s]".printf(locale));
+                    }
+                    if(file.has_key ("Desktop Entry", "Name")) {
+                        applicationName = file.get_string ("Desktop Entry", "Name");
+                    }
+                    if(file.has_key ("Desktop Entry", "Name[%s]".printf(locale))) {
+                        applicationName = file.get_string ("Desktop Entry", "Name[%s]".printf(locale));
+                    }
+
+                    action = file.get_string ("Desktop Entry", "Exec");
+                    icon = file.get_string ("Desktop Entry", "Icon");
+
                     var app = new ApplicationItem();
                     app.icon = icon;
                     app.label = applicationName;
                     app.action = action;
                     app.desktopFilePath = fileName;
-
-                    if(genericName != null) {
-                        app.label = genericName;
-                    }
-                    if(applicationName != null) {
-                        app.label = applicationName;
-                    }
-                    if(localeName != null) {
-                        app.label = localeName;
-                    }
-                    apps.add(app);
-                } catch (Error e) {
-                    print ("Error: %s\n", e.message);
+                    apps.add (app);
                 }
             }
             change (apps);
