@@ -71,9 +71,16 @@ public class ApplicationItemWidget: Gtk.EventBox {
             menu.add(separator);
 
             var menuItem3 = new Gtk.MenuItem();
-            menuItem3.set_label(_("Pin to start"));
+            if(!item.isFavorite)
+                menuItem3.set_label(_("Pin to start"));
+            else
+                menuItem3.set_label(_("Unpin from start"));
+                
             menuItem3.activate.connect(() => {
-                addToFavorites(item);
+                if(item.isFavorite)
+                    removeFromFavorites(item);
+                else
+                    addToFavorites(item);
             });
             menu.add(menuItem3);
 
@@ -131,8 +138,18 @@ public class ApplicationItemWidget: Gtk.EventBox {
         if(favorites.contains(item)) {
             return;
         }
-        
+
         favorites.add(item);
+        FavoritesRepository.saveFavorites(favorites);
+    }
+
+    private void removeFromFavorites(ApplicationItem item) {
+        var favorites = FavoritesRepository.getFavorites();
+        if(!favorites.contains(item)) {
+            return;
+        }
+        
+        favorites.remove(item);
         FavoritesRepository.saveFavorites(favorites);
     }
 }

@@ -3,6 +3,7 @@ public class ApplicationItem {
     public string icon {get; set;}
     public string action {get; set;}
     public string desktopFilePath {get; set;}
+    public bool isFavorite {get; set;}
 
     public string toString() {
         return "{\"label\": \"%s\", \"action\": \"%s\", \"icon\": \"%s\", \"desktopFilePath\": \"%s\"}"

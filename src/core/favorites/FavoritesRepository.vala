@@ -28,6 +28,7 @@ public class FavoritesRepository {
 
             var item = ApplicationItem.fromDesktopFile(line);
             if(item != null && !favorites.contains(item)) {
+                item.isFavorite = true;
                 favorites.add(item);
             }
         }
