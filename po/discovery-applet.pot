@@ -76,3 +76,12 @@ msgstr ""
 
 msgid "Back"
 msgstr ""
+
+msgid "Run"
+msgstr ""
+
+msgid "Pin to start"
+msgstr ""
+
+msgid "Run as user \"root\""
+msgstr ""

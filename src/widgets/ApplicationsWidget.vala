@@ -145,16 +145,8 @@ public class ApplicationsWidget: Gtk.Box {
 
         if(viewMode == ApplicationViewMode.ALL_APPS_MODE) {
             foreach(var item in this.allApps) {
-                var iconWidget = new ApplicationItemWidget(item);
+                var iconWidget = new ApplicationItemWidget(popover, item);
                 appsLayout.add(iconWidget);
-
-                iconWidget.onContextMenu.connect(widget => {
-                    message("DETECTED RIGHT CLICK ON ICON WIDGET");
-                });
-
-                iconWidget.onPrimaryClick.connect(() => {
-                    popover.hide();
-                });
             }
         }
         appsLayout.show_all();

@@ -183,3 +183,12 @@ msgstr "Alle Anwendungen"
 
 msgid "Back"
 msgstr "Zurück"
+
+msgid "Run"
+msgstr "Ausführen"
+
+msgid "Run as user \"root\""
+msgstr "Als Benutzer \"root\" ausführen"
+
+msgid "Pin to start"
+msgstr "An Start anheften"

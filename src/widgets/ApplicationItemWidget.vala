@@ -1,13 +1,12 @@
 using Gdk;
+using Gee;
 
 public class ApplicationItemWidget: Gtk.EventBox {
     private Gtk.Image icon;
     public Gtk.Label label {get; set;}
+    private Gtk.Menu menu;
 
-    public signal void onContextMenu(ApplicationItemWidget widget);
-    public signal void onPrimaryClick();
-
-    public ApplicationItemWidget(ApplicationItem item) {
+    public ApplicationItemWidget(Budgie.Popover popover, ApplicationItem item) {
         Object();
         var layout = new Gtk.Box(Gtk.Orientation.VERTICAL, 5);
         
@@ -28,20 +27,75 @@ public class ApplicationItemWidget: Gtk.EventBox {
         layout.pack_start(icon, false, false, 0);
         layout.pack_start(label, true, true, 0);
 
-        this.button_press_event.connect((event) => {
-            if(event.button == Gdk.BUTTON_SECONDARY) {
-                onContextMenu(this);
-            }
-            if(event.button == Gdk.BUTTON_PRIMARY) {
-                onPrimaryClick();
+        string[] argv = new string[]{item.action.split(" ")[0], null};
+        string[] pkexec = new string[]{"pkexec", item.action.split(" ")[0], null};
+
+        this.map.connect(() => {
+            menu = new Gtk.Menu();
+            var menuItem1 = new Gtk.MenuItem();
+            menuItem1.set_label(_("Run"));
+            menuItem1.button_press_event.connect(() => {
+                popover.hide();
                 Idle.add(() => {
                     try {
-                        GLib.Process.spawn_command_line_async(item.action);
+                        
+                        GLib.Process.spawn_async (null, argv, null,
+                              SpawnFlags.SEARCH_PATH, null, null);
                     } catch(Error e) {
                         error(e.message);
                     }
                     return false;
                 });
+                return true;
+            });
+            menu.add(menuItem1);
+
+            var menuItem2 = new Gtk.MenuItem();
+            menuItem2.set_label(_("Run as user \"root\""));
+            menuItem2.button_press_event.connect(() => {
+                popover.hide();
+                Idle.add(() => {
+                    try {
+                        
+                        GLib.Process.spawn_async (null, pkexec, null,
+                              SpawnFlags.SEARCH_PATH, null, null);
+                    } catch(Error e) {
+                        error(e.message);
+                    }
+                    return false;
+                });
+                return true;
+            });
+            menu.add(menuItem2);
+
+            var separator = new Gtk.SeparatorMenuItem ();
+            menu.add(separator);
+
+            var menuItem3 = new Gtk.MenuItem();
+            menuItem3.set_label(_("Pin to start"));
+            menu.add(menuItem3);
+
+            menu.show_all();
+        });
+
+        this.button_press_event.connect((event) => {
+            if(event.button == Gdk.BUTTON_SECONDARY) {
+                menu.popup_at_pointer(event);
+            }
+
+            if(event.button == Gdk.BUTTON_PRIMARY) {
+                popover.hide();
+                Idle.add(() => {
+                    try {
+                        
+                        GLib.Process.spawn_async (null, argv, null,
+                              SpawnFlags.SEARCH_PATH, null, null);
+                    } catch(Error e) {
+                        error(e.message);
+                    }
+                    return false;
+                });
+                return true;
             }
             return true;
         });
