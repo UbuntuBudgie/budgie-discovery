@@ -27,44 +27,43 @@ public class ApplicationItemWidget: Gtk.EventBox {
         layout.pack_start(icon, false, false, 0);
         layout.pack_start(label, true, true, 0);
 
-        string[] argv = new string[]{item.action.split(" ")[0], null};
-        string[] pkexec = new string[]{"pkexec", item.action.split(" ")[0], null};
+        string[] argv = null;
+        try {
+            GLib.Shell.parse_argv(item.action, out argv);
+        }
+        catch(Error e) {
+            error("Failed to parse action for app %s: %s", item.label, e.message);
+        }
 
+        string[] pkexec = argv != null ? new string[]{"pkexec", argv[0], null} : null;
+
+        menu = new Gtk.Menu();
         this.map.connect(() => {
-            menu = new Gtk.Menu();
             var menuItem1 = new Gtk.MenuItem();
             menuItem1.set_label(_("Run"));
-            menuItem1.button_press_event.connect(() => {
+            menuItem1.activate.connect(() => {
                 popover.hide();
-                Idle.add(() => {
-                    try {
-                        
-                        GLib.Process.spawn_async (null, argv, null,
-                              SpawnFlags.SEARCH_PATH, null, null);
-                    } catch(Error e) {
-                        error(e.message);
-                    }
-                    return false;
-                });
-                return true;
+                try {
+                    if(argv == null) return;   
+                    GLib.Process.spawn_async (null, new string[]{argv[0]}, null,
+                            SpawnFlags.SEARCH_PATH, null, null);
+                } catch(Error e) {
+                    error(e.message);
+                }
             });
             menu.add(menuItem1);
 
             var menuItem2 = new Gtk.MenuItem();
             menuItem2.set_label(_("Run as user \"root\""));
-            menuItem2.button_press_event.connect(() => {
+            menuItem2.activate.connect(() => {
                 popover.hide();
-                Idle.add(() => {
-                    try {
-                        
-                        GLib.Process.spawn_async (null, pkexec, null,
-                              SpawnFlags.SEARCH_PATH, null, null);
-                    } catch(Error e) {
-                        error(e.message);
-                    }
-                    return false;
-                });
-                return true;
+                try {
+                    if(pkexec == null) return;
+                    GLib.Process.spawn_async (null, pkexec, null,
+                            SpawnFlags.SEARCH_PATH, null, null);
+                } catch(Error e) {
+                    error(e.message);
+                }
             });
             menu.add(menuItem2);
 
@@ -85,17 +84,13 @@ public class ApplicationItemWidget: Gtk.EventBox {
 
             if(event.button == Gdk.BUTTON_PRIMARY) {
                 popover.hide();
-                Idle.add(() => {
-                    try {
-                        
-                        GLib.Process.spawn_async (null, argv, null,
-                              SpawnFlags.SEARCH_PATH, null, null);
-                    } catch(Error e) {
-                        error(e.message);
-                    }
-                    return false;
-                });
-                return true;
+                try {
+                    if(argv == null) return true;
+                    GLib.Process.spawn_async (null, new string[]{argv[0]}, null,
+                            SpawnFlags.SEARCH_PATH, null, null);
+                } catch(Error e) {
+                    error(e.message);
+                }
             }
             return true;
         });
@@ -111,7 +106,7 @@ public class ApplicationItemWidget: Gtk.EventBox {
             return;
         }
 
-        if(value.index_of("/") == 0) {
+        if(GLib.Path.is_absolute(value)) {
             try {
                 var pixbuf = new Pixbuf.from_file(value)
                     .scale_simple(icon.pixel_size, icon.pixel_size, Gdk.InterpType.BILINEAR);
