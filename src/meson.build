@@ -35,6 +35,7 @@ discovery_applet_sources = [
     'core/applications/ApplicationViewMode.vala',
     'core/feed/FeedItem.vala',
     'core/feed/FeedRepository.vala',
+    'core/favorites/FavoritesRepository.vala',
     'core/SortDirection.vala',
     'core/weather/WeatherRespository.vala',
     'core/weather/WeatherForecastItem.vala',

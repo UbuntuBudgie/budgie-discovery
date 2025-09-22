@@ -3,6 +3,7 @@ using Gee;
 public class ApplicationsWidget: Gtk.Box {
     private Gtk.FlowBox appsLayout;
     private ArrayList<ApplicationItem> allApps;
+    private HashSet<ApplicationItem> favoriteApps;
     private SortDirection sortDirection = SortDirection.ASCENDING;
     private Gtk.Button sortButton;
     private Gtk.Label pinnedLabel;
@@ -145,6 +146,14 @@ public class ApplicationsWidget: Gtk.Box {
 
         if(viewMode == ApplicationViewMode.ALL_APPS_MODE) {
             foreach(var item in this.allApps) {
+                var iconWidget = new ApplicationItemWidget(popover, item);
+                appsLayout.add(iconWidget);
+            }
+        }
+
+        if(viewMode == ApplicationViewMode.PINNED_APPS_MODE) {
+            this.favoriteApps = FavoritesRepository.getFavorites();
+            foreach(var item in this.favoriteApps) {
                 var iconWidget = new ApplicationItemWidget(popover, item);
                 appsLayout.add(iconWidget);
             }

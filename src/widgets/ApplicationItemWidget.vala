@@ -72,6 +72,9 @@ public class ApplicationItemWidget: Gtk.EventBox {
 
             var menuItem3 = new Gtk.MenuItem();
             menuItem3.set_label(_("Pin to start"));
+            menuItem3.activate.connect(() => {
+                addToFavorites(item);
+            });
             menu.add(menuItem3);
 
             menu.show_all();
@@ -121,5 +124,15 @@ public class ApplicationItemWidget: Gtk.EventBox {
 
     private void setLabel(string value) {
         label.set_text(value);
+    }
+
+    private void addToFavorites(ApplicationItem item) {
+        var favorites = FavoritesRepository.getFavorites();
+        if(favorites.contains(item)) {
+            return;
+        }
+        
+        favorites.add(item);
+        FavoritesRepository.saveFavorites(favorites);
     }
 }
