@@ -1,7 +1,7 @@
 using Gee;
 
 public class ApplicationsWidget: Gtk.Box {
-    private Gtk.FlowBox appsLayout;
+    private Gtk.Grid appsLayout;
     private ArrayList<ApplicationItem> allApps;
     private HashSet<ApplicationItem> favoriteApps;
     private SortDirection sortDirection = SortDirection.ASCENDING;
@@ -17,6 +17,7 @@ public class ApplicationsWidget: Gtk.Box {
         popover = parent;
         set_orientation(Gtk.Orientation.VERTICAL);
         set_spacing(10);
+        get_style_context().add_class("applications-widget");
 
         var headerWidget = new Gtk.Box(Gtk.Orientation.HORIZONTAL, 5);
         headerWidget.get_style_context().add_class ("header-widget");
@@ -65,11 +66,17 @@ public class ApplicationsWidget: Gtk.Box {
         scrollView.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC);
         scrollView.set_hexpand(true);
         scrollView.set_vexpand(true);
+        scrollView.set_overlay_scrolling(false);
         scrollView.add(stackSwitcher);
         pack_start(scrollView, true, true, 0);
 
-        appsLayout = new Gtk.FlowBox ();
-        appsLayout.max_children_per_line = 7;
+        appsLayout = new Gtk.Grid ();
+        appsLayout.get_style_context().add_class("card");
+        appsLayout.get_style_context().add_class("p-3");
+        appsLayout.set_row_spacing(10);
+        appsLayout.set_column_spacing(10);
+        appsLayout.set_halign(Gtk.Align.FILL);
+        appsLayout.set_valign(Gtk.Align.START);
         stackSwitcher.add(appsLayout);
 
         scrollView.map.connect(() => {
@@ -81,21 +88,7 @@ public class ApplicationsWidget: Gtk.Box {
             viewMode = ApplicationViewMode.PINNED_APPS_MODE;
             pinnedLabel.set_text(_("Pinned"));
             allAppsButton.set_label(_("All Apps"));
-
             updateAppsLayout();
-        });
-
-        this.size_allocate.connect((allocation) => {
-            int per = allocation.width / 6;
-            foreach (var w in appsLayout.get_children()) {
-                w.set_size_request(per, -1);
-
-                var item = w as ApplicationItemWidget;
-                if (item != null) {
-                    item.set_size_request(per, -1);
-                    item.label.set_size_request(per - 10, -1);
-                }
-            }
         });
 
         sortButton.button_press_event.connect(() => {
@@ -140,22 +133,28 @@ public class ApplicationsWidget: Gtk.Box {
     }
 
     private void updateAppsLayout() {
-        foreach(var widget in appsLayout.get_children()) {
-            appsLayout.remove(widget);
-        }
+        appsLayout.foreach((child) => appsLayout.remove(child));
 
-        if(viewMode == ApplicationViewMode.ALL_APPS_MODE) {
-            foreach(var item in this.allApps) {
-                var iconWidget = new ApplicationItemWidget(popover, item);
-                appsLayout.add(iconWidget);
-            }
-        }
+        int col = 0;
+        int row = 0;
+        int maxCols = 6;
 
         if(viewMode == ApplicationViewMode.PINNED_APPS_MODE) {
-            this.favoriteApps = FavoritesRepository.getFavorites();
-            foreach(var item in this.favoriteApps) {
-                var iconWidget = new ApplicationItemWidget(popover, item);
-                appsLayout.add(iconWidget);
+            favoriteApps = FavoritesRepository.getFavorites();
+        }
+
+        var items = (viewMode == ApplicationViewMode.ALL_APPS_MODE) ? allApps : 
+            (Gee.Iterable<ApplicationItem>)favoriteApps;
+
+        foreach (var item in items) {
+            var iconWidget = new ApplicationItemWidget(popover, item);
+            iconWidget.set_size_request(100, 100);
+            appsLayout.attach(iconWidget, col, row, 1, 1);
+
+            col++;
+            if (col >= maxCols) {
+                col = 0;
+                row++;
             }
         }
         appsLayout.show_all();

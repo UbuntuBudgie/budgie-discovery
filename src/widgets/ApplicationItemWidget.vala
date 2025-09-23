@@ -8,7 +8,12 @@ public class ApplicationItemWidget: Gtk.EventBox {
 
     public ApplicationItemWidget(Budgie.Popover popover, ApplicationItem item) {
         Object();
+        add_events(Gdk.EventMask.POINTER_MOTION_MASK |
+                Gdk.EventMask.ENTER_NOTIFY_MASK |
+                Gdk.EventMask.LEAVE_NOTIFY_MASK);
+
         var layout = new Gtk.Box(Gtk.Orientation.VERTICAL, 5);
+        layout.get_style_context().add_class("application-item");
         
         icon = new Gtk.Image();
         icon.set_pixel_size(48);
@@ -75,7 +80,7 @@ public class ApplicationItemWidget: Gtk.EventBox {
                 menuItem3.set_label(_("Pin to start"));
             else
                 menuItem3.set_label(_("Unpin from start"));
-                
+
             menuItem3.activate.connect(() => {
                 if(item.isFavorite)
                     removeFromFavorites(item);
@@ -104,6 +109,16 @@ public class ApplicationItemWidget: Gtk.EventBox {
             }
             return true;
         });
+
+        this.enter_notify_event.connect((event) => {
+            layout.get_style_context().add_class("hover");
+            return false;
+        });
+        this.leave_notify_event.connect((event) => {
+            layout.get_style_context().remove_class("hover");
+            return false;
+        });
+        
 
         add(layout);
         setIcon(item.icon);
