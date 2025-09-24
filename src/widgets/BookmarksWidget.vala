@@ -1,5 +1,8 @@
+using Gee;
+
 public class BookmarksWidget: Gtk.Box {
     private Gtk.Grid appsLayout = new Gtk.Grid();
+    private Gtk.Box bookmarksLayout = new Gtk.Box(Gtk.Orientation.VERTICAL, 0);
     private Budgie.Popover popover;
 
     public BookmarksWidget(Budgie.Popover parent) {
@@ -39,6 +42,18 @@ public class BookmarksWidget: Gtk.Box {
         appsLayout.set_valign(Gtk.Align.START);
         pageLayout.pack_start(appsLayout, true, true, 0);
 
+        bookmarksLayout.get_style_context().add_class("card");
+        bookmarksLayout.get_style_context().add_class("p-3");
+        bookmarksLayout.set_halign(Gtk.Align.FILL);
+        bookmarksLayout.set_valign(Gtk.Align.START);
+        pageLayout.pack_start(bookmarksLayout, true, true, 0);
+
+        var bookmarkService = new BookmarkService();
+        bookmarkService.bookmarksChanged.connect(() => {
+            updateBookmarksLayout();
+        });
+        bookmarkService.start_service();
+
         pageLayout.show_all();
         updateAppsLayout();
     }
@@ -64,5 +79,72 @@ public class BookmarksWidget: Gtk.Box {
             }
         }
         appsLayout.show_all();
+    }
+
+    private void updateBookmarksLayout() {
+        bookmarksLayout.foreach((child) => bookmarksLayout.remove(child));
+
+        var items = BookmarkRepository.getBookmarks();
+        foreach (var item in items) {
+            var bookmarkRow = new Gtk.Box(Gtk.Orientation.HORIZONTAL, 5);
+            bookmarkRow.get_style_context().add_class("bookmark-row");
+            bookmarkRow.set_halign(Gtk.Align.FILL);
+            bookmarkRow.set_valign(Gtk.Align.CENTER);
+
+            var eventBox = new Gtk.EventBox();
+            eventBox.add(bookmarkRow);
+
+            Icon gicon;
+            try {
+                var f = File.new_for_uri(item.uri);
+                if (f.has_uri_scheme("file")) {
+                    // Lokales File → Content-Type Icon
+                    var info = f.query_info("standard::icon", 0, null);
+                    gicon = info.get_icon();
+                } else {
+                    // Netzwerk / sonstige URIs → fallback auf "folder"
+                    gicon = new ThemedIcon("folder");
+                }
+            } catch (Error e) {
+                gicon = new ThemedIcon("folder");
+            }
+
+            var icon = new Gtk.Image();
+            icon.set_from_gicon(gicon, Gtk.IconSize.BUTTON);
+            icon.set_pixel_size(16);
+            icon.set_halign(Gtk.Align.START);
+            icon.set_valign(Gtk.Align.CENTER);
+            bookmarkRow.pack_start(icon, false, false, 0);
+
+            var label = new Gtk.Label(item.name);
+            label.set_halign(Gtk.Align.START);
+            label.set_valign(Gtk.Align.CENTER);
+            label.get_style_context().add_class("bookmark-label");
+            bookmarkRow.pack_start(label, true, true, 0);
+
+            eventBox.add_events(Gdk.EventMask.BUTTON_PRESS_MASK);
+            eventBox.button_press_event.connect((event) => {
+                message("Start URI: %s".printf(item.uri));
+                if (event.button == 1) {
+                    string uri = item.uri;
+                    if (!uri.contains("://")) {
+                        var f = File.new_for_path(uri);
+                        uri = f.get_uri();
+                    }
+
+                    try {
+                        AppInfo.launch_default_for_uri(uri, null);
+                        popover.hide();
+                    } catch (Error e) {
+                        message(e.message);
+                    }
+                }
+                return true;
+            });
+
+            bookmarksLayout.pack_start(eventBox, false, true, 5);
+        }
+
+        bookmarksLayout.show_all();
     }
 }

@@ -32,6 +32,8 @@ discovery_applet_sources = [
 
     'core/IService.vala',
     'core/applications/ApplicationItem.vala',
+    'core/bookmarks/BookmarkItem.vala',
+    'core/bookmarks/BookmarkRepository.vala',
     'core/feed/FeedItem.vala',
     'core/feed/FeedRepository.vala',
     'core/favorites/FavoritesRepository.vala',
@@ -55,6 +57,7 @@ discovery_applet_sources = [
     'widgets/WeatherWidget.vala',
 
     'services/ApplicationService.vala',
+    'services/BookmarkService.vala',
     'services/FeedService.vala', 
     'services/WeatherService.vala',
     config_header
@@ -71,6 +74,7 @@ discovery_applet_deps = [
     dependency('libsoup-3.0', version: '>=2.4'),
     dependency('libpeas-1.0', version: '>=1.36'),
     dependency('gee-0.8', version: '>=0.20'),
+    dependency('gio-2.0', version: '>=2.48', required: true),
     dependency('libxml-2.0', version: '>=2.9'),
     dependency('goa-1.0', version: '>=3.54'),
     cc.find_library('m', required: true),
