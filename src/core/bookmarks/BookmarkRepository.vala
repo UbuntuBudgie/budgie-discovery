@@ -27,13 +27,8 @@ public class BookmarkRepository {
                     if (parts.length > 1) {
                         name = parts[1];
                     } else {
-                        // Extract the last part of the path as the name
-                        try {
-                            var gfile = File.new_for_uri(uri);
-                            name = gfile.get_basename();
-                        } catch (Error e) {
-                            name = uri;
-                        }
+                        var gfile = File.new_for_uri(uri);
+                        name = gfile.get_basename();
                     }
 
                     var bookmark = new BookmarkItem();
