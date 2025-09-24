@@ -4,7 +4,7 @@ public class ApplicationsWidget: Gtk.Box {
     private Gtk.Grid appsLayout;
     private ArrayList<ApplicationItem> allApps;
     private SortDirection sortDirection = SortDirection.ASCENDING;
-    private Gtk.Button sortButton;
+    //private Gtk.Button sortButton;
     private Budgie.Popover popover;
 
     public ApplicationsWidget(Budgie.Popover parent) {
@@ -23,11 +23,11 @@ public class ApplicationsWidget: Gtk.Box {
         headerLabel.get_style_context().add_class ("header-label");
         headerWidget.pack_start(headerLabel, true);
 
-        var addButton = new Gtk.Button.from_icon_name("list-add-symbolic", Gtk.IconSize.SMALL_TOOLBAR);
-        headerWidget.pack_end(addButton, false); 
+        //var addButton = new Gtk.Button.from_icon_name("list-add-symbolic", Gtk.IconSize.SMALL_TOOLBAR);
+        //headerWidget.pack_end(addButton, false); 
 
-        sortButton = new Gtk.Button.from_icon_name("go-down-symbolic", Gtk.IconSize.SMALL_TOOLBAR);
-        headerWidget.pack_end(sortButton, false);
+        //sortButton = new Gtk.Button.from_icon_name("go-down-symbolic", Gtk.IconSize.SMALL_TOOLBAR);
+        //headerWidget.pack_end(sortButton, false);
 
 
         var scrollView = new Gtk.ScrolledWindow(null, null);
@@ -51,6 +51,7 @@ public class ApplicationsWidget: Gtk.Box {
             scrollView.vadjustment.value = 0;
         });
 
+        /*
         sortButton.button_press_event.connect(() => {
             sortDirection = sortDirection == SortDirection.ASCENDING ? SortDirection.DESCENDING : 
                 SortDirection.ASCENDING;
@@ -71,6 +72,8 @@ public class ApplicationsWidget: Gtk.Box {
             updateAppsLayout();
             return true;
         });
+        */
+    
 
         var service = new ApplicationService ();
         service.change.connect(onAppsChange);

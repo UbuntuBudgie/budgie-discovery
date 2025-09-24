@@ -42,7 +42,7 @@ public class ApplicationItemWidget: Gtk.EventBox {
 
         string[] pkexec = argv != null ? new string[]{"pkexec", argv[0], null} : null;
 
-        menu = new Gtk.Menu();
+        this.menu = new Gtk.Menu();
         this.map.connect(() => {
             var menuItem1 = new Gtk.MenuItem();
             menuItem1.set_label(_("Run"));
@@ -56,7 +56,7 @@ public class ApplicationItemWidget: Gtk.EventBox {
                     error(e.message);
                 }
             });
-            menu.add(menuItem1);
+            this.menu.add(menuItem1);
 
             var menuItem2 = new Gtk.MenuItem();
             menuItem2.set_label(_("Run as user \"root\""));
@@ -70,10 +70,10 @@ public class ApplicationItemWidget: Gtk.EventBox {
                     error(e.message);
                 }
             });
-            menu.add(menuItem2);
+            this.menu.add(menuItem2);
 
             var separator = new Gtk.SeparatorMenuItem ();
-            menu.add(separator);
+            this.menu.add(separator);
 
             var menuItem3 = new Gtk.MenuItem();
             if(!item.isFavorite)
@@ -87,14 +87,13 @@ public class ApplicationItemWidget: Gtk.EventBox {
                 else
                     addToFavorites(item);
             });
-            menu.add(menuItem3);
-
-            menu.show_all();
+            this.menu.add(menuItem3);
+            this.menu.show_all();
         });
 
         this.button_press_event.connect((event) => {
             if(event.button == Gdk.BUTTON_SECONDARY) {
-                menu.popup_at_pointer(event);
+                this.menu.popup_at_pointer(event);
             }
 
             if(event.button == Gdk.BUTTON_PRIMARY) {
