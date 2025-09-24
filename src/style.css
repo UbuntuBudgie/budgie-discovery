@@ -1,5 +1,6 @@
 .discovery-popup {
-    background-color: rgba(255, 255, 255, .975);
+    background-color: rgba(250, 250, 250, .975);
+    /*background-color: rgba(216, 233, 246, .975);*/
 }
 .discovery-popup .popup-content {
     margin: 15px;
@@ -209,7 +210,7 @@
 
 .discovery-popup .card {
     border-radius: 10px;
-    border: 1px solid rgba(222, 222, 222, .5);
+    border: 1px solid rgba(222, 222, 222, .75);
     box-shadow: 2px 2px 2px rgba(222, 222, 222, .5);
     transition: box-shadow 250ms ease-in;
 }
@@ -248,10 +249,11 @@
 .discovery-popup .applications-widget .application-item {
     padding: 0.5em;
     border-radius: 10px;
-    transition: background-color 150ms ease-in;
+    transition: background-color 250ms ease-in-out;
 }
 .discovery-popup .applications-widget .application-item.hover {
-    background-color: #efefef;
+    /*background-color: rgba(255, 255, 255, 0.75);*/
+    background-color: rgba(226, 241, 254, .75);
 }
 
 .discovery-popup .feed-widget scrollbar,
@@ -279,6 +281,11 @@
 .discovery-popup .feed-widget .card,
 .discovery-popup .applications-widget .card {
     background-color: #fff;
+    transition: background-color 250ms ease-in-out, box-shadow 250ms ease-in-out, border 250ms ease-in-out;
+}
+
+.discovery-popup .feed-widget .feed-item.hover {
+    background-color: rgba(240, 249, 255, .75);
 }
 
 .discovery-popup .weather-widget-day {

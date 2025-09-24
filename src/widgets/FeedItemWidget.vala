@@ -5,6 +5,7 @@ public class FeedItemWidget: Card {
 
     public FeedItemWidget(FeedItem feedItem) {
         base();
+        get_style_context().add_class ("feed-item");
         itemData = feedItem;
 
         var cardBody = new Gtk.Box(Gtk.Orientation.VERTICAL, 6);
@@ -12,10 +13,15 @@ public class FeedItemWidget: Card {
         
         var eventBox = new Gtk.EventBox ();
         eventBox.set_visible_window(true);
+        eventBox.add_events(Gdk.EventMask.POINTER_MOTION_MASK |
+                Gdk.EventMask.ENTER_NOTIFY_MASK |
+                Gdk.EventMask.LEAVE_NOTIFY_MASK);
+
         eventBox.add (cardBody);
         pack_start(eventBox, true);
 
         var image = new FeedItemImageWidget(feedItem);
+        image.set_sensitive (false);
         image.set_size_request(120, 100);
         cardBody.pack_start(image, false);
 
@@ -44,6 +50,23 @@ public class FeedItemWidget: Card {
                 return false;
             });
             return true;
+        });
+
+        eventBox.enter_notify_event.connect((event) => {
+            if (event.detail == Gdk.NotifyType.INFERIOR) return false;
+            var display = Gdk.Display.get_default();
+            var cursor = new Gdk.Cursor.from_name(display, "pointer");
+            eventBox.get_window().set_cursor(cursor);
+
+            get_style_context().add_class("hover");
+            return false;
+        });
+        eventBox.leave_notify_event.connect((event) => {
+            if (event.detail == Gdk.NotifyType.INFERIOR) return false;
+            eventBox.get_window().set_cursor(null);
+
+            get_style_context().remove_class("hover");
+            return false;
         });
     }
 }

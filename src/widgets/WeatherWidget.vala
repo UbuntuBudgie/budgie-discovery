@@ -10,7 +10,7 @@ public class WeatherWidget: Card {
 
     public WeatherWidget() {
         base();
-        get_style_context ().add_class ("no-border");
+        //get_style_context ().add_class ("no-border");
         get_style_context ().add_class ("weather-widget");
         get_style_context ().add_class ("weather-widget-night");
 
