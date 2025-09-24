@@ -28,13 +28,18 @@ public class DiscoveryPopupContent: Gtk.Box {
         feedWidget.set_name("feed");
         stackView.add_named(feedWidget, "feed");
 
+        var bookmarksWidget = new BookmarksWidget();
+        bookmarksWidget.set_name("bookmarks");
+        stackView.add_named(bookmarksWidget, "bookmarks");
+
         var applicationsWidget = new ApplicationsWidget(parent);
         applicationsWidget.set_name("applications");
         stackView.add_named(applicationsWidget, "applications");
 
         // Add tabs to the navigation box
         add_tab(0, "feed", "accessories-dictionary-symbolic");
-        add_tab(1, "applications", "system-software-install-symbolic");
+        add_tab(1, "bookmarks", "user-bookmarks-symbolic");
+        add_tab(2, "applications", "system-software-install-symbolic");
 
         // TODO separate code for that
         var buttonBox = new Gtk.Box(Gtk.Orientation.HORIZONTAL, 5);

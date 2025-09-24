@@ -42,6 +42,7 @@ discovery_applet_sources = [
 
     'widgets/ApplicationItemWidget.vala',
     'widgets/ApplicationsWidget.vala',
+    'widgets/BookmarksWidget.vala',
     'widgets/Card.vala',
     'widgets/SettingsWidget.vala',
     'widgets/DiscoveryPopupContent.vala',
