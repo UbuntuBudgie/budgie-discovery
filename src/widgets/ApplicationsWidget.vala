@@ -16,6 +16,7 @@ public class ApplicationsWidget: Gtk.Box {
 
         var headerWidget = new Gtk.Box(Gtk.Orientation.HORIZONTAL, 5);
         headerWidget.get_style_context().add_class ("header-widget");
+        headerWidget.get_style_context().add_class ("pb-1");
         pack_start(headerWidget, false, true);
 
         var headerLabel = new Gtk.Label(_("Applications"));

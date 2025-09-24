@@ -7,6 +7,7 @@ public class GreetingWidget: Gtk.Box {
         Object();
         set_orientation(Gtk.Orientation.HORIZONTAL);
         get_style_context().add_class("header-widget");
+        get_style_context().add_class ("pb-5");
 
         var leftLayout = new Gtk.Box(Gtk.Orientation.VERTICAL, 0);
         pack_start(leftLayout, true);

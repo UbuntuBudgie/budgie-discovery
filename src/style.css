@@ -85,20 +85,37 @@
 .discovery-popup .p-0 {
     padding: 0;
 }
-.discovery-popup .ps-0 {
-    padding-left: 0;
-}
 
 .discovery-popup .p-1 {
     padding: .125em;
 }
-
 .discovery-popup .p-2 {
     padding: .25em;
 }
-
 .discovery-popup .p-3 {
     padding: .5em;
+}
+.discovery-popup .p-4 {
+    padding: .75em;
+}
+.discovery-popup .p-5 {
+    padding: 1em;
+}
+
+.discovery-popup .pb-1 {
+    padding-bottom: .125em;
+}
+.discovery-popup .pb-2 {
+    padding-bottom: .25em;
+}
+.discovery-popup .pb-3 {
+    padding-bottom: .5em;
+}
+.discovery-popup .pb-4 {
+    padding-bottom: .75em;
+}
+.discovery-popup .pb-5 {
+    padding-bottom: 1em;
 }
 
 .discovery-popup .ps-1 {
@@ -113,10 +130,6 @@
     padding-top: .125em;
 }
 
-.discovery-popup .pb-1 {
-    padding-bottom: .125em;
-}
-
 .discovery-popup .ps-2 {
     padding-left: .25em;
 }
@@ -127,11 +140,6 @@
 .discovery-popup .p-3 {
     padding: .5em;
 }
-
-.discovery-popup .pb-2 {
-    padding-bottom: .25em;
-}
-
 .discovery-popup .pe-2 {
     padding-right: .25em;
 }
@@ -187,10 +195,6 @@
 .discovery-popup .navigation-box {
     padding: 0;
     margin: 0;
-}
-
-.discovery-popup .header-widget {
-    padding-bottom: 20px;
 }
 
 .discovery-popup button {

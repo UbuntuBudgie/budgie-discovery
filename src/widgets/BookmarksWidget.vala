@@ -11,6 +11,7 @@ public class BookmarksWidget: Gtk.Box {
 
         var headerWidget = new Gtk.Box(Gtk.Orientation.HORIZONTAL, 5);
         headerWidget.get_style_context().add_class ("header-widget");
+        headerWidget.get_style_context().add_class ("pb-1");
         pack_start(headerWidget, false, true);
 
         var headerLabel = new Gtk.Label(_("Bookmarks"));
@@ -21,7 +22,14 @@ public class BookmarksWidget: Gtk.Box {
         var pageLayout = new Gtk.Box(Gtk.Orientation.VERTICAL, 0);
         pageLayout.set_hexpand(true);
         pageLayout.set_vexpand(true);
-        pack_start(pageLayout, true, true, 0);
+
+        var scrollView = new Gtk.ScrolledWindow(null, null);
+        scrollView.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC);
+        scrollView.set_hexpand(true);
+        scrollView.set_vexpand(true);
+        scrollView.set_overlay_scrolling(false);
+        scrollView.add(pageLayout);
+        pack_start(scrollView, true, true, 0);
 
         appsLayout.get_style_context().add_class("card");
         appsLayout.get_style_context().add_class("p-3");
@@ -31,13 +39,7 @@ public class BookmarksWidget: Gtk.Box {
         appsLayout.set_valign(Gtk.Align.START);
         pageLayout.pack_start(appsLayout, true, true, 0);
 
-        var scrollView = new Gtk.ScrolledWindow(null, null);
-        scrollView.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC);
-        scrollView.set_hexpand(true);
-        scrollView.set_vexpand(true);
-        scrollView.set_overlay_scrolling(false);
-        pack_start(scrollView, true, true, 0);
-
+        pageLayout.show_all();
         updateAppsLayout();
     }
 
