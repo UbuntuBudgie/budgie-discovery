@@ -6,7 +6,7 @@ public class DiscoveryPopupContent: Gtk.Box {
     private Gtk.Stack stackView;
     private int activeTabIndex = 0;
 
-    public DiscoveryPopupContent(Budgie.Popover? parent = null) {
+    public DiscoveryPopupContent(Budgie.Popover? parent) {
         Object();
         set_orientation(Gtk.Orientation.HORIZONTAL);
         set_spacing(5);
@@ -28,7 +28,7 @@ public class DiscoveryPopupContent: Gtk.Box {
         feedWidget.set_name("feed");
         stackView.add_named(feedWidget, "feed");
 
-        var bookmarksWidget = new BookmarksWidget();
+        var bookmarksWidget = new BookmarksWidget(parent);
         bookmarksWidget.set_name("bookmarks");
         stackView.add_named(bookmarksWidget, "bookmarks");
 

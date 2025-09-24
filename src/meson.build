@@ -32,7 +32,6 @@ discovery_applet_sources = [
 
     'core/IService.vala',
     'core/applications/ApplicationItem.vala',
-    'core/applications/ApplicationViewMode.vala',
     'core/feed/FeedItem.vala',
     'core/feed/FeedRepository.vala',
     'core/favorites/FavoritesRepository.vala',

@@ -3,13 +3,8 @@ using Gee;
 public class ApplicationsWidget: Gtk.Box {
     private Gtk.Grid appsLayout;
     private ArrayList<ApplicationItem> allApps;
-    private HashSet<ApplicationItem> favoriteApps;
     private SortDirection sortDirection = SortDirection.ASCENDING;
     private Gtk.Button sortButton;
-    private Gtk.Label pinnedLabel;
-    private Gtk.Button allAppsButton = new Gtk.Button();
-    private Gtk.Stack stackSwitcher = new Gtk.Stack();
-    private ApplicationViewMode viewMode = ApplicationViewMode.PINNED_APPS_MODE;
     private Budgie.Popover popover;
 
     public ApplicationsWidget(Budgie.Popover parent) {
@@ -34,41 +29,12 @@ public class ApplicationsWidget: Gtk.Box {
         sortButton = new Gtk.Button.from_icon_name("go-down-symbolic", Gtk.IconSize.SMALL_TOOLBAR);
         headerWidget.pack_end(sortButton, false);
 
-        var buttonBox = new Gtk.Box(Gtk.Orientation.HORIZONTAL, 0);
-        pack_start(buttonBox, false);
 
-        pinnedLabel = new Gtk.Label(_("Pinned"));
-        pinnedLabel.get_style_context().add_class("text-size-normal");
-        pinnedLabel.get_style_context().add_class("fw-300");
-        buttonBox.pack_start(pinnedLabel, false);
-
-        allAppsButton.margin_end = 10;
-        allAppsButton.label = _("All Apps");
-        buttonBox.pack_end(allAppsButton, false);
-
-        allAppsButton.button_press_event.connect(() => {
-            if(viewMode == ApplicationViewMode.PINNED_APPS_MODE) {
-                viewMode = ApplicationViewMode.ALL_APPS_MODE;
-                pinnedLabel.set_text(_("All Applications"));
-                allAppsButton.set_label(_("Back"));
-            } else {
-                viewMode = ApplicationViewMode.PINNED_APPS_MODE;
-                pinnedLabel.set_text(_("Pinned"));
-                allAppsButton.set_label(_("All Apps"));
-            }
-            updateAppsLayout();
-            return true;
-        });
-
-        stackSwitcher.set_vexpand(true);
-        stackSwitcher.set_hexpand(true);
         var scrollView = new Gtk.ScrolledWindow(null, null);
         scrollView.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC);
         scrollView.set_hexpand(true);
         scrollView.set_vexpand(true);
         scrollView.set_overlay_scrolling(false);
-        scrollView.add(stackSwitcher);
-        pack_start(scrollView, true, true, 0);
 
         appsLayout = new Gtk.Grid ();
         appsLayout.get_style_context().add_class("card");
@@ -77,18 +43,12 @@ public class ApplicationsWidget: Gtk.Box {
         appsLayout.set_column_spacing(10);
         appsLayout.set_halign(Gtk.Align.FILL);
         appsLayout.set_valign(Gtk.Align.START);
-        stackSwitcher.add(appsLayout);
+        scrollView.add(appsLayout);
+        pack_start(scrollView, true, true, 0);
 
         scrollView.map.connect(() => {
             scrollView.hadjustment.value = 0;
             scrollView.vadjustment.value = 0;
-        });
-
-        map.connect(() => {
-            viewMode = ApplicationViewMode.PINNED_APPS_MODE;
-            pinnedLabel.set_text(_("Pinned"));
-            allAppsButton.set_label(_("All Apps"));
-            updateAppsLayout();
         });
 
         sortButton.button_press_event.connect(() => {
@@ -109,7 +69,6 @@ public class ApplicationsWidget: Gtk.Box {
                 });
             }
             updateAppsLayout();
-
             return true;
         });
 
@@ -139,13 +98,7 @@ public class ApplicationsWidget: Gtk.Box {
         int row = 0;
         int maxCols = 6;
 
-        if(viewMode == ApplicationViewMode.PINNED_APPS_MODE) {
-            favoriteApps = FavoritesRepository.getFavorites();
-        }
-
-        var items = (viewMode == ApplicationViewMode.ALL_APPS_MODE) ? allApps : 
-            (Gee.Iterable<ApplicationItem>)favoriteApps;
-
+        var items = (Gee.Iterable<ApplicationItem>)allApps;
         foreach (var item in items) {
             var iconWidget = new ApplicationItemWidget(popover, item);
             iconWidget.set_size_request(100, 100);
