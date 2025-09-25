@@ -3,7 +3,7 @@
     /*background-color: rgba(216, 233, 246, .975);*/
 }
 .discovery-popup .popup-content {
-    margin: 15px;
+    margin: 10px;
     font-size: 1em;
     font-family: "Roboto Regular", sans-serif;
     font-weight: 400;
@@ -11,7 +11,7 @@
 }
 
 .navigation-box {
-    padding-right: 20px;
+    padding-right: 5px;
     border-right: 1px solid #dedede;
 }
 
@@ -190,11 +190,6 @@
     margin-top: 10px;
     padding-top: 10px;
     border-top: 1px solid #ccc;
-}
-
-.discovery-popup .navigation-box {
-    padding: 0;
-    margin: 0;
 }
 
 .discovery-popup button {
