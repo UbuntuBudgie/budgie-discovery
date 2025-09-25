@@ -4,6 +4,7 @@ public class BookmarksWidget: Gtk.Box {
     private Gtk.Grid appsLayout = new Gtk.Grid();
     private Gtk.Grid bookmarksLayout = new Gtk.Grid();
     private Budgie.Popover popover;
+    private static int ITEM_SIZE = 100;
 
     public BookmarksWidget(Budgie.Popover parent) {
         Object();
@@ -92,7 +93,7 @@ public class BookmarksWidget: Gtk.Box {
 
         foreach (var item in items) {
             var iconWidget = new ApplicationItemWidget(popover, item);
-            iconWidget.set_size_request(100, 100);
+            iconWidget.set_size_request(ITEM_SIZE, ITEM_SIZE);
             appsLayout.attach(iconWidget, col, row, 1, 1);
 
             col++;
@@ -115,7 +116,6 @@ public class BookmarksWidget: Gtk.Box {
         foreach (var item in items) {
             var bookmarkWidget = new BookmarkItemWidget(popover, item);
             bookmarkWidget.button_press_event.connect((event) => {
-                message("Start URI: %s".printf(item.uri));
                 if (event.button == 1) {
                     string uri = item.uri;
                     if (!uri.contains("://")) {
@@ -147,7 +147,7 @@ public class BookmarksWidget: Gtk.Box {
                 return true;
             });
 
-            bookmarkWidget.set_size_request(100, 100);
+            bookmarkWidget.set_size_request(ITEM_SIZE, ITEM_SIZE);
             bookmarksLayout.attach(bookmarkWidget, col, row, 1, 1);
 
             col++;
