@@ -60,6 +60,7 @@ discovery_applet_sources = [
 
     'services/ApplicationService.vala',
     'services/BookmarkService.vala',
+    'services/FileWatcherService.vala',
     'services/FeedService.vala', 
     'services/WeatherService.vala',
     config_header

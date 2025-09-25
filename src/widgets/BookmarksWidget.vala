@@ -64,9 +64,16 @@ public class BookmarksWidget: Gtk.Box {
         bookmarksLayout.set_valign(Gtk.Align.START);
         pageLayout.pack_start(bookmarksLayout, false, false, 0);
 
-        var bookmarkService = new BookmarkService();
-        bookmarkService.bookmarksChanged.connect(() => {
-            updateBookmarksLayout();
+        var bookmarksPath = Environment.get_user_config_dir () + "/gtk-3.0/bookmarks";
+        var favoritesPath = "%s/budgie-desktop/plugins/discovery-applet/favorites.txt".printf( Environment.get_user_data_dir());
+
+        var bookmarkService = new FileWatcherSevice();
+        bookmarkService.watchFile(bookmarksPath);
+        bookmarkService.watchFile(favoritesPath);
+
+        bookmarkService.fileChanged.connect((path) => {
+            if( path == bookmarksPath) updateBookmarksLayout();
+            if( path == favoritesPath) updateAppsLayout();
         });
         bookmarkService.start_service();
 
