@@ -169,20 +169,20 @@ msgstr "Leichte Gewitter mit Hagel"
 msgid "Thunderstorms With Hail"
 msgstr "Gewitter mit Hagel"
 
+msgid "Bookmarks"
+msgstr "Favoriten"
+
 msgid "Applications"
 msgstr "Anwendungen"
 
 msgid "Pinned"
 msgstr "Angeheftet"
 
-msgid "All Apps"
-msgstr "Alle"
+msgid "Favorite Applications"
+msgstr "Bevorzugte Anwendungen"
 
-msgid "All Applications"
-msgstr "Alle Anwendungen"
-
-msgid "Back"
-msgstr "Zurück"
+msgid "Locations"
+msgstr "Orte"
 
 msgid "Run"
 msgstr "Ausführen"
@@ -192,3 +192,6 @@ msgstr "Als Benutzer \"root\" ausführen"
 
 msgid "Pin to start"
 msgstr "An Start anheften"
+
+msgid "Unpin from start"
+msgstr "Vom Start lösen"

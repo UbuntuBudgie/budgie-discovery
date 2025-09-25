@@ -22,7 +22,7 @@ public class BookmarksWidget: Gtk.Box {
         headerLabel.get_style_context().add_class ("header-label");
         headerWidget.pack_start(headerLabel, true);
 
-        var pageLayout = new Gtk.Box(Gtk.Orientation.VERTICAL, 10);
+        var pageLayout = new Gtk.Box(Gtk.Orientation.VERTICAL, 0);
         pageLayout.set_hexpand(true);
         pageLayout.set_vexpand(true);
 
@@ -34,13 +34,27 @@ public class BookmarksWidget: Gtk.Box {
         scrollView.add(pageLayout);
         pack_start(scrollView, true, true, 0);
 
+        var applicationsLabel = new Gtk.Label(_("Favorite Applications"));
+        applicationsLabel.get_style_context().add_class("text-size-small");
+        applicationsLabel.get_style_context().add_class("section-label");
+        applicationsLabel.set_halign(Gtk.Align.START);
+        applicationsLabel.set_valign(Gtk.Align.END);
+        pageLayout.pack_start(applicationsLabel, false, false, 0);
+
         appsLayout.get_style_context().add_class("card");
         appsLayout.get_style_context().add_class("p-3");
+        appsLayout.get_style_context().add_class("mb-5");
         appsLayout.set_row_spacing(10);
         appsLayout.set_column_spacing(10);
         appsLayout.set_halign(Gtk.Align.FILL);
         appsLayout.set_valign(Gtk.Align.START);
         pageLayout.pack_start(appsLayout, false, false, 0);
+
+        var locationsLabel = new Gtk.Label(_("Locations"));
+        locationsLabel.get_style_context().add_class("text-size-small");
+        locationsLabel.get_style_context().add_class("section-label");
+        locationsLabel.set_halign(Gtk.Align.START);
+        pageLayout.pack_start(locationsLabel, false, false, 0);
 
         bookmarksLayout.get_style_context().add_class("card");
         bookmarksLayout.get_style_context().add_class("p-3");

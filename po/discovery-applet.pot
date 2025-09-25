@@ -65,23 +65,29 @@ msgstr ""
 msgid "Low"
 msgstr ""
 
+msgid "Bookmarks"
+msgstr ""
+
 msgid "Applications"
 msgstr ""
 
 msgid "Pinned"
+msgstr "Angeheftet"
+
+msgid "Favorite Applications"
 msgstr ""
 
-msgid "All Applications"
-msgstr ""
-
-msgid "Back"
+msgid "Locations"
 msgstr ""
 
 msgid "Run"
 msgstr ""
 
+msgid "Run as user \"root\""
+msgstr ""
+
 msgid "Pin to start"
 msgstr ""
 
-msgid "Run as user \"root\""
+msgid "Unpin from start"
 msgstr ""
