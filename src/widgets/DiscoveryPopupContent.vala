@@ -1,5 +1,4 @@
 using Config;
-using WebKit;
 
 public class DiscoveryPopupContent: Gtk.Box {
     private Gtk.Box navigationBox;
