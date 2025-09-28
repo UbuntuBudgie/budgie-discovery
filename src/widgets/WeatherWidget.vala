@@ -78,6 +78,12 @@ public class WeatherWidget: Card {
 
         var weatherCodes = weatherCodesJson.get_object();
 
+        var weatherService = new WeatherService();
+        Idle.add(() => {
+            weatherService.start_service ();
+            return false;
+        });
+
         weatherRepository = WeatherRepository.getInstance();
         weatherRepository.weatherUpdated.connect(() => {
             forecastItems.clear();
