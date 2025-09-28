@@ -6,6 +6,7 @@ public class WeatherWidget: Card {
     private Gtk.Label currentTemperatureLabel = new Gtk.Label("--");
     private Gtk.Label currentDescriptionLabel = new Gtk.Label("");
     private Gtk.Image currentWeatherIcon = new Gtk.Image();
+    private Gtk.Label lastUpdatedLabel = new Gtk.Label("");
     private ArrayList <WeatherForecastItem> forecastItems = new ArrayList<WeatherForecastItem>();
 
     public WeatherWidget() {
@@ -68,6 +69,12 @@ public class WeatherWidget: Card {
 
         var forecastBox = new Gtk.Box(Gtk.Orientation.HORIZONTAL, 3);
         layout.pack_start(forecastBox, true);
+
+        lastUpdatedLabel.get_style_context().add_class("text-size-small");
+        lastUpdatedLabel.get_style_context().add_class("text-color-muted");
+        lastUpdatedLabel.set_halign (Gtk.Align.CENTER);
+        lastUpdatedLabel.set_valign (Gtk.Align.END);
+        pack_end (lastUpdatedLabel,false);
 
         var weatherCodes = weatherCodesJson.get_object();
 
@@ -182,7 +189,7 @@ public class WeatherWidget: Card {
                     forecastBox.pack_start(forcastWidget, true);
                 }
                 forecastBox.show_all();
-
+                lastUpdatedLabel.set_label (_("Last updated: %s").printf(currentDate));
             } else {
                 // Handle the case where no data is available
             }
