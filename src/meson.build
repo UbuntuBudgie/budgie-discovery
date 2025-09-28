@@ -47,14 +47,13 @@ discovery_applet_sources = [
     'widgets/BookmarkItemWidget.vala',
     'widgets/BookmarksWidget.vala',
     'widgets/Card.vala',
-    'widgets/SettingsWidget.vala',
     'widgets/DiscoveryPopupContent.vala',
     'widgets/FeedWidget.vala',
     'widgets/FeedItemWidget.vala',
     'widgets/FeedItemImageWidget.vala',
     'widgets/GreetingWidget.vala',
     'widgets/PowerWidget.vala',
-    'widgets/SettingsWidget.vala',
+    'widgets/SettingsWindow.vala',
     'widgets/WeatherForecastWidget.vala',
     'widgets/WeatherWidget.vala',
 
@@ -72,7 +71,6 @@ vala = meson.get_compiler('vala')
 discovery_applet_deps = [
     dependency('gtk+-3.0', version: '>=3.18'),
     dependency('budgie-1.0', version: '>=2'),
-    dependency('webkit2gtk-4.1', version: '>=2.48'),
     dependency('json-glib-1.0', version: '>=1.10'),
     dependency('libsoup-3.0', version: '>=2.4'),
     dependency('libpeas-1.0', version: '>=1.36'),
@@ -88,7 +86,6 @@ discovery_applet_deps = [
 discovery_applet_vala_args = [
     '--target-glib=2.80', 
     '--pkg', 'posix', 
-    '--pkg', 'webkit2gtk-4.1',
     '--pkg', 'glib-2.0'
 ]
 

@@ -3,14 +3,16 @@ A budgie-desktop applet to show latest news, weather and custom widgets in a pop
 
 ## Dependencies
 ```
-vala
-gtk+-3.0
 budgie-1.0
-```
-
-SOLUS
-```
-sudo eopkg it budgie-desktop-devel libgnome-desktop-devel vala
+gee-0.8
+gio-2.0
+goa-1.0
+gtk+-3.0
+json-glib-1.0
+libpeas-1.0
+libsoup-3.0
+libxml-2.0
+vala
 ```
 
 ### Installing from source

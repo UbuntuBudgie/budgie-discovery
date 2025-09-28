@@ -71,18 +71,6 @@ namespace DiscoveryApplet {
                 }
                 return Gdk.EVENT_STOP;
             });
-            
-            var weatherService = new WeatherService();
-            Idle.add(() => {
-                weatherService.start_service ();
-                return false;
-            });
-
-            var feedService = new FeedService();
-            Idle.add(() => {
-                feedService.start_service ();
-                return false;
-            });
 
             popover.get_child ().show_all ();
             show_all ();
