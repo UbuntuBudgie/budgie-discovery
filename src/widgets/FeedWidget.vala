@@ -31,12 +31,11 @@ public class FeedWidget: Gtk.Box {
         var settingsButton = new Gtk.Button.from_icon_name("preferences-system-symbolic", Gtk.IconSize.SMALL_TOOLBAR);
         greetingWidget.addButton(settingsButton);
 
-        var feedService = new FeedService(); 
-        reloadButton.clicked.connect(() => {
-            Idle.add(() => {
-                feedService.update_service(true);
-                return false;
-            });
+        settingsButton.button_press_event.connect((event) => {
+            var settingsPopup = new SettingsWindow();
+            settingsPopup.present();
+            popover.hide();
+            return true;
         });
 
         var feedBox = new Gtk.Box(Gtk.Orientation.VERTICAL, 10);
@@ -74,8 +73,21 @@ public class FeedWidget: Gtk.Box {
             feedView.vadjustment.value = 0;
         });
 
+        var feedService = new FeedService();
+        Idle.add(() => {
+            feedService.start_service ();
+            return false;
+        });
+
         var feedRepository = FeedRepository.getInstance();
         feedRepository.feedUpdated.connect(update_feed);
+
+        reloadButton.clicked.connect(() => {
+            Idle.add(() => {
+                feedService.update_service(true);
+                return false;
+            });
+        });
     }
 
     private void resizeChildren() {
