@@ -32,8 +32,9 @@ public class FeedWidget: Gtk.Box {
         greetingWidget.addButton(settingsButton);
 
         settingsButton.button_press_event.connect((event) => {
-            var settingsPopup = new SettingsWindow();
-            settingsPopup.present();
+            var settingsDialog = new SettingsWindow();
+            settingsDialog.show_all();
+            settingsDialog.present();
             popover.hide();
             return true;
         });

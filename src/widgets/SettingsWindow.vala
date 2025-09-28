@@ -1,27 +1,26 @@
 public class SettingsWindow: Gtk.Window {
+    Gtk.Notebook notebook;
     public SettingsWindow() {
         Object();
         set_title("Settings");
         set_type_hint(Gdk.WindowTypeHint.DIALOG);
         gravity = Gdk.Gravity.CENTER;
+        set_default_size (640, 480);
 
-        resize (640, 480);
+        var layout = new Gtk.Box(Gtk.Orientation.VERTICAL, 0);
+        add(layout);
 
-        var notebook = new Gtk.Notebook();
+        notebook = new Gtk.Notebook();
         notebook.set_tab_pos(Gtk.PositionType.TOP);
         notebook.set_scrollable(true);
-        add(notebook);
+        notebook.show_border = false;
+        layout.pack_start(notebook, false);
 
-        /*
-        var generalBox = new GeneralSettingsWidget();
-        notebook.append_page(generalBox, new Gtk.Label("General"));
-
-        var feedBox = new FeedSettingsWidget();
+        var feedBox = new Gtk.Box(Gtk.Orientation.VERTICAL, 10);
         notebook.append_page(feedBox, new Gtk.Label("Feeds"));
 
-        var aboutBox = new AboutWidget();
-        notebook.append_page(aboutBox, new Gtk.Label("About"));
-        */
-        show_all();
+        var aboutBox = new Gtk.Box(Gtk.Orientation.VERTICAL, 10);
+        notebook.append_page(aboutBox, new Gtk.Label("Weather"));
+        layout.show_all ();
     }
 }
