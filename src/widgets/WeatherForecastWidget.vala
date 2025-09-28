@@ -11,7 +11,7 @@ public class WeatherForecastWidget: Card {
         get_style_context().add_class("no-border");
         get_style_context().add_class("no-shadow");
         get_style_context().add_class("weather-forecast-widget");
-        set_spacing (3);
+        set_spacing (1);
 
         pack_start(dateLabel, false);
         dateLabel.get_style_context().add_class("text-size-small");
