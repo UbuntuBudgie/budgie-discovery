@@ -17,6 +17,12 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
+msgid "Weather"
+msgstr ""
+
+msgid "Feeds"
+msgstr ""
+
 #: src/widgets/HumidityWidget.vala:6
 msgid "Humidity"
 msgstr ""
@@ -92,8 +98,17 @@ msgstr ""
 msgid "Unpin from start"
 msgstr ""
 
+msgid "Applet Settings"
+msgstr ""
+
 msgid "OK"
 msgstr ""
 
 msgid "Cancel"
+msgstr ""
+
+msgid "Add Feed"
+msgstr ""
+
+msgid "Add"
 msgstr ""

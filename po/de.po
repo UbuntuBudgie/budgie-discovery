@@ -19,6 +19,12 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Poedit 3.6\n"
 
+msgid "Weather"
+msgstr "Wetter"
+
+msgid "Feeds"
+msgstr ""
+
 #: src/widgets/HumidityWidget.vala:6
 msgid "Humidity"
 msgstr "Luftfeuchtigkeit"
@@ -201,3 +207,12 @@ msgstr "OK"
 
 msgid "Cancel"
 msgstr "Abbrechen"
+
+msgid "Add Feed"
+msgstr "Feed hinzufügen"
+
+msgid "Add"
+msgstr "Hinzufügen"
+
+msgid "Applet Settings"
+msgstr "Applet Einstellungen"

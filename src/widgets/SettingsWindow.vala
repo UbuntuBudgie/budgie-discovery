@@ -9,17 +9,14 @@ public class SettingsWindow: Gtk.Window {
 
     public SettingsWindow() {
         Object();
-        set_title("Settings");
+        set_title(_("Applet Settings"));
         set_type_hint(Gdk.WindowTypeHint.DIALOG);
         gravity = Gdk.Gravity.CENTER;
         set_default_size (640, 480);
         get_style_context().add_class("discovery-settings");
 
         var settingsPath = "%s/%s".printf(Environment.get_user_config_dir(), "discovery-applet").to_string ();
-        message("Checking SettingsPath %s", settingsPath);
-
         if(FileUtils.test(settingsPath, FileTest.IS_DIR) == false) {
-            message("Creating config directory %s", settingsPath);
             DirUtils.create_with_parents(settingsPath, 0755);
             if(FileUtils.test(settingsPath, FileTest.IS_DIR) == false) {
                 stderr.printf("Could not create config directory: %s\n", settingsPath);
@@ -30,8 +27,6 @@ public class SettingsWindow: Gtk.Window {
         filePath = "%s/%s".printf(settingsPath, "settings.json");
         if(FileUtils.test(filePath, FileTest.EXISTS) == false) {
             try {
-                message("Touching file %s", filePath);
-
                 var file = File.new_for_path(filePath);
                 var outputStream = file.create(FileCreateFlags.NONE);
                 outputStream.write("{}".data, null);
@@ -58,9 +53,6 @@ public class SettingsWindow: Gtk.Window {
             Process.exit (1);
         }
 
-
-        message("SettingsFile parsed.");
-
         // Get the root node:
         rootNode = parser.get_root ();
         if(rootNode.is_null ()) {
@@ -81,10 +73,8 @@ public class SettingsWindow: Gtk.Window {
             var feeds_node = new Json.Node (Json.NodeType.ARRAY);
             feeds_node.set_array (feeds);
             rootObject.set_member ("feeds", feeds_node);
-            message("Modified root object: feed array added");
         }
         else {
-            message("Root object has feed array");
             feeds =  rootObject.get_array_member ("feeds");
         }
 
@@ -96,8 +86,6 @@ public class SettingsWindow: Gtk.Window {
             var feedNode = new Json.Node (Json.NodeType.OBJECT);
             feedNode.set_object (feedNodeObject);
             feeds.add_element (feedNode);
-
-            message("Feed added");
             updateSettings();
         }
 
@@ -112,10 +100,10 @@ public class SettingsWindow: Gtk.Window {
 
         var feedBox = new Gtk.Box(Gtk.Orientation.VERTICAL, 10);
         feedBox.get_style_context().add_class("settings-page");
-        notebook.append_page(feedBox, new Gtk.Label("Feeds"));
+        notebook.append_page(feedBox, new Gtk.Label(_("Feeds")));
 
         var aboutBox = new Gtk.Box(Gtk.Orientation.VERTICAL, 10);
-        notebook.append_page(aboutBox, new Gtk.Label("Weather"));
+        notebook.append_page(aboutBox, new Gtk.Label(_("Weather")));
         layout.show_all ();
 
         var feedHeadline = new Gtk.Label("RSS Feeds");
@@ -140,7 +128,9 @@ public class SettingsWindow: Gtk.Window {
         var plusImage = new Gtk.Image.from_icon_name("list-add-symbolic", Gtk.IconSize.BUTTON);
         plusImage.pixel_size = 16;
         addFeedButton.set_image(plusImage);
+        addFeedButton.set_label(_("Add"));
         addFeedButton.set_halign (Gtk.Align.START);
+        addFeedButton.set_always_show_image(true);
         addFeedButton.clicked.connect(() => {
             var dialog = new FeedItemDialog(this);
             int response = dialog.run();
@@ -154,7 +144,6 @@ public class SettingsWindow: Gtk.Window {
                     var feedNode = new Json.Node (Json.NodeType.OBJECT);
                     feedNode.set_object (feedNodeObject);
                     feeds.add_element (feedNode);   
-                    message("Feed added");
                     updateSettings();
                     var feedRow = new FeedRow(this, feedUri, feedName);
                     scrollLayout.pack_start (feedRow, false);
@@ -258,7 +247,6 @@ public class SettingsWindow: Gtk.Window {
                         if(feed.get_string_member ("uri") == uri && feed.get_string_member ("name") == feedName) {
                             parentWindow.feeds.remove_element (i);
                             parentWindow.updateSettings();
-                            message("Feed removed");
                             break;  
                         }
                     }
@@ -278,10 +266,10 @@ public class SettingsWindow: Gtk.Window {
             get_style_context().add_class("settings-dialog");
             load_style_sheet();
             set_transient_for(parent);
-            set_title("Feed Item");
             set_type_hint(Gdk.WindowTypeHint.DIALOG);
             gravity = Gdk.Gravity.CENTER;
             set_default_size (400, 200);
+            set_title(_("Add Feed"));
 
             var contentArea = get_content_area();
             var layout = new Gtk.Box(Gtk.Orientation.VERTICAL, 10);
@@ -289,6 +277,7 @@ public class SettingsWindow: Gtk.Window {
             layout.set_margin_bottom (10);
             layout.set_margin_start (10);
             layout.set_margin_end (10);
+            layout.vexpand = true;
             contentArea.add(layout);
 
             var nameLabel = new Gtk.Label("Name:");
@@ -317,16 +306,19 @@ public class SettingsWindow: Gtk.Window {
             uriErrorLabel.hide();
             layout.pack_start(uriErrorLabel, false);
 
+            var dummy = new Gtk.Box(Gtk.Orientation.VERTICAL, 0);
+            layout.pack_start(dummy, true, true);
+
             var buttonBox = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 6);
             layout.pack_end (buttonBox, false, false, 0);
-
-            var cancelButton = new Gtk.Button.with_label(_("Cancel"));
-            buttonBox.pack_end (cancelButton, false, false, 0);
 
             var okButton = new Gtk.Button.with_label (_("OK"));
             okButton.set_can_default (true);
             okButton.grab_default ();
             buttonBox.pack_end (okButton, false, false, 0);
+
+            var cancelButton = new Gtk.Button.with_label(_("Cancel"));
+            buttonBox.pack_end (cancelButton, false, false, 0);
 
             cancelButton.clicked.connect(() => {
                 response(Gtk.ResponseType.CANCEL);
