@@ -91,3 +91,9 @@ msgstr ""
 
 msgid "Unpin from start"
 msgstr ""
+
+msgid "OK"
+msgstr ""
+
+msgid "Cancel"
+msgstr ""

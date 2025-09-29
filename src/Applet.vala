@@ -38,8 +38,6 @@ namespace DiscoveryApplet {
         }
 
         public Applet () {
-            
-
             Intl.setlocale (LocaleCategory.ALL, "");
             Intl.bindtextdomain (GETTEXT_PACKAGE, GETTEXT_DIR);
             Intl.bind_textdomain_codeset (GETTEXT_PACKAGE, "UTF-8");
