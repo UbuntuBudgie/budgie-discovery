@@ -203,7 +203,10 @@ public class SettingsWindow: Gtk.Window {
 
             var layout = new Gtk.Box(Gtk.Orientation.HORIZONTAL, 0);
             layout.get_style_context().add_class("feed-row");
-            layout.get_style_context().add_class("ps-2");
+            layout.get_style_context().add_class("ps-3");
+            layout.get_style_context().add_class("pe-1");
+            layout.get_style_context().add_class("pt-1");
+            layout.get_style_context().add_class("pb-1");
             layout.set_sensitive(true);
             add(layout);
 
@@ -224,6 +227,7 @@ public class SettingsWindow: Gtk.Window {
             deleteButton = new Gtk.Button();
             deleteButton.set_size_request(16, 16);
             deleteButton.get_style_context().add_class("p-0");
+            deleteButton.get_style_context().add_class("m-0");
             deleteButton.get_style_context().add_class("no-border");
             deleteButton.get_style_context().add_class("no-background");
 
