@@ -4,9 +4,11 @@ public class DiscoveryPopupContent: Gtk.Box {
     private Gtk.Box navigationBox;
     private Gtk.Stack stackView;
     private int activeTabIndex = 0;
+    private Budgie.Popover popover;
 
     public DiscoveryPopupContent(Budgie.Popover? parent) {
         Object();
+        popover = parent;
         set_orientation(Gtk.Orientation.HORIZONTAL);
         set_spacing(5);
         get_style_context().add_class("discovery-popup-content");
@@ -50,28 +52,31 @@ public class DiscoveryPopupContent: Gtk.Box {
         navigationBox.pack_start(buttonBox, true);
 
         var menu = new Gtk.Menu ();
-        var item1 = new Gtk.MenuItem.with_label ("Lock Screen");
+        var item1 = createPowerMenuItem("Lock Screen", "system-lock-screen-symbolic");
         item1.activate.connect (() => {
             print ("Option 1 gewählt\n");
             parent.hide();
         });
         menu.append (item1);
 
-        var item2 = new Gtk.MenuItem.with_label ("Sleep");
-        item2.activate.connect (() => {
-            print ("Option 2 gewählt\n");
+        var item5 = createPowerMenuItem("Logout", "system-log-out-symbolic");
+        item5.activate.connect (() => {
+            print ("Option 5 gewählt\n");
             parent.hide();
         });
-        menu.append (item2);
+        menu.append (item5);
 
-        var item3 = new Gtk.MenuItem.with_label ("Shut down");
+        var divider = new Gtk.SeparatorMenuItem();
+        menu.append(divider);
+
+        var item3 = createPowerMenuItem("Shut Down", "system-shutdown-symbolic");
         item3.activate.connect (() => {
             print ("Option 3 gewählt\n");
             parent.hide();
         });
         menu.append (item3);
 
-        var item4 = new Gtk.MenuItem.with_label ("Restart");
+        var item4 = createPowerMenuItem("Restart", "system-reboot-symbolic");
         item4.activate.connect (() => {
             print ("Option 4 gewählt\n");
             parent.hide();
@@ -80,6 +85,16 @@ public class DiscoveryPopupContent: Gtk.Box {
 
         menuButton.set_popup (menu);
         menu.show_all();
+    }
+
+    private Gtk.MenuItem createPowerMenuItem(string text, string? iconName) {
+        var item = new Gtk.ImageMenuItem.with_label(text);
+        var image = new Gtk.Image.from_icon_name(iconName, Gtk.IconSize.MENU);
+        image.get_style_context().add_class("ms-4");
+        image.valign = Gtk.Align.CENTER;
+        item.image = image;
+        item.always_show_image = true;
+        return item;
     }
 
     public override void get_preferred_width(out int minimum_width, out int natural_width) {
@@ -104,15 +119,6 @@ public class DiscoveryPopupContent: Gtk.Box {
         var icon = new Gtk.Image.from_icon_name(iconName, Gtk.IconSize.SMALL_TOOLBAR);
         // icon.set_pixel_size(24);
         tabButton.set_image(icon);
-
-        if(index == 0) {
-            // Highlight the first tab as active
-            tabButton.set_state_flags(Gtk.StateFlags.ACTIVE, true);
-            tabButton.get_style_context().add_class("active");
-        } else {
-            tabButton.set_state_flags(Gtk.StateFlags.NORMAL, true);
-        }
-
         navigationBox.pack_start(tabButton, false, false, 0);
     }
 
@@ -127,15 +133,6 @@ public class DiscoveryPopupContent: Gtk.Box {
             return; // No change needed
         }
 
-        // reset button states
-        navigationBox.get_children().foreach((child) => {
-            if (child is Gtk.Button) { // ignore power buttons
-                var button = (Gtk.Button) child;
-                button.set_state_flags(Gtk.StateFlags.NORMAL, true);
-                button.get_style_context().remove_class("active");
-            }
-        });
-
         var widget = (Gtk.Widget) stackView.get_children().nth_data(index);
         if(widget == null) {
             warning("Widget at index %d is null", index);
@@ -147,19 +144,5 @@ public class DiscoveryPopupContent: Gtk.Box {
         }
         activeTabIndex = index;
         stackView.set_visible_child( widget );
-
-        navigationBox.get_children().foreach((child) => {
-            if (child is Gtk.Button) { // ignore power buttons
-                var button = (Gtk.Button) child;
-                if (child.get_name() == widget.get_name()) {
-                    // Highlight the active tab button
-                    button.set_state_flags(Gtk.StateFlags.ACTIVE|Gtk.StateFlags.FOCUSED|Gtk.StateFlags.SELECTED, true);
-                    button.get_style_context().add_class("active");
-                } else {
-                    button.set_state_flags(Gtk.StateFlags.NORMAL, true);
-                    button.get_style_context().remove_class("active");
-                }
-            }
-        });
     }
 }
