@@ -98,24 +98,18 @@ public class SettingsWindow: Gtk.Window {
         notebook.show_border = false;
         layout.pack_start(notebook, false);
 
-        var feedBox = new Gtk.Box(Gtk.Orientation.VERTICAL, 10);
+        var feedBox = new Gtk.Box(Gtk.Orientation.VERTICAL, 0);
         feedBox.get_style_context().add_class("settings-page");
         notebook.append_page(feedBox, new Gtk.Label(_("Feeds")));
 
-        var aboutBox = new Gtk.Box(Gtk.Orientation.VERTICAL, 10);
-        notebook.append_page(aboutBox, new Gtk.Label(_("Weather")));
+        var weatherBox = new Gtk.Box(Gtk.Orientation.VERTICAL, 10);
+        notebook.append_page(weatherBox, new Gtk.Label(_("Weather")));
         layout.show_all ();
-
-        var feedHeadline = new Gtk.Label("RSS Feeds");
-        feedHeadline.get_style_context ().add_class ("text-size-normal");
-        feedHeadline.get_style_context ().add_class ("fw-bold");
-        feedHeadline.get_style_context().add_class("ps-4");
-        feedHeadline.set_halign (Gtk.Align.START);
-        feedBox.pack_start (feedHeadline, false);
 
         // add scrollwindow for feed list
         var feedScroll = new Gtk.ScrolledWindow (null, null);
         feedScroll.get_style_context().add_class("feed-list");
+        feedScroll.get_style_context().add_class("mb-2");
         feedScroll.set_policy (Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC);
         feedScroll.vexpand = true;
         feedScroll.hexpand = true;
@@ -131,6 +125,7 @@ public class SettingsWindow: Gtk.Window {
         addFeedButton.set_label(_("Add"));
         addFeedButton.set_halign (Gtk.Align.START);
         addFeedButton.set_always_show_image(true);
+        addFeedButton.get_style_context().add_class("border-1");
         addFeedButton.clicked.connect(() => {
             var dialog = new FeedItemDialog(this);
             int response = dialog.run();
@@ -229,6 +224,8 @@ public class SettingsWindow: Gtk.Window {
             deleteButton = new Gtk.Button();
             deleteButton.set_size_request(16, 16);
             deleteButton.get_style_context().add_class("p-0");
+            deleteButton.get_style_context().add_class("no-border");
+            deleteButton.get_style_context().add_class("no-background");
 
             var deleteImage = new Gtk.Image();
             deleteImage.set_from_icon_name("edit-delete-symbolic", Gtk.IconSize.BUTTON);
