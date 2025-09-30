@@ -37,6 +37,7 @@ discovery_applet_sources = [
     'core/feed/FeedItem.vala',
     'core/feed/FeedRepository.vala',
     'core/favorites/FavoritesRepository.vala',
+    'core/settings/SettingsUtils.vala',
     'core/SortDirection.vala',
     'core/weather/WeatherRespository.vala',
     'core/weather/WeatherForecastItem.vala',
@@ -60,7 +61,8 @@ discovery_applet_sources = [
     'services/ApplicationService.vala',
     'services/BookmarkService.vala',
     'services/FileWatcherService.vala',
-    'services/FeedService.vala', 
+    'services/FeedService.vala',
+    'services/SettingsService.vala',
     'services/WeatherService.vala',
     config_header
 ]

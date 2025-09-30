@@ -6,6 +6,7 @@ public class SettingsWindow: Gtk.Window {
     public Json.Array feeds;
     private Json.Node rootNode;
     private string filePath;
+    private Gtk.Box feedLayout;
 
     public SettingsWindow() {
         Object();
@@ -15,41 +16,21 @@ public class SettingsWindow: Gtk.Window {
         set_default_size (640, 480);
         get_style_context().add_class("discovery-settings");
 
-        var settingsPath = "%s/%s".printf(Environment.get_user_config_dir(), "discovery-applet").to_string ();
-        if(FileUtils.test(settingsPath, FileTest.IS_DIR) == false) {
-            DirUtils.create_with_parents(settingsPath, 0755);
-            if(FileUtils.test(settingsPath, FileTest.IS_DIR) == false) {
-                stderr.printf("Could not create config directory: %s\n", settingsPath);
-                Process.exit (1);
-            }
-        }
-
-        filePath = "%s/%s".printf(settingsPath, "settings.json");
+        SettingsUtils.checkSettingsFile();
+        filePath = SettingsUtils.getSettingsFilePath();
         if(FileUtils.test(filePath, FileTest.EXISTS) == false) {
-            try {
-                var file = File.new_for_path(filePath);
-                var outputStream = file.create(FileCreateFlags.NONE);
-                outputStream.write("{}".data, null);
-                outputStream.close();
-
-                if(FileUtils.test(filePath, FileTest.EXISTS) == false) {
-                    stderr.printf("Could not create settings file: %s\n", filePath);
-                    Process.exit (1);
-                }
-            } catch (Error e) {
-                stderr.printf("Could not create settings file: %s\n", e.message);
-                Process.exit (1);
-            }
+            stderr.printf("Unable to read settings file '%s': file does not exists\n", filePath);
+            Process.exit (1);
         }
 
         Json.Parser parser = new Json.Parser ();
         try {
             if(!parser.load_from_file (filePath)) {
-                stderr.printf ("Unable to parse `%s'\n", filePath);
+                stderr.printf ("Unable to parse settings file '%s'\n", filePath);
                 Process.exit (1);
             }
         } catch (Error e) {
-            stderr.printf ("Unable to parse `%s': %s\n", filePath, e.message);
+            stderr.printf ("Unable to parse settings file '%s': %s\n", filePath, e.message);
             Process.exit (1);
         }
 
@@ -66,8 +47,6 @@ public class SettingsWindow: Gtk.Window {
             Process.exit (1);
         }
 
-        message("Root Node OK");
-
         if(!rootObject.has_member ("feeds")) {
             feeds = new Json.Array ();
             var feeds_node = new Json.Node (Json.NodeType.ARRAY);
@@ -75,18 +54,7 @@ public class SettingsWindow: Gtk.Window {
             rootObject.set_member ("feeds", feeds_node);
         }
         else {
-            feeds =  rootObject.get_array_member ("feeds");
-        }
-
-        if(feeds.get_length () == 0) {
-            var feedNodeObject = new Json.Object();
-            feedNodeObject.set_string_member ("name", "Reddit News");
-            feedNodeObject.set_string_member ("uri", "https://www.reddit.com/r/news/.rss");
-
-            var feedNode = new Json.Node (Json.NodeType.OBJECT);
-            feedNode.set_object (feedNodeObject);
-            feeds.add_element (feedNode);
-            updateSettings();
+            feeds = rootObject.get_array_member ("feeds");
         }
 
         var layout = new Gtk.Box(Gtk.Orientation.VERTICAL, 0);
@@ -114,8 +82,8 @@ public class SettingsWindow: Gtk.Window {
         feedScroll.vexpand = true;
         feedScroll.hexpand = true;
 
-        var scrollLayout = new Gtk.Box (Gtk.Orientation.VERTICAL, 5);
-        feedScroll.add (scrollLayout);
+        feedLayout = new Gtk.Box (Gtk.Orientation.VERTICAL, 5);
+        feedScroll.add (feedLayout);
         feedBox.pack_start (feedScroll, true);
 
         var addFeedButton = new Gtk.Button();
@@ -141,8 +109,8 @@ public class SettingsWindow: Gtk.Window {
                     feeds.add_element (feedNode);   
                     updateSettings();
                     var feedRow = new FeedRow(this, feedUri, feedName);
-                    scrollLayout.pack_start (feedRow, false);
-                    scrollLayout.show_all ();
+                    feedLayout.pack_start (feedRow, false);
+                    feedLayout.show_all ();
                 }
             }
             dialog.destroy();
@@ -152,7 +120,7 @@ public class SettingsWindow: Gtk.Window {
         for(int i = 0; i < feeds.get_length (); i++) {
             var feed = feeds.get_object_element (i);
             var feedRow = new FeedRow(this, feed.get_string_member ("uri"), feed.get_string_member ("name"));
-            scrollLayout.pack_start (feedRow, false);
+            feedLayout.pack_start (feedRow, false);
         }
 
         load_style_sheet();
@@ -198,7 +166,7 @@ public class SettingsWindow: Gtk.Window {
             feedName = n;
 
             set_visible_window(true); // sorgt dafür, dass EventBox Events empfängt
-            set_above_child(true);    // Events gehen an die EventBox, nicht nur an die Kinder
+            set_above_child(false);    // Events gehen an die EventBox, nicht nur an die Kinder
             add_events(Gdk.EventMask.ENTER_NOTIFY_MASK | Gdk.EventMask.LEAVE_NOTIFY_MASK);
 
             var layout = new Gtk.Box(Gtk.Orientation.HORIZONTAL, 0);
@@ -238,21 +206,17 @@ public class SettingsWindow: Gtk.Window {
             deleteImage.hexpand = false;
             deleteButton.set_image(deleteImage);
 
-            deleteButton.clicked.connect(() => {
-                // remove this row from parent
-                var parent = get_parent();
-                if(parent != null) {
-                    parent.remove(this);
-                    for(int i = 0; i < parentWindow.feeds.get_length(); i++) {
-                        var feed = parentWindow.feeds.get_object_element (i);
-                        if(feed.get_string_member ("uri") == uri && feed.get_string_member ("name") == feedName) {
-                            parentWindow.feeds.remove_element (i);
-                            parentWindow.updateSettings();
-                            break;  
-                        }
+            deleteButton.button_press_event.connect(() => {
+                parentWindow.feedLayout.remove(this);
+                for(int i = 0; i < parentWindow.feeds.get_length(); i++) {
+                    var feed = parentWindow.feeds.get_object_element (i);
+                    if(feed.get_string_member ("uri") == uri && feed.get_string_member ("name") == feedName) {
+                        parentWindow.feeds.remove_element (i);
+                        parentWindow.updateSettings();
+                        break;  
                     }
-
                 }
+                return true;
             });
             layout.pack_start(deleteButton, false);
         }

@@ -70,6 +70,9 @@ namespace DiscoveryApplet {
                 return Gdk.EVENT_STOP;
             });
 
+            var settingsService = new SettingsService ();
+            settingsService.start_service ();
+
             popover.get_child ().show_all ();
             show_all ();
         }
