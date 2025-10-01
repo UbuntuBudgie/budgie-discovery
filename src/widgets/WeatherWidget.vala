@@ -31,8 +31,8 @@ public class WeatherWidget: Card {
 
         var layout = new Gtk.Box(Gtk.Orientation.VERTICAL, 0);
         layout.get_style_context ().add_class("card-body");
-        layout.get_style_context ().add_class("pt-2");
-        layout.get_style_context ().add_class("pb-2");
+        //layout.get_style_context ().add_class("pt-2");
+        //layout.get_style_context ().add_class("pb-2");
         pack_start (layout, true);
 
         var currentWeatherBox = new Gtk.Box(Gtk.Orientation.HORIZONTAL, 0);
@@ -88,6 +88,7 @@ public class WeatherWidget: Card {
         weatherRepository.weatherUpdated.connect(() => {
             forecastItems.clear();
             forecastBox.get_children().foreach((child) => {
+                child.destroy ();
                 forecastBox.remove(child);
             });
 
@@ -101,8 +102,6 @@ public class WeatherWidget: Card {
                 currentTemperatureLabel.set_text(currentTemperature.to_string() + "°C");
 
                 var currentDate = new DateTime.now().format ("%Y-%m-%d %H:%M");
-                message("Updated weather widget: %s\n", currentDate);
-
                 var weatherCodeEntry = weatherCodesJson.get_object().get_member(currentWeatherCode);
                 if (weatherCodeEntry != null) {
                     var weatherCodeObject = weatherCodeEntry.get_object();
@@ -192,7 +191,7 @@ public class WeatherWidget: Card {
                 for(var i = 0; i < 5; i++) {
                     var item = forecastItems.get(i);
                     var forcastWidget = new WeatherForecastWidget(item);
-                    forecastBox.pack_start(forcastWidget, true);
+                    forecastBox.pack_start(forcastWidget, true, true, 2);
                 }
                 forecastBox.show_all();
                 lastUpdatedLabel.set_label (_("Last updated: %s").printf(currentDate));

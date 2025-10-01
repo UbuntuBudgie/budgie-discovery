@@ -1,21 +1,21 @@
-public class BookmarkService: IService {
+public class BookmarkService: Service {
     public signal void bookmarksChanged ();
     private uint timer;
     private uint64 last_mtime = 0;
 
-    public void start_service () {
+    public new void start_service () {
         timer = Timeout.add (500, () => {
             checkBookmarks();
             return true;
         });
     }
-    public void stop_service () {
+    public new void stop_service () {
         if (timer != 0) {
             Source.remove (timer);
             timer = 0;
         }
     }
-    public void update_service (bool force) {
+    public new void update_service (bool force) {
         if(timer != 0) return;
         checkBookmarks();
     }

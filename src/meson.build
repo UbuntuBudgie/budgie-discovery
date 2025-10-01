@@ -35,12 +35,13 @@ discovery_applet_sources = [
     'core/bookmarks/BookmarkItem.vala',
     'core/bookmarks/BookmarkRepository.vala',
     'core/feed/FeedItem.vala',
-    'core/feed/FeedRepository.vala',
+    'core/feed/FeedConfigItem.vala',
     'core/favorites/FavoritesRepository.vala',
     'core/settings/SettingsUtils.vala',
     'core/SortDirection.vala',
     'core/weather/WeatherRespository.vala',
     'core/weather/WeatherForecastItem.vala',
+    'core/Service.vala',
 
     'widgets/ApplicationItemWidget.vala',
     'widgets/ApplicationsWidget.vala',
@@ -52,6 +53,7 @@ discovery_applet_sources = [
     'widgets/FeedWidget.vala',
     'widgets/FeedItemWidget.vala',
     'widgets/FeedItemImageWidget.vala',
+    'widgets/FeedView.vala',
     'widgets/GreetingWidget.vala',
     'widgets/PowerWidget.vala',
     'widgets/SettingsWindow.vala',
@@ -72,6 +74,7 @@ vala = meson.get_compiler('vala')
 
 discovery_applet_deps = [
     dependency('gtk+-3.0', version: '>=3.18'),
+    dependency('gobject-2.0'),
     dependency('budgie-1.0', version: '>=2'),
     dependency('json-glib-1.0', version: '>=1.10'),
     dependency('libsoup-3.0', version: '>=2.4'),

@@ -2,7 +2,7 @@ using GLib;
 using Gee;
 using Config;
 
-public class WeatherService: IService {
+public class WeatherService: Service {
     private static Json.Parser jsonParser = new Json.Parser();
     private static WeatherRepository weatherRepository;
 
@@ -17,7 +17,7 @@ public class WeatherService: IService {
         return weatherRepository;
     }
 
-    public void start_service() {
+    public new void start_service() {
         string url = "https://api.open-meteo.com/v1/forecast?latitude=47.789&longitude=11.8338&daily=weather_code,temperature_2m_max,temperature_2m_min&current=temperature_2m,weather_code,rain,showers,snowfall,wind_speed_10m,wind_direction_10m,is_day&timezone=Europe%2FBerlin&forecast_hours=6";
         fetch_weather_data.begin("GET", url);
 
@@ -28,11 +28,11 @@ public class WeatherService: IService {
         });
     }
 
-    public void stop_service() {
+    public new void stop_service() {
         jsonParser = null;
     }
 
-    public void update_service(bool force) {
+    public new void update_service(bool force) {
         // do nothing
     }
 

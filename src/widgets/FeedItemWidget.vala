@@ -18,7 +18,7 @@ public class FeedItemWidget: Card {
                 Gdk.EventMask.LEAVE_NOTIFY_MASK);
 
         eventBox.add (cardBody);
-        pack_start(eventBox, true);
+        pack_start(eventBox, false, false,0);
 
         var image = new FeedItemImageWidget(feedItem);
         image.set_sensitive (false);
@@ -68,5 +68,9 @@ public class FeedItemWidget: Card {
             get_style_context().remove_class("hover");
             return false;
         });
+    }
+
+    public override void get_preferred_height_for_width (int width, out int minimum_height, out int natural_height) {
+        minimum_height = natural_height = width -15;
     }
 }

@@ -3,18 +3,18 @@ using GLib;
 
 /* TODO generate applications cache file: generate appId to support favorites */
 
-public class ApplicationService: IService {
+public class ApplicationService: Service {
     public signal void change(ArrayList<ApplicationItem> apps);
 
-    public void start_service () {
+    public new void start_service () {
         update_service (false);
     }
 
-    public void stop_service () {
+    public new void stop_service () {
         assert_not_reached ();
     }
 
-    public void update_service (bool force) {
+    public new void update_service (bool force) {
         ArrayList<ApplicationItem> apps = new ArrayList<ApplicationItem>();
         ArrayList<string> files = new ArrayList<string>();
 

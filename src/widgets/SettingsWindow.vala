@@ -103,7 +103,12 @@ public class SettingsWindow: Gtk.Window {
                 if(feedName.length > 0 && feedUri.length > 0) {
                     var feedNodeObject = new Json.Object();
                     feedNodeObject.set_string_member ("name", feedName);
-                    feedNodeObject.set_string_member ("uri", feedUri);  
+                    feedNodeObject.set_string_member ("uri", feedUri);
+                    
+                    var digest = new Checksum(ChecksumType.MD5);
+                    digest.update(feedUri.data, feedUri.length);
+                    feedNodeObject.set_string_member("uid", digest.get_string());
+
                     var feedNode = new Json.Node (Json.NodeType.OBJECT);
                     feedNode.set_object (feedNodeObject);
                     feeds.add_element (feedNode);   

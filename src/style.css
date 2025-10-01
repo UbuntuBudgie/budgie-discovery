@@ -287,9 +287,15 @@
 .bg-red {
     background: red;
 }
+.bg-green {
+    background: green;
+}
 
 .bg-white {
     background: #fff;
+}
+.bg-yellow {
+    background: yellow;
 }
 
 .middot-medium {
@@ -399,18 +405,38 @@ button.active {
     background-color: rgba(240, 249, 255, .75);
 }
 
+.feed-widget notebook, 
+.feed-widget notebook > stack, 
+.feed-widget notebook > header, 
+.feed-widget notebook > header tab {
+    background-color: transparent;
+    border: none;
+}
+
+.feed-widget notebook > header {
+    margin-top: -15px;
+}
+.feed-widget notebook > header tab {
+    padding-top: 8px;
+    padding-bottom: 0;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
 .weather-widget-day {
     background-image: linear-gradient(180deg, #f0f9ff, #d1eeff);
     color: #444;
 }
 
 .weather-widget {
-    padding: 15px 8px 5px;
+    padding: 8px 6px 5px;
 }
 
 .weather-widget .weather-forecast-widget{
     padding-top: 5px;
     padding-bottom: 5px;
+    border: 0;
+    box-shadow: none;
 }
 
 .weather-widget-day .weather-forecast-widget {

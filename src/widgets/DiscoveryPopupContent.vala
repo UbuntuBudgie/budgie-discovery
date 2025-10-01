@@ -11,9 +11,8 @@ public class DiscoveryPopupContent: Gtk.Box {
         popover = parent;
         set_orientation(Gtk.Orientation.HORIZONTAL);
         set_spacing(5);
+        hexpand = false;
         get_style_context().add_class("discovery-popup-content");
-        set_hexpand(false);
-        set_vexpand(false);
 
         navigationBox = new Gtk.Box(Gtk.Orientation.VERTICAL, 0);
         navigationBox.get_style_context().add_class("navigation-box");
@@ -23,6 +22,7 @@ public class DiscoveryPopupContent: Gtk.Box {
         stackView.get_style_context().add_class("content-stack");
         stackView.set_transition_type(Gtk.StackTransitionType.NONE);
         stackView.set_transition_duration(0);
+        stackView.hexpand = false;
         pack_start(stackView, true, true, 0);
 
         var feedWidget = new FeedWidget(parent);
@@ -117,7 +117,6 @@ public class DiscoveryPopupContent: Gtk.Box {
         });
 
         var icon = new Gtk.Image.from_icon_name(iconName, Gtk.IconSize.SMALL_TOOLBAR);
-        // icon.set_pixel_size(24);
         tabButton.set_image(icon);
         navigationBox.pack_start(tabButton, false, false, 0);
     }
@@ -127,7 +126,6 @@ public class DiscoveryPopupContent: Gtk.Box {
             warning("Invalid index: %d", index);
             return;
         }
-
 
         if (activeTabIndex == index) {
             return; // No change needed

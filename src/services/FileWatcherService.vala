@@ -1,32 +1,32 @@
-public class FileWatcherSevice: IService {
+public class FileWatcherSevice: Service {
     public signal void fileChanged (string path);
     private uint timer;
     private static HashTable<string, uint64?> files = new GLib.HashTable<string, uint64?> (GLib.str_hash, GLib.str_equal);
 
-    public void start_service () {
+    public new void start_service () {
         timer = Timeout.add (500, () => {
             checkFiles();
             return true;
         });
     }
-    public void stop_service () {
+    public new void stop_service () {
         if (timer != 0) {
             Source.remove (timer);
             timer = 0;
         }
     }
-    public void update_service (bool force) {
+    public new void update_service (bool force) {
         if(timer != 0) return;
         checkFiles();
     }
 
-    public void watchFile (string path) {
+    public new void watchFile (string path) {
         if (!files.contains (path)) {
             files.insert (path, 0);
         }
     }
 
-    public void unwatchFile (string path) {
+    public new void unwatchFile (string path) {
         if (files.contains (path)) {
             files.remove (path);
         }

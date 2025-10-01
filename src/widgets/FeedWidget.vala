@@ -4,11 +4,10 @@ using Xml;
 
 public class FeedWidget: Gtk.Box {
     private GreetingWidget greetingWidget;
-    private Gtk.Grid feedLayout = new Gtk.Grid();
     private Gtk.Box widgetLayout = new Gtk.Box(Gtk.Orientation.VERTICAL, 10);
-    private int currentColumn = 0;
-    private int currentRow = 0;
+    private Gtk.Box mainLayout = new Gtk.Box(Gtk.Orientation.HORIZONTAL, 10);
     private Budgie.Popover popup;
+    private Gtk.Notebook notebook;
 
     public FeedWidget(Budgie.Popover popover) {
         Object();
@@ -20,9 +19,9 @@ public class FeedWidget: Gtk.Box {
         greetingWidget = new GreetingWidget();
         pack_start (greetingWidget, false);
 
-        var mainLayout = new Gtk.Box(Gtk.Orientation.HORIZONTAL, 10);
         pack_start(mainLayout, true);
 
+        mainLayout.hexpand = false;
         mainLayout.pack_start(widgetLayout, true, true);
 
         var reloadButton = new Gtk.Button.from_icon_name("view-refresh-symbolic", Gtk.IconSize.SMALL_TOOLBAR);
@@ -39,107 +38,97 @@ public class FeedWidget: Gtk.Box {
             return true;
         });
 
-        var feedBox = new Gtk.Box(Gtk.Orientation.VERTICAL, 10);
-        var feedsLabel = new Gtk.Label("Feed");
-        feedsLabel.get_style_context().add_class("text-size-small");
-        feedsLabel.set_halign(Gtk.Align.START);
-        feedBox.pack_start(feedsLabel, false);
+        notebook = new Gtk.Notebook();
+        notebook.scrollable = true;
+        notebook.show_border = false;
+        notebook.get_style_context().add_class("no-border");
+        mainLayout.pack_start(notebook, true, true, 0);
 
-        feedLayout.set_hexpand(true);
-        feedLayout.get_style_context().add_class("news-feed-layout");
-        feedLayout.set_column_homogeneous(true);
-        feedLayout.set_column_spacing(10);
-        feedLayout.set_row_spacing(10);
+        var settingsFile = SettingsUtils.getSettingsFilePath();
+        var parser = new Json.Parser();
 
-        var feedView = new Gtk.ScrolledWindow(null, null);
-        feedView.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC);
-        feedView.add(feedLayout);
-        feedView.overlay_scrolling = false;
-        feedView.shadow_type = Gtk.ShadowType.NONE;
-        feedBox.pack_start(feedView);
+        var service = SettingsService.getInstance();
+        if(service == null) {
+            warning("unable to get service");
+        }
+        service.settingsChanged.connect(() => {
+            try {
+                if(parser.load_from_file(settingsFile)) {
+                    var pages = notebook.get_n_pages();
+                    for(var i = 0; i < pages; i++) {
+                        var page = notebook.get_nth_page(i);
+                        page.destroy();
+                        notebook.remove_page(i);
+                    }
 
-        mainLayout.pack_start(feedBox, true, true);
+                    var rootNode = parser.get_root();
+                    var configuredFeeds = rootNode.get_object().get_array_member("feeds");
+                    for(var i = 0; i < configuredFeeds.get_length (); i++) {
+                        var item = configuredFeeds.get_object_element(i);
+                        var config = new FeedConfigItem();
+                        config.name = item.get_string_member("name");
+                        config.uri = item.get_string_member("uri");
+                        config.uid = item.get_string_member("uid");
 
+                        var widget = new FeedView(popover, config);
+                        widget.get_style_context().add_class ("no-background");
+                        var label = new Gtk.Label(item.get_string_member("name"));
+                        label.get_style_context().add_class("text-size-small");
+                        notebook.append_page(widget, label);
+                    }
+                } else {
+                    warning("UNABLE TO READ SETTINGS");
+                }
+            } catch(GLib.Error e) {
+                warning(e.message);
+                // do nothing
+            }
+            show_all();
+        });
+
+        /* WIDGETS */
         var widgetsLabel = new Gtk.Label("Widgets");
         widgetsLabel.get_style_context().add_class("text-size-small");
         widgetsLabel.set_halign(Gtk.Align.START);
         widgetLayout.pack_start(widgetsLabel, false);
 
         var weatherWidget = new WeatherWidget();
-        widgetLayout.pack_start(weatherWidget, false);
+        widgetLayout.pack_start(weatherWidget, false, false, 0);
 
         this.map.connect(() => {
+            notebook.set_current_page(0);
             resizeChildren();
-            feedView.hadjustment.value = 0;
-            feedView.vadjustment.value = 0;
         });
-
-        var feedService = new FeedService();
-        Idle.add(() => {
-            feedService.start_service ();
-            return false;
-        });
-
-        var feedRepository = FeedRepository.getInstance();
-        feedRepository.feedUpdated.connect(update_feed);
 
         reloadButton.clicked.connect(() => {
             Idle.add(() => {
-                feedService.update_service(true);
+                var index = notebook.get_current_page();
+                var page = (FeedView) notebook.get_nth_page(index);
+                page.reload();
                 return false;
             });
         });
     }
 
+    private int mainLayoutWidth = 0;
     private void resizeChildren() {
-        int size = (get_allocated_width() / 3) - 20;
-        var index = 0;
-        widgetLayout.get_children ().foreach((child) => {
+        mainLayoutWidth = get_parent().get_allocated_width();
+        if(mainLayoutWidth <= 1) return;
+
+        int columnWidth = (mainLayoutWidth / 3) -  20;
+        widgetLayout.set_size_request(columnWidth, -1);
+        
+        int index = 0;
+        widgetLayout.get_children().foreach(child => {
             if(index == 0) {
                 index++;
                 return;
             }
 
-            child.set_size_request(size, size);
-            index++;
+            //child.set_size_request(columnWidth, columnWidth);
         });
 
-        feedLayout.get_children ().foreach((child) => {
-            child.set_size_request(size, size);
-        });
-    }
-
-    public void update_feed(ArrayList<FeedItem>? feedList) {
-        if(feedList == null) return;
-
-        feedLayout.foreach ((element) => {
-            element.destroy();
-        });
-
-        currentColumn = 0;
-        currentRow = 0;
-
-        int size = (get_allocated_width() / 3) - 20 - 10;
-        foreach(var feedItem in feedList) {
-            var card = new FeedItemWidget(feedItem);
-            feedLayout.attach(card, currentColumn, currentRow);
-
-            card.clicked.connect(() => {
-                popup.hide();
-            });
-
-            if(currentColumn == 1) {
-                currentColumn = 0;
-                currentRow++;
-            } else {
-                currentColumn++;
-            }
-        }
-
-        if(size > 0) {
-            resizeChildren();
-        }
-
-        show_all();
+        columnWidth = ((mainLayoutWidth / 3)) * 2;
+        notebook.set_size_request(columnWidth - 20, -1);
     }
 }

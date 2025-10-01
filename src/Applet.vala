@@ -14,11 +14,11 @@ using Gdk;
 namespace DiscoveryApplet {
     public class Plugin : Budgie.Plugin, Peas.ExtensionBase {
         public Budgie.Applet get_panel_widget (string uuid) {
-            return new Applet ();
+            return new DiscoveryApplet ();
         }
     }
 
-    public class Applet : Budgie.Applet {
+    public class DiscoveryApplet : Budgie.Applet {
         protected Gtk.EventBox widget;
         protected Gtk.Box layout;
         protected Gtk.Label label;
@@ -37,7 +37,7 @@ namespace DiscoveryApplet {
             }
         }
 
-        public Applet () {
+        public DiscoveryApplet () {
             Intl.setlocale (LocaleCategory.ALL, "");
             Intl.bindtextdomain (GETTEXT_PACKAGE, GETTEXT_DIR);
             Intl.bind_textdomain_codeset (GETTEXT_PACKAGE, "UTF-8");
@@ -70,8 +70,9 @@ namespace DiscoveryApplet {
                 return Gdk.EVENT_STOP;
             });
 
-            var settingsService = new SettingsService ();
-            settingsService.start_service ();
+            
+            SettingsService.getInstance ().start_service ();
+
 
             popover.get_child ().show_all ();
             show_all ();

@@ -1,3 +1,5 @@
+using GLib;
+
 public class SettingsUtils {
     public static string getSettingsFilePath() {
         return "%s/%s/%s".printf(Environment.get_user_config_dir(), "discovery-applet", "settings.json").to_string ();
@@ -62,8 +64,13 @@ public class SettingsUtils {
             rootObject.set_member ("feeds", feeds_node);
 
             var feedNodeObject = new Json.Object();
+            var uri = "https://www.reddit.com/r/news/.rss";
             feedNodeObject.set_string_member ("name", "Reddit News");
-            feedNodeObject.set_string_member ("uri", "https://www.reddit.com/r/news/.rss");
+            feedNodeObject.set_string_member ("uri", uri);
+
+            var digest = new Checksum(ChecksumType.MD5);
+            digest.update(uri.data, uri.length);
+            feedNodeObject.set_string_member("uid", digest.get_string());
 
             var feedNode = new Json.Node (Json.NodeType.OBJECT);
             feedNode.set_object (feedNodeObject);
