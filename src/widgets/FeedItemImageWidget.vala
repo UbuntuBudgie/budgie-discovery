@@ -41,34 +41,33 @@ public class FeedItemImageWidget : Gtk.DrawingArea {
             if (regex.match (html, 0, out info)) {
                 imageUrl = info.fetch (1);
                 loadImage.begin();
+            } else {
+                throw new Error (Quark.from_string (""), 1000, "NO IMAGE FOUND: %s", url);
             }
         } catch(Error e) {
-            // not handled
+            warning(e.message);
+            // TODO load alternate pixbuf
         }
     }
 
-    private async void loadImage () {
+    private async void loadImage () throws Error {
         if (!(imageUrl.has_prefix ("http://") || imageUrl.has_prefix ("https://")))
             return;
 
         var msg = new Soup.Message ("GET", imageUrl);
-        try {
-            var bytes = yield session.send_and_read_async(msg, Priority.DEFAULT, null);
-            uint8[] data = bytes.get_data ();
+        var bytes = yield session.send_and_read_async(msg, Priority.DEFAULT, null);
+        uint8[] data = bytes.get_data ();
 
-            var loader = new Gdk.PixbufLoader ();
-            loader.write (data);
-            loader.close ();
-            pixbuf = loader.get_pixbuf ();
+        var loader = new Gdk.PixbufLoader ();
+        loader.write (data);
+        loader.close ();
+        pixbuf = loader.get_pixbuf ();
 
-            if (pixbuf != null) {
-                Idle.add (() => {
-                    queue_draw (); // neu rendern
-                    return false;
-                });
-            }
-        } catch (Error e) {
-            warning ("Fehler beim Laden von Bild %s: %s", imageUrl, e.message);
+        if (pixbuf != null) {
+            Idle.add (() => {
+                queue_draw (); // neu rendern
+                return false;
+            });
         }
     }
 

@@ -58,8 +58,9 @@ public class FeedService: Service {
                 var feedList = new ArrayList<FeedItem>();
                 Xml.Doc* doc = Xml.Parser.parse_file (cacheFilePath);
                 Xml.Node *root = doc->get_root_element ();
-                Xml.Node* channel = root->first_element_child();
-                if (channel->name == "channel") {
+
+                if (root->name == "rss") {
+                    Xml.Node* channel = root->first_element_child();
                     for (Xml.Node* item = channel->children; item != null; item = item->next) {
                         if (item->name == "item") {
                             FeedItem feedItem = new FeedItem();
@@ -76,6 +77,28 @@ public class FeedService: Service {
                                 
                                 if(itemChild->name == "link") {
                                     feedItem.link = itemChild->get_content ();
+                                }
+                            }
+
+                            feedList.add (feedItem);
+                        }
+                    }
+                } else if(root->name == "feed") {
+                    for (Xml.Node* item = root->children; item != null; item = item->next) {
+                        if(item->name == "entry") {
+                            FeedItem feedItem = new FeedItem();
+                            for (Xml.Node *itemChild = item->children; itemChild != null; itemChild = itemChild->next) {
+                                if (itemChild->name == "title") {
+                                    var title = itemChild->get_content ();
+                                    feedItem.title = title;
+                                }
+
+                                if(itemChild->name == "published") {
+                                    feedItem.pubDate = itemChild->get_content ();
+                                }
+                                
+                                if(itemChild->name == "link") {
+                                    feedItem.link = itemChild->get_prop("href");
                                 }
                             }
 
