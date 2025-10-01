@@ -70,7 +70,7 @@ public class FeedItemWidget: Card {
         });
     }
 
-    public override void get_preferred_height_for_width (int width, out int minimum_height, out int natural_height) {
-        minimum_height = natural_height = width -15;
-    }
+    //public override void get_preferred_height_for_width (int width, out int minimum_height, out int natural_height) {
+    //    minimum_height = natural_height = width -15;
+    //}
 }

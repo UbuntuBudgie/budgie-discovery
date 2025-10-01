@@ -97,6 +97,9 @@ public class FeedWidget: Gtk.Box {
 
         this.map.connect(() => {
             notebook.set_current_page(0);
+        });
+
+        size_allocate.connect((allocation) => {
             resizeChildren();
         });
 
@@ -110,12 +113,11 @@ public class FeedWidget: Gtk.Box {
         });
     }
 
-    private int mainLayoutWidth = 0;
     private void resizeChildren() {
-        mainLayoutWidth = get_parent().get_allocated_width();
+        int mainLayoutWidth = get_allocated_width();
         if(mainLayoutWidth <= 1) return;
 
-        int columnWidth = (mainLayoutWidth / 3) -  20;
+        int columnWidth = (mainLayoutWidth / 3) - 15;
         widgetLayout.set_size_request(columnWidth, -1);
         
         int index = 0;
@@ -125,10 +127,10 @@ public class FeedWidget: Gtk.Box {
                 return;
             }
 
-            //child.set_size_request(columnWidth, columnWidth);
+            child.set_size_request(columnWidth, columnWidth);
         });
 
-        columnWidth = ((mainLayoutWidth / 3)) * 2;
-        notebook.set_size_request(columnWidth - 20, -1);
+        int notebookWidth = ((mainLayoutWidth / 3) - 5) * 2;
+        notebook.set_size_request(notebookWidth, -1);
     }
 }

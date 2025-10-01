@@ -1,23 +1,22 @@
 using Gee;
 
 public class FeedView: Gtk.ScrolledWindow {
-    private Gtk.Grid feedLayout;
+    private Gtk.Layout feedLayout = new Gtk.Layout();
     private static Budgie.Popover popover;
     private FeedService feedService;
 
     public FeedView(Budgie.Popover bp, FeedConfigItem c) {
         Object();
         popover = bp;
+        hexpand = true;
+        vexpand = true;
         margin_top = 10;
-
-        set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC);
+        get_style_context().add_class("news-feed-layout");
+        get_style_context().add_class("feed-list");
         overlay_scrolling = false;
-        shadow_type = Gtk.ShadowType.NONE;
+        set_policy (Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC);
 
-        feedLayout = new Gtk.Grid();
-        feedLayout.get_style_context().add_class("news-feed-layout");
-        feedLayout.set_column_spacing(10);
-        feedLayout.set_row_spacing(10);
+        feedLayout.hexpand = true;
         add(feedLayout);
 
         map.connect(() => {
@@ -25,7 +24,8 @@ public class FeedView: Gtk.ScrolledWindow {
             vadjustment.value = 0;
         });
 
-        feedLayout.map.connect(() => {
+        feedLayout.size_allocate.connect((allocation) => {
+            resizeChildren();
         });
 
         feedService = new FeedService(c);
@@ -34,8 +34,6 @@ public class FeedView: Gtk.ScrolledWindow {
             feedService.start_service ();
             return false;
         });
-
-        show_all();
     }
 
     ~FeedView() {
@@ -46,27 +44,44 @@ public class FeedView: Gtk.ScrolledWindow {
         feedService.update_service(true);
     }
 
+    private void resizeChildren() {
+        int width = get_allocated_width();
+        if(width <= 1) return;
+
+        int widgetSize = (width / 2) - 15;
+        int column = 0;
+        int row = 0;
+        int y = 0;
+        feedLayout.get_children().foreach(child => {
+            int x = column == 0 ? 0 : widgetSize + 10;
+
+            child.set_size_request(widgetSize, widgetSize);
+            feedLayout.move(child, x, y);
+
+            if(column == 0) {
+                column++;
+            } else {
+                column = 0;
+                row++;
+                y += widgetSize + 10;
+            }
+        });
+
+        int total_height = (row * widgetSize) + ((row - 1) * 10);
+        feedLayout.set_size(width - 20, total_height);
+    }
+
     private void onFeedFetched(ArrayList<FeedItem>? items) {
         feedLayout.foreach ((element) => {
             element.destroy();
         });
 
-        var currentColumn = 0;
-        var currentRow = 0;
         foreach(var feedItem in items) {
             var card = new FeedItemWidget(feedItem);
-            feedLayout.attach(card, currentColumn, currentRow);
-
+            feedLayout.add(card);
             card.clicked.connect(() => {
                 popover.hide();
             });
-
-            if(currentColumn == 1) {
-                currentColumn = 0;
-                currentRow++;
-            } else {
-                currentColumn++;
-            }
         }
 
         show_all();
