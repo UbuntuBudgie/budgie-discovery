@@ -4,7 +4,7 @@ using GLib;
 public class SettingsWindow: Gtk.Window {
     Gtk.Notebook notebook;
     public Json.Array feeds;
-    private Json.Node rootNode;
+    public Json.Node rootNode;
     private string filePath;
     private Gtk.Box feedLayout;
 
@@ -113,7 +113,7 @@ public class SettingsWindow: Gtk.Window {
                     feedNode.set_object (feedNodeObject);
                     feeds.add_element (feedNode);   
                     updateSettings();
-                    var feedRow = new FeedRow(this, feedUri, feedName);
+                    var feedRow = new FeedRow(this, digest.get_string(), feedUri, feedName);
                     feedLayout.pack_start (feedRow, false);
                     feedLayout.show_all ();
                 }
@@ -124,8 +124,20 @@ public class SettingsWindow: Gtk.Window {
 
         for(int i = 0; i < feeds.get_length (); i++) {
             var feed = feeds.get_object_element (i);
-            var feedRow = new FeedRow(this, feed.get_string_member ("uri"), feed.get_string_member ("name"));
+            var feedRow = new FeedRow(this, feed.get_string_member("uid"), feed.get_string_member ("uri"), feed.get_string_member ("name"));
             feedLayout.pack_start (feedRow, false);
+
+            feedRow.onFeedDelete.connect(uid => {
+                int index = 0;
+                feeds.foreach_element((feed) => {
+                    var objectNode = feed.get_object_element(index);
+                    if(objectNode.get_string_member("uid") == uid) {
+                        feeds.remove_element(index);
+                    }
+                    index++;
+                });
+                updateSettings();
+            });
         }
 
         load_style_sheet();
@@ -163,12 +175,19 @@ public class SettingsWindow: Gtk.Window {
         private Gtk.Label label;
         private Gtk.Button deleteButton;
         private string feedName;
-        private string uri;
+        private string feedUri;
+        private string uid;
 
-        public FeedRow(SettingsWindow parentWindow, string u, string n) {
+        public signal void onFeedDelete(string uid) {
+
+        }
+
+        public FeedRow(SettingsWindow parentWindow, string uid, string uri, string name) {
             Object();
-            uri = u;
-            feedName = n;
+            feedUri = uri;
+            feedName = name;
+            this.uid = uid;
+
 
             set_visible_window(true); // sorgt dafür, dass EventBox Events empfängt
             set_above_child(false);    // Events gehen an die EventBox, nicht nur an die Kinder
@@ -213,14 +232,7 @@ public class SettingsWindow: Gtk.Window {
 
             deleteButton.button_press_event.connect(() => {
                 parentWindow.feedLayout.remove(this);
-                for(int i = 0; i < parentWindow.feeds.get_length(); i++) {
-                    var feed = parentWindow.feeds.get_object_element (i);
-                    if(feed.get_string_member ("uri") == uri && feed.get_string_member ("name") == feedName) {
-                        parentWindow.feeds.remove_element (i);
-                        parentWindow.updateSettings();
-                        break;  
-                    }
-                }
+                onFeedDelete(uid);
                 return true;
             });
             layout.pack_start(deleteButton, false);

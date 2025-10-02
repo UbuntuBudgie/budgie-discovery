@@ -53,14 +53,16 @@ public class FeedWidget: Gtk.Box {
         }
         service.settingsChanged.connect(() => {
             try {
-                if(parser.load_from_file(settingsFile)) {
-                    var pages = notebook.get_n_pages();
-                    for(var i = 0; i < pages; i++) {
-                        var page = notebook.get_nth_page(i);
+                while (notebook.get_n_pages() > 0) {
+                    var page = notebook.get_nth_page(0);
+                    notebook.remove_page(0);
+                    if (page != null) {
                         page.destroy();
-                        notebook.remove_page(i);
                     }
+                    page = null;
+                }
 
+                if(parser.load_from_file(settingsFile)) {
                     var rootNode = parser.get_root();
                     var configuredFeeds = rootNode.get_object().get_array_member("feeds");
                     for(var i = 0; i < configuredFeeds.get_length (); i++) {
@@ -69,6 +71,8 @@ public class FeedWidget: Gtk.Box {
                         config.name = item.get_string_member("name");
                         config.uri = item.get_string_member("uri");
                         config.uid = item.get_string_member("uid");
+
+                        message("add page: %s", config.name);
 
                         var widget = new FeedView(popover, config);
                         widget.get_style_context().add_class ("no-background");
