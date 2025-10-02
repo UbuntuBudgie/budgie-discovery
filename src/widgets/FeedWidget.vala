@@ -72,8 +72,6 @@ public class FeedWidget: Gtk.Box {
                         config.uri = item.get_string_member("uri");
                         config.uid = item.get_string_member("uid");
 
-                        message("add page: %s", config.name);
-
                         var widget = new FeedView(popover, config);
                         widget.get_style_context().add_class ("no-background");
                         var label = new Gtk.Label(item.get_string_member("name"));

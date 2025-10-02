@@ -29,7 +29,6 @@ public class FeedService: Service {
 
     public new void stop_service() {
         Source.remove(timer);
-        message("FeedService for %s stopped", config.uri);
     }
 
     public new void update_service(bool force) {
