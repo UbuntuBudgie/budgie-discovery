@@ -24,8 +24,8 @@ public class SettingsWindow: Gtk.Window {
         var feedSettings = new FeedSettings(this);
         notebook.append_page(feedSettings, new Gtk.Label(_("Feeds")));
 
-        var weatherSettings = new Gtk.Box(Gtk.Orientation.VERTICAL, 10);
-        notebook.append_page(weatherSettings, new Gtk.Label(_("Weather")));
+        var widgetSettings = new WidgetSettings(this);
+        notebook.append_page(widgetSettings, new Gtk.Label(_("Widgets")));
 
         load_style_sheet();
         show_all ();

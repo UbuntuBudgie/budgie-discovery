@@ -60,6 +60,7 @@ discovery_applet_sources = [
     'widgets/SettingsWindow.vala',
     'widgets/WeatherForecastWidget.vala',
     'widgets/WeatherWidget.vala',
+    'widgets/WidgetSettings.vala',
 
     'services/ApplicationService.vala',
     'services/BookmarkService.vala',

@@ -22,15 +22,15 @@ public class FeedSettings: Gtk.Box {
         feedScroll.add (feedLayout);
         pack_start (feedScroll, true);
 
-        var addFeedButton = new Gtk.Button();
+        var plusButton = new Gtk.Button();
         var plusImage = new Gtk.Image.from_icon_name("list-add-symbolic", Gtk.IconSize.BUTTON);
         plusImage.pixel_size = 16;
-        addFeedButton.set_image(plusImage);
-        addFeedButton.set_label(_("Add"));
-        addFeedButton.set_halign (Gtk.Align.START);
-        addFeedButton.set_always_show_image(true);
-        addFeedButton.get_style_context().add_class("border-1");
-        addFeedButton.clicked.connect(() => {
+        plusButton.set_image(plusImage);
+        plusButton.set_label(_("Add"));
+        plusButton.set_halign (Gtk.Align.START);
+        plusButton.set_always_show_image(true);
+        plusButton.get_style_context().add_class("border-1");
+        plusButton.clicked.connect(() => {
             var dialog = new FeedItemDialog(window);
             int response = dialog.run();
             if(response == Gtk.ResponseType.OK) {
@@ -67,7 +67,7 @@ public class FeedSettings: Gtk.Box {
             }
             dialog.destroy();
         });
-        pack_start (addFeedButton, false);
+        pack_start (plusButton, false);
 
         SettingsUtils.checkSettingsFile();
         filePath = SettingsUtils.getSettingsFilePath();
