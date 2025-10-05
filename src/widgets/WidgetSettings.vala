@@ -61,6 +61,7 @@ public class WidgetSettings: Gtk.Box {
             layout.set_margin_start (10);
             layout.set_margin_end (10);
             layout.vexpand = true;
+            contentArea.get_style_context().add_class("no-border");
             contentArea.add(layout);
 
             var nameLabel = new Gtk.Label("Location:");
@@ -74,7 +75,15 @@ public class WidgetSettings: Gtk.Box {
             searchBox.pack_start(searchButton, false);
             layout.pack_start(searchBox, false, true);
 
-            layout.pack_start(locationLayout, false);
+            var scrollArea = new Gtk.ScrolledWindow(null, null);
+            scrollArea.overlay_scrolling = false;
+            scrollArea.border_width = 0;
+            scrollArea.set_policy (Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC);
+            scrollArea.vexpand = true;
+            scrollArea.hexpand = true;
+            scrollArea.get_style_context().add_class("feed-list");
+            scrollArea.add(locationLayout);
+            layout.pack_start(scrollArea, true);
 
             var nameErrorLabel = new Gtk.Label("Please enter a location name");
             nameErrorLabel.get_style_context ().add_class ("text-danger");
@@ -82,9 +91,6 @@ public class WidgetSettings: Gtk.Box {
             nameErrorLabel.set_no_show_all(true);
             nameErrorLabel.hide();
             layout.pack_start(nameErrorLabel, false);
-
-            var dummy = new Gtk.Box(Gtk.Orientation.VERTICAL, 0);
-            layout.pack_start(dummy, true, true);
 
             var buttonBox = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 6);
             layout.pack_end (buttonBox, false, false, 0);
@@ -108,76 +114,99 @@ public class WidgetSettings: Gtk.Box {
             });
 
             map.connect(() => {
-            locations.clear();
-                locationLayout.foreach((child) => {
-                    locationLayout.remove(child);
-                    child.destroy();
-                });
+                locations.clear();
+                    locationLayout.foreach((child) => {
+                        locationLayout.remove(child);
+                    });
             });
 
             searchButton.clicked.connect(() => {
-                string searchText = nameEntry.get_text().chomp();
-                if (searchText.length == 0) return;
-
-                string url = OPEN_METEO_SEARCH_URL.printf(searchText);
-
-                var session = new Soup.Session();
-                var msg = new Soup.Message("GET", url);
-
-                try {
-                    var responseData = session.send_and_read(msg, null);
-                    if (msg.status_code != 200) {
-                        warning("HTTP-Fehler: %d", msg.get_status());
-                        return;
-                    }
-
-                    uint8[] bytes = responseData.get_data().copy();
-                    string data = (string) bytes;
-
-                    var parser = new Json.Parser();
-                    parser.load_from_data(data, data.length);
-
-                    var root = parser.get_root()?.get_object();
-                    if (root != null && root.has_member("results")) {
-                        var results = root.get_array_member("results");
-
-                        // Alte Einträge löschen
-                        locationLayout.foreach(child => {
-                            locationLayout.remove(child);
-                            child.destroy();
-                        });
-
-                        locations.clear();
-
-                        results.foreach_element((element, index) => {
-                            var resultNode = element.get_object_element(index);
-                            LocationItem item = new LocationItem();
-                            item.name = resultNode.get_string_member("name");
-                            item.country = resultNode.get_string_member("country");
-                            item.admin1 = resultNode.has_member("admin1") ? resultNode.get_string_member("admin1") : null;
-                            item.admin2 = resultNode.has_member("admin2") ? resultNode.get_string_member("admin2") : null;
-                            item.admin3 = resultNode.has_member("admin3") ? resultNode.get_string_member("admin3") : null;
-                            item.admin4 = resultNode.has_member("admin4") ? resultNode.get_string_member("admin4") : null;
-                            locations.add(item);
-
-                            var layoutItem = new LocationLayoutItem(item);
-                            locationLayout.pack_start(layoutItem, false);
-
-                            if((index + 1) < results.get_length()) {
-                                var divider = new Gtk.Separator(Gtk.Orientation.VERTICAL);
-                                divider.get_style_context().add_class ("border-bottom");
-                                locationLayout.pack_start(divider, true);
-                            }
-                        });
-
-                        show_all();
-                    }
-
-                } catch (Error e) {
-                    warning("Fehler beim Abrufen der Daten: %s", e.message);
-                }
+                Idle.add(() => {
+                    searchLocation();
+                    return false;
+                }, 0);
             });
             layout.show_all();
+        }
+
+        private void searchLocation() {
+            string searchText = nameEntry.get_text().chomp();
+            if (searchText.length == 0) return;
+
+            string url = OPEN_METEO_SEARCH_URL.printf(searchText);
+
+            var session = new Soup.Session();
+            var msg = new Soup.Message("GET", url);
+
+            try {
+                var responseData = session.send_and_read(msg, null);
+                if (msg.status_code != 200) {
+                    warning("HTTP-Fehler: %d", msg.get_status());
+                    return;
+                }
+
+                var contentType = msg.get_response_headers().get_content_type(null);
+                message(contentType);
+                // TODO check for json
+
+                uint8[] bytes = responseData.get_data().copy();
+                string data = (string) bytes;
+
+                var parser = new Json.Parser();
+                parser.load_from_data(data, data.length);
+
+                var root = parser.get_root()?.get_object();
+                if (root != null && root.has_member("results")) {
+                    var results = root.get_array_member("results");
+
+                    // Alte Einträge löschen
+                    locationLayout.foreach(child => {
+                        locationLayout.remove(child);
+                        child = null;
+                    });
+
+                    locations.clear();
+
+                    Gtk.RadioButton? radioGroup = null;
+                    results.foreach_element((element, index) => {
+                        var resultNode = element.get_object_element(index);
+                        LocationItem item = new LocationItem();
+                        item.name = resultNode.get_string_member("name");
+                        item.country = resultNode.get_string_member("country");
+                        item.admin1 = resultNode.has_member("admin1") ? resultNode.get_string_member("admin1") : null;
+                        item.admin2 = resultNode.has_member("admin2") ? resultNode.get_string_member("admin2") : null;
+                        item.admin3 = resultNode.has_member("admin3") ? resultNode.get_string_member("admin3") : null;
+                        item.admin4 = resultNode.has_member("admin4") ? resultNode.get_string_member("admin4") : null;
+                        locations.add(item);
+
+                        var layoutItem = new LocationLayoutItem(item, radioGroup);
+                        if (radioGroup == null)
+                            radioGroup = layoutItem.getRadio();
+                        layoutItem.valign = Gtk.Align.START;
+                        locationLayout.pack_start(layoutItem, false, false);
+
+                        if((index + 1) < results.get_length()) {
+                            var divider = new Gtk.Separator(Gtk.Orientation.VERTICAL);
+                            divider.get_style_context().add_class ("border-bottom");
+                            divider.valign = Gtk.Align.START;
+                            locationLayout.pack_start(divider, false);
+                        }
+
+                        layoutItem.selectionChanged.connect(() => {
+                            locationLayout.foreach(child => {
+                                if(child is LocationLayoutItem && layoutItem != child) {
+                                    ((LocationLayoutItem)child).setSelected(false);
+                                }
+                            });
+                        });
+                    });
+
+                    show_all();
+                }
+
+            } catch (Error e) {
+                warning("Fehler beim Abrufen der Daten: %s", e.message);
+            }
         }
 
         private void load_style_sheet() {
@@ -196,14 +225,24 @@ public class WidgetSettings: Gtk.Box {
         }
 
         private class LocationLayoutItem: Gtk.Box {
-            public LocationLayoutItem(LocationItem item) {
+            private Gtk.RadioButton radio;
+
+            public signal void selectionChanged();
+
+            public void setSelected(bool value) {
+                radio.set_active(value);
+                get_style_context().remove_class("selected");    
+            }
+
+            public Gtk.RadioButton getRadio() {
+                return radio;
+            }
+
+            public LocationLayoutItem(LocationItem item, Gtk.RadioButton? group) {
                 Object();
-                set_orientation(Gtk.Orientation.VERTICAL);
-                set_spacing(0);
-                get_style_context().add_class("pt-2");
-                get_style_context().add_class("pb-2");
-                get_style_context().add_class("ps-3");
-                get_style_context().add_class("pe-3");
+                set_orientation(Gtk.Orientation.HORIZONTAL);
+                set_spacing(10);
+                get_style_context().add_class("list-item");
 
                 var admins = new Gee.ArrayList<string>();
                 if (item.country != null && item.country.length > 0)
@@ -233,13 +272,25 @@ public class WidgetSettings: Gtk.Box {
                     }
                 }
 
+                radio = (group == null)
+                    ? new Gtk.RadioButton(null)
+                    : new Gtk.RadioButton.from_widget(group);
+                pack_start(radio, false);
+
+                var textLayout = new Gtk.Box(Gtk.Orientation.VERTICAL, 0);
+                textLayout.get_style_context().add_class("pt-2");
+                textLayout.get_style_context().add_class("pb-2");
+                textLayout.get_style_context().add_class("ps-3");
+                textLayout.get_style_context().add_class("pe-3");
+                pack_start(textLayout, false);
+
                 string name = item.name;
                 var nameLabel = new Gtk.Label(null);
                 nameLabel.halign = Gtk.Align.START;
                 nameLabel.valign = Gtk.Align.END;
                 nameLabel.set_text(name);
                 nameLabel.set_use_markup(false);
-                pack_start(nameLabel, false);
+                textLayout.pack_start(nameLabel, false);
 
                 if (admin_text.length > 0) {
                     var descriptionLabel = new Gtk.Label(null);
@@ -251,8 +302,14 @@ public class WidgetSettings: Gtk.Box {
                     descriptionLabel.get_style_context().add_class("font-italic");
                     descriptionLabel.set_text(admin_text);
                     descriptionLabel.set_use_markup(false);
-                    pack_start(descriptionLabel, false);
+                    textLayout.pack_start(descriptionLabel, false);
                 }
+
+                radio.set_size_request(24, 24);
+                radio.toggled.connect(() => {
+                    get_style_context().add_class("selected");
+                    selectionChanged();
+                });
             }
         }
     }

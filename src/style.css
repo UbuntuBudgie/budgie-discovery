@@ -377,7 +377,8 @@ button.active {
 }
 
 .feed-widget scrollbar,
-.applications-widget scrollbar {
+.applications-widget scrollbar,
+.settings-dialog scrollbar {
     background: transparent;
     border: none;
     min-width: 4px;   /* vertikal */
@@ -385,7 +386,8 @@ button.active {
 }
 
 .feed-widget scrollbar slider,
-.applications-widget scrollbar slider {
+.applications-widget scrollbar slider,
+.settings-dialog scrollbar slider {
     background-color: rgba(80, 80, 80, 0.45); /* der „Griff“ */
     /*border-radius: 3px;*/
     min-width: 4px;
@@ -393,7 +395,8 @@ button.active {
 }
 
 .feed-widget scrollbar trough,
-.applications-widget scrollbar trough  {
+.applications-widget scrollbar trough,
+.settings-dialog scrollbar though  {
     background: transparent;  /* die Spur unsichtbar */
     border: none;
 }
@@ -471,4 +474,15 @@ button.active {
 
 .border-bottom {
     border-bottom: 1px solid #ddd;
+}
+
+.settings-dialog .list-item {
+    background: transparent;
+    border: 1px solid transparent;
+    margin: 2px;
+    border-radius: 3px;
+}
+.settings-dialog .list-item.selected {
+    background: rgba(204, 232, 255, .65);
+    border: 1px solid rgba(204, 232, 255, .95);
 }
