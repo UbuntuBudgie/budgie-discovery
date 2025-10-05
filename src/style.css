@@ -39,6 +39,9 @@
 .text-size-medium {
     font-size: 1.85em;
 }
+.font-italic {
+    font-style: italic;
+}
 
 .fw-bold {
     font-weight: bold;
@@ -464,4 +467,8 @@ button.active {
 
 .settings-page .feed-row.hover {
     background-color: #f6f6f6;
+}
+
+.border-bottom {
+    border-bottom: 1px solid #ddd;
 }

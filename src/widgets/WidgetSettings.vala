@@ -162,6 +162,12 @@ public class WidgetSettings: Gtk.Box {
 
                             var layoutItem = new LocationLayoutItem(item);
                             locationLayout.pack_start(layoutItem, false);
+
+                            if((index + 1) < results.get_length()) {
+                                var divider = new Gtk.Separator(Gtk.Orientation.VERTICAL);
+                                divider.get_style_context().add_class ("border-bottom");
+                                locationLayout.pack_start(divider, true);
+                            }
                         });
 
                         show_all();
@@ -192,8 +198,12 @@ public class WidgetSettings: Gtk.Box {
         private class LocationLayoutItem: Gtk.Box {
             public LocationLayoutItem(LocationItem item) {
                 Object();
-                set_orientation(Gtk.Orientation.HORIZONTAL);
-                set_spacing(5);
+                set_orientation(Gtk.Orientation.VERTICAL);
+                set_spacing(0);
+                get_style_context().add_class("pt-2");
+                get_style_context().add_class("pb-2");
+                get_style_context().add_class("ps-3");
+                get_style_context().add_class("pe-3");
 
                 var admins = new Gee.ArrayList<string>();
                 if (item.country != null && item.country.length > 0)
@@ -223,14 +233,26 @@ public class WidgetSettings: Gtk.Box {
                     }
                 }
 
-                string text = item.name;
-                if (admin_text.length > 0)
-                    text += " (" + admin_text + ")";
+                string name = item.name;
+                var nameLabel = new Gtk.Label(null);
+                nameLabel.halign = Gtk.Align.START;
+                nameLabel.valign = Gtk.Align.END;
+                nameLabel.set_text(name);
+                nameLabel.set_use_markup(false);
+                pack_start(nameLabel, false);
 
-                var label = new Gtk.Label(null);
-                label.set_text(text);
-                label.set_use_markup(false);
-                pack_start(label, false);
+                if (admin_text.length > 0) {
+                    var descriptionLabel = new Gtk.Label(null);
+                    descriptionLabel.halign = Gtk.Align.START;
+                    descriptionLabel.yalign = -5.0f;
+                    descriptionLabel.valign = Gtk.Align.START;
+                    descriptionLabel.get_style_context().add_class("text-size-small");
+                    descriptionLabel.get_style_context().add_class("text-secondary");
+                    descriptionLabel.get_style_context().add_class("font-italic");
+                    descriptionLabel.set_text(admin_text);
+                    descriptionLabel.set_use_markup(false);
+                    pack_start(descriptionLabel, false);
+                }
             }
         }
     }
