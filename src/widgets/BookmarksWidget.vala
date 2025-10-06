@@ -6,15 +6,12 @@ public class BookmarksWidget: Gtk.Box {
     private Budgie.Popover popover;
     private static int ITEM_SIZE = 100;
 
-    public BookmarksWidget(Budgie.Popover parent) {
+    public BookmarksWidget(Budgie.Popover parent) throws IOError {
         Object();
         popover = parent;
         set_orientation(Gtk.Orientation.VERTICAL);
         set_spacing(10);
         get_style_context().add_class("applications-widget");
-
-        var settingsFile = SettingsUtils.getSettingsFilePath();
-        var parser = new Json.Parser();
 
         var headerWidget = new Gtk.Box(Gtk.Orientation.HORIZONTAL, 5);
         headerWidget.get_style_context().add_class ("header-widget");
@@ -68,14 +65,32 @@ public class BookmarksWidget: Gtk.Box {
         bookmarksLayout.set_valign(Gtk.Align.START);
         pageLayout.pack_start(bookmarksLayout, false, false, 0);
 
-        var bookmarksPath = Environment.get_user_config_dir () + "/gtk-3.0/bookmarks";
+        var bookmarksFile = Environment.get_user_config_dir () + "/gtk-3.0/bookmarks";
+        if(!FileUtils.test(bookmarksFile, GLib.FileTest.EXISTS)) {
+            // check, if directory exists
+            var bookmarksDir = Environment.get_user_config_dir () + "/gtk-3.0";
+            if(!FileUtils.test(bookmarksDir, GLib.FileTest.IS_DIR)) {
+                DirUtils.create_with_parents(bookmarksDir, 0700);
+                if(!FileUtils.test(bookmarksDir, GLib.FileTest.IS_DIR)) {
+                    throw new IOError.NOT_DIRECTORY("directory %s cant be created, aborting".printf(bookmarksDir));
+                }
+            }
+
+            // directory exists, touch file
+            try {
+                GLib.File.new_for_path(bookmarksFile).create(GLib.FileCreateFlags.NONE, null);
+            } catch(Error e) {
+                throw new IOError.NOT_FOUND("file %s cant be created, aborting".printf(bookmarksFile));
+            }
+        }
+        var settingsFile = SettingsUtils.getSettingsFilePath();
 
         var bookmarkService = new FileWatcherSevice();
-        bookmarkService.watchFile(bookmarksPath);
+        bookmarkService.watchFile(bookmarksFile);
         bookmarkService.watchFile(settingsFile);
 
         bookmarkService.fileChanged.connect((path) => {
-            if( path == bookmarksPath) updateBookmarksLayout();
+            if( path == bookmarksFile) updateBookmarksLayout();
             if( path == settingsFile) updateAppsLayout();
         });
         bookmarkService.start_service();
