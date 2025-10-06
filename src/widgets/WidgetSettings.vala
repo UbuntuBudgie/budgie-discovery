@@ -35,6 +35,7 @@ public class WidgetSettings: Gtk.Box {
                 layoutItem.setData(location);
                 layoutItem.setPrimaryText(location.name);
                 layoutItem.setSecondaryText(location.getDescription());
+                layoutItem.setSelectable(false);
                 widgetListLayout.pack_start(layoutItem, false);
                 widgetListLayout.show_all();
             }

@@ -4,12 +4,14 @@ public class ListItem: Gtk.EventBox {
             private Gtk.Label primaryLabel = new Gtk.Label(null);
             private Gtk.Label secondaryLabel = new Gtk.Label(null);
 
+            private bool selectable;
             private string? primaryText;
             private string? secondaryText;
 
             public signal void selected();
 
             public void setSelected(bool value) {
+                if(!selectable) return;
                 if(!value) {
                     textLayout.get_style_context().remove_class("selected");
                 } else {
@@ -33,6 +35,10 @@ public class ListItem: Gtk.EventBox {
 
             public Object getData() {
                 return data;
+            }
+
+            public void setSelectable(bool value) {
+                selectable = value;
             }
 
             public ListItem() {
@@ -70,6 +76,7 @@ public class ListItem: Gtk.EventBox {
                     return true;
                 });
                 this.button_press_event.connect(() => {
+                    if(!selectable) return true;
                     this.setSelected(true);
                     textLayout.get_style_context().remove_class("hover");
                     selected();
