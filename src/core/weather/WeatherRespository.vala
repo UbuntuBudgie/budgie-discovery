@@ -25,7 +25,7 @@ public class WeatherRepository {
                 DirUtils.create_with_parents(cacheDir, 0755);
                 if(FileUtils.test(cacheDir, FileTest.IS_DIR)) {
                     warning("Unable to set cache dir: %s", cacheDir);
-                    filePath = cacheDir + "/weather.json";
+                    Process.exit(1);
                 }
             } else {
                 filePath = cacheDir + "/weather.json";

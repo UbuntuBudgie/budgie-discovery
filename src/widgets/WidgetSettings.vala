@@ -18,6 +18,80 @@ public class WidgetSettings: Gtk.Box {
         widgetListScrollable.add (widgetListLayout);
         pack_start (widgetListScrollable, true);
 
+        // Load Settings
+        SettingsUtils.checkSettingsFile();
+        var settingsFile = SettingsUtils.getSettingsFilePath();
+        var parser = new Json.Parser();
+        Json.Node rootNode = null; // reference!
+        Json.Object weatherObject = null; // reference!!
+        try {
+            parser.load_from_file(settingsFile);
+            rootNode = parser.get_root();
+            if(!rootNode.get_object().has_member("weather")) {
+                rootNode.get_object().set_object_member("weather", new Json.Object());
+            }
+            weatherObject = rootNode.get_object().get_object_member("weather");
+        } catch(Error e) {
+            warning("unable to load weather settings: %s", e.message);
+            Process.exit(1);
+        }
+
+        var weatherLocations = new Json.Array();
+        if(weatherObject.has_member("locations")) {
+            weatherLocations = weatherObject.get_array_member("locations");
+        }
+
+        var generator = new Json.Generator();
+        generator.set_pretty(true);
+
+        weatherLocations.foreach_element((element, index) => {
+            var record = element.get_object_element(index);
+            var name = record.get_string_member("name");
+            var country = record.get_string_member("country");
+            var latitude = record.get_double_member("latitude");
+            var longitude = record.get_double_member("longitude");
+            var admin1 = record.has_member("admin1") ? record.get_string_member("admin1") : null;
+            var admin2 = record.has_member("admin2") ? record.get_string_member("admin2") : null;
+            var admin3 = record.has_member("admin3") ? record.get_string_member("admin3") : null;
+            var admin4 = record.has_member("admin4") ? record.get_string_member("admin4") : null;
+
+            var location1 = new LocationItem();
+            location1.name = name;
+            location1.country = country;
+            location1.latitude = latitude;
+            location1.longitude = longitude;
+            location1.admin1 = admin1;
+            location1.admin2 = admin2;
+            location1.admin3 = admin3;
+            location1.admin4 = admin4;
+
+            var layoutItem1 = new WeatherListItem();
+            layoutItem1.setData(location1);
+            layoutItem1.setPrimaryText(location1.name);
+            layoutItem1.setSecondaryText(location1.getDescription());
+            layoutItem1.setSelectable(false);
+            widgetListLayout.pack_start(layoutItem1, false);
+
+            layoutItem1.deleted.connect(listItem => {
+                var data = (LocationItem) listItem.getData();
+                weatherLocations.foreach_element((element, index) => {
+                    var obj = element.get_object_element(index);
+                    if(obj.get_double_member("latitude") == data.latitude && obj.get_double_member("longitude") == data.longitude) {
+                        weatherLocations.remove_element(index);
+                    }
+                });
+                try {
+                    weatherObject.set_array_member("locations", weatherLocations);
+                    generator.set_root(rootNode);
+                    generator.to_file(settingsFile);
+                } catch(Error e) {
+                    warning(e.message);
+                }
+            });
+
+            widgetListLayout.show_all();
+        });
+
         var plusButton = new Gtk.Button();
         var plusImage = new Gtk.Image.from_icon_name("list-add-symbolic", Gtk.IconSize.BUTTON);
         plusImage.pixel_size = 16;
@@ -38,6 +112,43 @@ public class WidgetSettings: Gtk.Box {
                 layoutItem.setSelectable(false);
                 widgetListLayout.pack_start(layoutItem, false);
                 widgetListLayout.show_all();
+
+                layoutItem.deleted.connect(listItem => {
+                    var data = (LocationItem) listItem.getData();
+                    weatherLocations.foreach_element((element, index) => {
+                        var obj = element.get_object_element(index);
+                        if(obj.get_double_member("latitude") == data.latitude && obj.get_double_member("longitude") == data.longitude) {
+                            weatherLocations.remove_element(index);
+                        }
+                    });
+                    try {
+                        weatherObject.set_array_member("locations", weatherLocations);
+                        generator.set_root(rootNode);
+                        generator.to_file(settingsFile);
+                    } catch(Error e) {
+                        warning(e.message);
+                    }
+                });
+
+                // Save Settings
+                var locationNode = new Json.Object();
+                locationNode.set_string_member("name", location.name);
+                locationNode.set_string_member("country", location.country);
+                locationNode.set_double_member("latitude", location.latitude);
+                locationNode.set_double_member("longitude", location.longitude);
+                locationNode.set_string_member("admin1", location.admin1);
+                locationNode.set_string_member("admin2", location.admin2);
+                locationNode.set_string_member("admin3", location.admin3);
+                locationNode.set_string_member("admin4", location.admin4);
+
+                weatherLocations.add_object_element(locationNode);
+                try {
+                    weatherObject.set_array_member("locations", weatherLocations);
+                    generator.set_root(rootNode);
+                    generator.to_file(settingsFile);
+                } catch(Error e) {
+                    warning(e.message);
+                }
             }
             dialog.destroy();
         });
@@ -46,6 +157,8 @@ public class WidgetSettings: Gtk.Box {
 
     private class WeatherListItem: ListItem {
         private Gtk.Button deleteButton = new Gtk.Button();
+        public signal void deleted(WeatherListItem item);
+
         public WeatherListItem() {
             deleteButton.set_size_request(16, 16);
             deleteButton.get_style_context().add_class("p-0");
@@ -61,6 +174,7 @@ public class WidgetSettings: Gtk.Box {
             deleteButton.set_image(deleteImage);
 
             deleteButton.button_press_event.connect(() => {
+                deleted(this);
                 get_parent().remove(this);
                 return true;
             });
@@ -223,8 +337,8 @@ public class WidgetSettings: Gtk.Box {
                         item.admin2 = resultNode.has_member("admin2") ? resultNode.get_string_member("admin2") : null;
                         item.admin3 = resultNode.has_member("admin3") ? resultNode.get_string_member("admin3") : null;
                         item.admin4 = resultNode.has_member("admin4") ? resultNode.get_string_member("admin4") : null;
-                        item.latitude = resultNode.has_member("latitude") ? resultNode.get_string_member("latitude") : null;
-                        item.latitude = resultNode.has_member("longitude") ? resultNode.get_string_member("longitude") : null;
+                        item.latitude = resultNode.has_member("latitude") ? resultNode.get_double_member("latitude") : 0;
+                        item.longitude = resultNode.has_member("longitude") ? resultNode.get_double_member("longitude") : 0;
                         locations.add(item);
 
                         var layoutItem = new ListItem();

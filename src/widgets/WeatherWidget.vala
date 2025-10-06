@@ -2,14 +2,14 @@ using Config;
 using Gee;
 
 public class WeatherWidget: Card {
-    private WeatherRepository weatherRepository;
     private Gtk.Label currentTemperatureLabel = new Gtk.Label("--");
     private Gtk.Label currentDescriptionLabel = new Gtk.Label("");
     private Gtk.Image currentWeatherIcon = new Gtk.Image();
     private Gtk.Label lastUpdatedLabel = new Gtk.Label("");
     private ArrayList <WeatherForecastItem> forecastItems = new ArrayList<WeatherForecastItem>();
+    private WeatherService weatherService;
 
-    public WeatherWidget() {
+    public WeatherWidget(LocationItem location) {
         base();
         //get_style_context ().add_class ("no-border");
         get_style_context ().add_class ("weather-widget");
@@ -29,14 +29,14 @@ public class WeatherWidget: Card {
             warning("Failed to load weather codes from %s\n", weatherCodesFile);
         }
 
-        var layout = new Gtk.Box(Gtk.Orientation.VERTICAL, 0);
-        layout.get_style_context ().add_class("card-body");
-        //layout.get_style_context ().add_class("pt-2");
-        //layout.get_style_context ().add_class("pb-2");
-        pack_start (layout, true);
+        var locationLabel = new Gtk.Label(location.name);
+        locationLabel.set_halign (Gtk.Align.START);
+        locationLabel.get_style_context ().add_class ("ps-3");
+        locationLabel.get_style_context ().add_class ("pt-3");
+        pack_start (locationLabel, false);
 
         var currentWeatherBox = new Gtk.Box(Gtk.Orientation.HORIZONTAL, 0);
-        layout.pack_start(currentWeatherBox, false);
+        pack_start(currentWeatherBox, false);
 
         currentWeatherIcon.set_valign (Gtk.Align.START);
         currentWeatherIcon.set_halign (Gtk.Align.START);
@@ -61,14 +61,15 @@ public class WeatherWidget: Card {
         currentDescriptionLabel.set_valign (Gtk.Align.CENTER);
         currentDescriptionLabel.set_halign (Gtk.Align.START);
         currentDescriptionLabel.margin_top = 0;
-        currentDescriptionLabel.margin_bottom = 15;
-        currentDescriptionLabel.yalign = 30.0f;
+        currentDescriptionLabel.margin_bottom = 8;
+        currentDescriptionLabel.yalign = 20.0f;
         currentDescriptionLabel.vexpand = false;
         currentDescriptionLabel.single_line_mode = true;
         currentWeatherTempBox.pack_start (currentDescriptionLabel, false);
 
         var forecastBox = new Gtk.Box(Gtk.Orientation.HORIZONTAL, 3);
-        layout.pack_start(forecastBox, true);
+        forecastBox.margin_bottom = 5;
+        pack_start(forecastBox, true);
 
         lastUpdatedLabel.get_style_context().add_class("text-size-small");
         lastUpdatedLabel.get_style_context().add_class("text-color-muted");
@@ -78,23 +79,20 @@ public class WeatherWidget: Card {
 
         var weatherCodes = weatherCodesJson.get_object();
 
-        var weatherService = new WeatherService();
+        weatherService = new WeatherService(location);
         Idle.add(() => {
             weatherService.start_service ();
             return false;
         });
 
-        weatherRepository = WeatherRepository.getInstance();
-        weatherRepository.weatherUpdated.connect(() => {
+        weatherService.weatherUpdated.connect((weather) => {
             forecastItems.clear();
             forecastBox.get_children().foreach((child) => {
                 child.destroy ();
                 forecastBox.remove(child);
             });
 
-            var root = weatherRepository.getRoot();
-            if (root != null) {
-                var current = root.get_object ().get_member ("current").get_object();
+            var current = weather.get_member ("current").get_object();
                 int currentTemperature = (int)Math.ceil(current.get_member("temperature_2m").get_int ());
                 string currentWeatherCode = current.get_member("weather_code").get_int().to_string();
                 bool isDay = current.get_member("is_day").get_int() == 1;
@@ -119,7 +117,7 @@ public class WeatherWidget: Card {
                     }
                 }
 
-                var daily = root.get_object ().get_member ("daily").get_object();
+                var daily = weather.get_member ("daily").get_object();
                 daily.get_member ("time")
                     .get_array ()
                     .get_elements ()
@@ -195,9 +193,10 @@ public class WeatherWidget: Card {
                 }
                 forecastBox.show_all();
                 lastUpdatedLabel.set_label (_("Last updated: %s").printf(currentDate));
-            } else {
-                // Handle the case where no data is available
-            }
         });
+    }
+
+    ~WeatherWidget() {
+        weatherService.stop_service();
     }
 }

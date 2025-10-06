@@ -31,7 +31,6 @@ public class SettingsService: Service {
 
     private void checkSettings() {
         SettingsUtils.checkSettingsFile ();
-
         filePath = SettingsUtils.getSettingsFilePath ();
         var file = File.new_for_path (filePath);
 

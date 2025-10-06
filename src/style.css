@@ -435,7 +435,7 @@ button.active {
 }
 
 .weather-widget {
-    padding: 8px 6px 5px;
+    padding: 10px;
 }
 
 .weather-widget .weather-forecast-widget{

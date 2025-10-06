@@ -5,8 +5,8 @@ public class LocationItem: GLib.Object {
     public string? admin2 {get; set;}
     public string? admin3 {get; set;}
     public string? admin4 {get; set;}
-    public string? latitude {get;set;}
-    public string? longitude {get;set;}
+    public double? latitude {get;set;}
+    public double? longitude {get;set;}
     
     public string? getDescription() {
         var admins = new Gee.ArrayList<string>();
