@@ -112,3 +112,6 @@ msgstr ""
 
 msgid "Add"
 msgstr ""
+
+msgid "Add Location"
+msgstr ""

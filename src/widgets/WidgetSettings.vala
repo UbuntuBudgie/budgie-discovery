@@ -46,7 +46,7 @@ public class WidgetSettings: Gtk.Box {
         private Gtk.Button okButton;
         private Gee.ArrayList<LocationItem> locations;
         private Gtk.Box locationLayout = new Gtk.Box(Gtk.Orientation.VERTICAL, 0);
-        private static string OPEN_METEO_SEARCH_URL = "https://geocoding-api.open-meteo.com/v1/search?name=%s&count=10&language=en";
+        private static string OPEN_METEO_SEARCH_URL = "https://geocoding-api.open-meteo.com/v1/search?name=%s&count=10&language=%s";
         private LocationItem selectedLocation;
 
         public LocationItem getLocation() {
@@ -61,7 +61,7 @@ public class WidgetSettings: Gtk.Box {
             set_type_hint(Gdk.WindowTypeHint.DIALOG);
             gravity = Gdk.Gravity.CENTER;
             set_default_size (400, 280);
-            set_title(_("Add Weather Location"));
+            set_title(_("Add Location"));
 
             locations = new Gee.ArrayList<LocationItem>();
 
@@ -75,7 +75,7 @@ public class WidgetSettings: Gtk.Box {
             contentArea.get_style_context().add_class("no-border");
             contentArea.add(layout);
 
-            var nameLabel = new Gtk.Label("Location:");
+            var nameLabel = new Gtk.Label("%s:".printf(_("Location")));
             nameLabel.set_halign (Gtk.Align.START);
             layout.pack_start(nameLabel, false);
 
@@ -146,24 +146,32 @@ public class WidgetSettings: Gtk.Box {
             string searchText = nameEntry.get_text().chomp();
             if (searchText.length == 0) return;
 
-            string url = OPEN_METEO_SEARCH_URL.printf(searchText);
+            string? locale = Intl.setlocale (LocaleCategory.ALL, "");
+            if (locale == null)
+                locale = "C";
+
+            string[] parts = locale.split ("_");
+
+            string lang = parts.length > 0 ? parts[0] : "en";
+            string url = OPEN_METEO_SEARCH_URL.printf(searchText, lang);
 
             var session = new Soup.Session();
             var msg = new Soup.Message("GET", url);
 
             try {
-                var responseData = session.send_and_read(msg, null);
+                var response = session.send_and_read (msg, null);
                 if (msg.status_code != 200) {
-                    warning("HTTP-Fehler: %d", msg.get_status());
+                    warning ("HTTP-Fehler: %d", msg.get_status ());
                     return;
                 }
 
-                var contentType = msg.get_response_headers().get_content_type(null);
-                message(contentType);
-                // TODO check for json
+                // Lies den Body als UTF-8-Text
+                var data_stream = new GLib.MemoryInputStream.from_bytes (response);
+                var dis = new GLib.DataInputStream (data_stream);
+                string? data = dis.read_upto ("", 0, null); // liest gesamten Stream
 
-                uint8[] bytes = responseData.get_data().copy();
-                string data = (string) bytes;
+                if (data == null)
+                    data = "";
 
                 var parser = new Json.Parser();
                 parser.load_from_data(data, data.length);
@@ -172,7 +180,6 @@ public class WidgetSettings: Gtk.Box {
                 if (root != null && root.has_member("results")) {
                     var results = root.get_array_member("results");
 
-                    // Alte Einträge löschen
                     locationLayout.foreach(child => {
                         locationLayout.remove(child);
                         child = null;
@@ -189,6 +196,8 @@ public class WidgetSettings: Gtk.Box {
                         item.admin2 = resultNode.has_member("admin2") ? resultNode.get_string_member("admin2") : null;
                         item.admin3 = resultNode.has_member("admin3") ? resultNode.get_string_member("admin3") : null;
                         item.admin4 = resultNode.has_member("admin4") ? resultNode.get_string_member("admin4") : null;
+                        item.latitude = resultNode.has_member("latitude") ? resultNode.get_string_member("latitude") : null;
+                        item.latitude = resultNode.has_member("longitude") ? resultNode.get_string_member("longitude") : null;
                         locations.add(item);
 
                         var layoutItem = new LocationLayoutItem(item);

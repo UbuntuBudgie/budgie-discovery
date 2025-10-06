@@ -214,5 +214,11 @@ msgstr "Feed hinzufügen"
 msgid "Add"
 msgstr "Hinzufügen"
 
+msgid "Add Location"
+msgstr "Ort hinzufügen"
+
+msgid "Location"
+msgstr "Ort"
+
 msgid "Applet Settings"
 msgstr "Applet Einstellungen"
