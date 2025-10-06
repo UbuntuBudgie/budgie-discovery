@@ -127,8 +127,7 @@ public class FeedSettings: Gtk.Box {
         load_style_sheet();
     }
 
-    private class FeedRow: Gtk.EventBox {
-        private Gtk.Label label;
+    private class FeedRow: ListItem {
         private Gtk.Button deleteButton;
         private string feedName;
         private string feedUri;
@@ -137,38 +136,16 @@ public class FeedSettings: Gtk.Box {
         public signal void onFeedDelete(string uid);
 
         public FeedRow(Gtk.Window parentWindow, string uid, string uri, string name) {
-            Object();
+            base();
             feedUri = uri;
             feedName = name;
             this.uid = uid;
 
+            setSelectable(false);
+            //set_visible_window(true); // sorgt dafür, dass EventBox Events empfängt
+            //set_above_child(false);    // Events gehen an die EventBox, nicht nur an die Kinder
 
-            set_visible_window(true); // sorgt dafür, dass EventBox Events empfängt
-            set_above_child(false);    // Events gehen an die EventBox, nicht nur an die Kinder
-            add_events(Gdk.EventMask.ENTER_NOTIFY_MASK | Gdk.EventMask.LEAVE_NOTIFY_MASK);
-
-            var layout = new Gtk.Box(Gtk.Orientation.HORIZONTAL, 0);
-            layout.get_style_context().add_class("list-item");
-            layout.get_style_context().add_class("ps-3");
-            layout.get_style_context().add_class("pe-1");
-            layout.get_style_context().add_class("pt-1");
-            layout.get_style_context().add_class("pb-1");
-            layout.set_sensitive(true);
-            add(layout);
-
-            enter_notify_event.connect(() => {
-                layout.get_style_context().add_class("hover");
-                return true;
-            });
-            leave_notify_event.connect(() => {
-                layout.get_style_context().remove_class("hover");
-                return true;
-            });
-
-            label = new Gtk.Label(feedName);
-            label.get_style_context ().add_class ("text-size-small");
-            label.set_halign (Gtk.Align.START);
-            layout.pack_start(label, true);
+            setPrimaryText(feedName);
 
             deleteButton = new Gtk.Button();
             deleteButton.set_size_request(16, 16);
@@ -189,7 +166,7 @@ public class FeedSettings: Gtk.Box {
                 onFeedDelete(uid);
                 return true;
             });
-            layout.pack_start(deleteButton, false);
+            addActionButton(deleteButton);
         }
     }
 
