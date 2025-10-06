@@ -476,16 +476,19 @@ button.active {
     border-bottom: 1px solid #ddd;
 }
 
-.settings-dialog .list-item {
+.settings-dialog .list-item,
+.settings-page .list-item {
     background: transparent;
     border: 1px solid transparent;
     border-radius: 3px;
 }
-.settings-dialog .list-item.selected {
+.settings-dialog .list-item.selected,
+.settings-page .list-item.selected {
     background: rgba(204, 232, 255, .65);
     border: 1px solid rgba(204, 232, 255, .95);
 }
-.settings-dialog .list-item.hover {
+.settings-dialog .list-item.hover,
+.settings-page .list-item.hover {
     background: rgba(240, 240, 240, .65);
     border: 1px solid rgba(240, 240, 240, .75);
 }
