@@ -146,6 +146,7 @@ public class FeedSettings: Gtk.Box {
             //set_above_child(false);    // Events gehen an die EventBox, nicht nur an die Kinder
 
             setPrimaryText(feedName);
+            setSecondaryText(uri);
 
             deleteButton = new Gtk.Button();
             deleteButton.set_size_request(16, 16);
