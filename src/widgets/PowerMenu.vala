@@ -18,7 +18,7 @@ public interface SessionManager : Object
     public abstract async void Shutdown() throws Error;
 }
 
-public class PowerWidget : Gtk.Box {
+public class PowerMenu : Gtk.Menu {
     private ScreenSaver? saver = null;
     private SessionManager? session = null;
     private LogindInterface? logind_interface = null;
@@ -47,51 +47,16 @@ public class PowerWidget : Gtk.Box {
         }
     }
 
-    public PowerWidget() {
-        Object(
-            orientation: Gtk.Orientation.HORIZONTAL,
-            spacing: 5
-        );
+    public PowerMenu(Budgie.Popover popover) {
+        Object();
 
-        var powerButton = new Gtk.Button.from_icon_name("system-shutdown-symbolic", Gtk.IconSize.SMALL_TOOLBAR);
-        var rebootButton = new Gtk.Button.from_icon_name("system-restart-symbolic", Gtk.IconSize.SMALL_TOOLBAR);
-        var suspendButton = new Gtk.Button.from_icon_name("system-suspend-symbolic", Gtk.IconSize.SMALL_TOOLBAR);
-        var logoutButton = new Gtk.Button.from_icon_name("system-log-out-symbolic", Gtk.IconSize.SMALL_TOOLBAR);
-
-        this.pack_start(powerButton, false);
-        this.pack_start(rebootButton, false);
-        this.pack_start(suspendButton, false);
-        this.pack_start(logoutButton, false);
-        this.get_style_context().add_class("power-widget");
-
-        powerButton.clicked.connect(() => {
-            if (session == null) {
-                return;
-            }
-
-            invoke_action();
-            Timeout.add(100, ()=> {
-                session.Shutdown.begin();
-                return false;
-            });
-        });
-        rebootButton.clicked.connect(() => {
-            if (session == null) {
-                return;
-            }
-
-            invoke_action();
-            Timeout.add(100, ()=> {
-                session.Reboot.begin();
-                return false;
-            });
-        });
-        suspendButton.clicked.connect(() => {   
+        var item1 = createPowerMenuItem(_("Lock Screen"), "system-lock-screen-symbolic");
+        item1.activate.connect (() => {
             if (logind_interface == null) {
                 return;
             }
 
-            invoke_action();
+            hide();
             Timeout.add(100, ()=> {
                 try {
                     logind_interface.suspend(false);
@@ -101,18 +66,63 @@ public class PowerWidget : Gtk.Box {
                 return false;
             });
         });
-        logoutButton.clicked.connect(() => { 
+        append (item1);
+
+        var item5 = createPowerMenuItem(_("Logout"), "system-log-out-symbolic");
+        item5.activate.connect (() => {
             if (session == null) {
                 return;
             }
 
-            invoke_action();
+            popover.hide();
             Timeout.add(100, ()=> {    
                 session.Logout.begin(0);
                 return false;
             });
         });
+        append (item5);
+
+        var divider = new Gtk.SeparatorMenuItem();
+        append(divider);
+
+        var item3 = createPowerMenuItem(_("Shut Down"), "system-shutdown-symbolic");
+        item3.activate.connect (() => {
+            if (session == null) {
+                return;
+            }
+
+            popover.hide();
+            Timeout.add(100, ()=> {
+                session.Shutdown.begin();
+                return false;
+            });
+        });
+        append (item3);
+
+        var item4 = createPowerMenuItem(_("Reboot"), "system-reboot-symbolic");
+        item4.activate.connect (() => {
+            if (session == null) {
+                return;
+            }
+
+            popover.hide();
+            Timeout.add(100, ()=> {
+                session.Reboot.begin();
+                return false;
+            });
+        });
+        append (item4);
 
         setup_dbus.begin((obj,res)=> {});
+    }
+
+    private Gtk.MenuItem createPowerMenuItem(string text, string? iconName) {
+        var item = new Gtk.ImageMenuItem.with_label(text);
+        var image = new Gtk.Image.from_icon_name(iconName, Gtk.IconSize.MENU);
+        image.get_style_context().add_class("ms-4");
+        image.valign = Gtk.Align.CENTER;
+        item.image = image;
+        item.always_show_image = true;
+        return item;
     }
 }

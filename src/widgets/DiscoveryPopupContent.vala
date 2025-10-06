@@ -51,50 +51,10 @@ public class DiscoveryPopupContent: Gtk.Box {
         buttonBox.pack_start(menuButton, false);
         navigationBox.pack_start(buttonBox, true);
 
-        var menu = new Gtk.Menu ();
-        var item1 = createPowerMenuItem("Lock Screen", "system-lock-screen-symbolic");
-        item1.activate.connect (() => {
-            print ("Option 1 gewählt\n");
-            parent.hide();
-        });
-        menu.append (item1);
-
-        var item5 = createPowerMenuItem("Logout", "system-log-out-symbolic");
-        item5.activate.connect (() => {
-            print ("Option 5 gewählt\n");
-            parent.hide();
-        });
-        menu.append (item5);
-
-        var divider = new Gtk.SeparatorMenuItem();
-        menu.append(divider);
-
-        var item3 = createPowerMenuItem("Shut Down", "system-shutdown-symbolic");
-        item3.activate.connect (() => {
-            print ("Option 3 gewählt\n");
-            parent.hide();
-        });
-        menu.append (item3);
-
-        var item4 = createPowerMenuItem("Restart", "system-reboot-symbolic");
-        item4.activate.connect (() => {
-            print ("Option 4 gewählt\n");
-            parent.hide();
-        });
-        menu.append (item4);
+        var menu = new PowerMenu(parent);
 
         menuButton.set_popup (menu);
         menu.show_all();
-    }
-
-    private Gtk.MenuItem createPowerMenuItem(string text, string? iconName) {
-        var item = new Gtk.ImageMenuItem.with_label(text);
-        var image = new Gtk.Image.from_icon_name(iconName, Gtk.IconSize.MENU);
-        image.get_style_context().add_class("ms-4");
-        image.valign = Gtk.Align.CENTER;
-        item.image = image;
-        item.always_show_image = true;
-        return item;
     }
 
     public override void get_preferred_width(out int minimum_width, out int natural_width) {

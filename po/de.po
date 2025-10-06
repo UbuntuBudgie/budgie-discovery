@@ -222,3 +222,15 @@ msgstr "Ort"
 
 msgid "Applet Settings"
 msgstr "Applet Einstellungen"
+
+msgid "Logout"
+msgstr "Abmelden"
+
+msgid "Lock Screen"
+msgstr "Bildschirm sperren"
+
+msgid "Reboot"
+msgstr "Neustarten"
+
+msgid "Shut Down"
+msgstr "Herunterfahren"

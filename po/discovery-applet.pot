@@ -115,3 +115,15 @@ msgstr ""
 
 msgid "Add Location"
 msgstr ""
+
+msgid "Logout"
+msgstr ""
+
+msgid "Lock Screen"
+msgstr ""
+
+msgid "Reboot"
+msgstr ""
+
+msgid "Shut Down"
+msgstr ""
