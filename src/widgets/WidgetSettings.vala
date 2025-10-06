@@ -30,10 +30,11 @@ public class WidgetSettings: Gtk.Box {
             var dialog = new WeatherItemDialog(window, this);
             int response = dialog.run();
             if(response == Gtk.ResponseType.OK) {
-                message("Item added");
                 var location = dialog.getLocation();
                 var layoutItem = new ListItem();
                 layoutItem.setData(location);
+                layoutItem.setPrimaryText(location.name);
+                layoutItem.setSecondaryText(location.getDescription());
                 widgetListLayout.pack_start(layoutItem, false);
                 widgetListLayout.show_all();
             }
@@ -203,6 +204,8 @@ public class WidgetSettings: Gtk.Box {
 
                         var layoutItem = new ListItem();
                         layoutItem.setData(item);
+                        layoutItem.setPrimaryText(item.name);
+                        layoutItem.setSecondaryText(item.getDescription());
                         layoutItem.valign = Gtk.Align.START;
                         locationLayout.pack_start(layoutItem, false, false);
 
