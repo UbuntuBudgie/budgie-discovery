@@ -4,6 +4,7 @@ using Posix;
 
 public class WeatherRepository {
     private string filePath = null;
+    private static string cacheDir;
     private Json.Parser parser = new Json.Parser();
     private Json.Node root = null;
     private static WeatherRepository instance = null;
@@ -19,11 +20,13 @@ public class WeatherRepository {
 
     private WeatherRepository() {
         if (filePath == null) {
-            string localSharePackageDir = Environment.get_home_dir() + "/.local/share/budgie-desktop/plugins/" + PACKAGE_NAME;
-            if( !FileUtils.test(localSharePackageDir, FileTest.IS_DIR)) {
-                mkdir(localSharePackageDir, 0755);
+            cacheDir = "%s/%s".printf(Environment.get_user_cache_dir(), PACKAGE_NAME);
+            if( !FileUtils.test(cacheDir, FileTest.IS_DIR)) {
+                DirUtils.create_with_parents(cacheDir, 0755);
+                if(FileUtils.test(cacheDir, FileTest.IS_DIR)) {
+                    filePath = cacheDir + "/weather.json";
+                }
             }
-            filePath = localSharePackageDir + "/weather.json";
         }
     }
 
