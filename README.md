@@ -1,5 +1,5 @@
 # discovery-applet
-A budgie-desktop applet to show latest news, weather and custom widgets in a popover
+A budgie-desktop applet to show latest news, weather and favorite locations and applications in a popover
 
 ### Screenshots
 
