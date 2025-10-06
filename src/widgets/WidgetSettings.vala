@@ -31,7 +31,7 @@ public class WidgetSettings: Gtk.Box {
             int response = dialog.run();
             if(response == Gtk.ResponseType.OK) {
                 var location = dialog.getLocation();
-                var layoutItem = new ListItem();
+                var layoutItem = new WeatherListItem();
                 layoutItem.setData(location);
                 layoutItem.setPrimaryText(location.name);
                 layoutItem.setSecondaryText(location.getDescription());
@@ -42,6 +42,30 @@ public class WidgetSettings: Gtk.Box {
             dialog.destroy();
         });
         pack_start (plusButton, false);
+    }
+
+    private class WeatherListItem: ListItem {
+        private Gtk.Button deleteButton = new Gtk.Button();
+        public WeatherListItem() {
+            deleteButton.set_size_request(16, 16);
+            deleteButton.get_style_context().add_class("p-0");
+            deleteButton.get_style_context().add_class("m-0");
+            deleteButton.get_style_context().add_class("no-border");
+            deleteButton.get_style_context().add_class("no-background");
+
+            var deleteImage = new Gtk.Image();
+            deleteImage.set_from_icon_name("edit-delete-symbolic", Gtk.IconSize.BUTTON);
+            deleteImage.pixel_size = 16;
+            deleteImage.vexpand = false;
+            deleteImage.hexpand = false;
+            deleteButton.set_image(deleteImage);
+
+            deleteButton.button_press_event.connect(() => {
+                get_parent().remove(this);
+                return true;
+            });
+            addActionButton(deleteButton);
+        }
     }
 
     private class WeatherItemDialog: Gtk.Dialog {

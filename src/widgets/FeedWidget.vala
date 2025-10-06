@@ -8,6 +8,7 @@ public class FeedWidget: Gtk.Box {
     private Gtk.Box mainLayout = new Gtk.Box(Gtk.Orientation.HORIZONTAL, 10);
     private Budgie.Popover popup;
     private Gtk.Notebook notebook;
+    private SettingsWindow settingsDialog;
 
     public FeedWidget(Budgie.Popover popover) {
         Object();
@@ -31,7 +32,11 @@ public class FeedWidget: Gtk.Box {
         greetingWidget.addButton(settingsButton);
 
         settingsButton.button_press_event.connect((event) => {
-            var settingsDialog = new SettingsWindow();
+            if(settingsDialog != null) {
+                settingsDialog.destroy();
+                settingsDialog = null;
+            }
+            settingsDialog = new SettingsWindow();
             settingsDialog.show_all();
             settingsDialog.present();
             popover.hide();
