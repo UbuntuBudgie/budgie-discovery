@@ -479,10 +479,13 @@ button.active {
 .settings-dialog .list-item {
     background: transparent;
     border: 1px solid transparent;
-    margin: 2px;
     border-radius: 3px;
 }
 .settings-dialog .list-item.selected {
     background: rgba(204, 232, 255, .65);
     border: 1px solid rgba(204, 232, 255, .95);
+}
+.settings-dialog .list-item.hover {
+    background: rgba(240, 240, 240, .65);
+    border: 1px solid rgba(240, 240, 240, .75);
 }

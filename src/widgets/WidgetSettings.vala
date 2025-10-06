@@ -30,6 +30,11 @@ public class WidgetSettings: Gtk.Box {
             var dialog = new WeatherItemDialog(window, this);
             int response = dialog.run();
             if(response == Gtk.ResponseType.OK) {
+                message("Item added");
+                var location = dialog.getLocation();
+                var layoutItem = new LocationLayoutItem(location);
+                widgetListLayout.pack_start(layoutItem, false);
+                widgetListLayout.show_all();
             }
             dialog.destroy();
         });
@@ -38,9 +43,15 @@ public class WidgetSettings: Gtk.Box {
 
     private class WeatherItemDialog: Gtk.Dialog {
         private Gtk.Entry nameEntry;
+        private Gtk.Button okButton;
         private Gee.ArrayList<LocationItem> locations;
         private Gtk.Box locationLayout = new Gtk.Box(Gtk.Orientation.VERTICAL, 0);
         private static string OPEN_METEO_SEARCH_URL = "https://geocoding-api.open-meteo.com/v1/search?name=%s&count=10&language=en";
+        private LocationItem selectedLocation;
+
+        public LocationItem getLocation() {
+            return selectedLocation;
+        }
 
         public WeatherItemDialog(Gtk.Window window, WidgetSettings parent) {
             Object();
@@ -95,7 +106,7 @@ public class WidgetSettings: Gtk.Box {
             var buttonBox = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 6);
             layout.pack_end (buttonBox, false, false, 0);
 
-            var okButton = new Gtk.Button.with_label (_("OK"));
+            okButton = new Gtk.Button.with_label (_("OK"));
             okButton.set_can_default (true);
             okButton.grab_default ();
             okButton.set_sensitive(false);
@@ -109,7 +120,6 @@ public class WidgetSettings: Gtk.Box {
             });
 
             okButton.clicked.connect((e) => {
-                
                 response(Gtk.ResponseType.OK);
             });
 
@@ -130,6 +140,9 @@ public class WidgetSettings: Gtk.Box {
         }
 
         private void searchLocation() {
+            selectedLocation = null;
+            okButton.set_sensitive(false);
+
             string searchText = nameEntry.get_text().chomp();
             if (searchText.length == 0) return;
 
@@ -167,7 +180,6 @@ public class WidgetSettings: Gtk.Box {
 
                     locations.clear();
 
-                    Gtk.RadioButton? radioGroup = null;
                     results.foreach_element((element, index) => {
                         var resultNode = element.get_object_element(index);
                         LocationItem item = new LocationItem();
@@ -179,26 +191,29 @@ public class WidgetSettings: Gtk.Box {
                         item.admin4 = resultNode.has_member("admin4") ? resultNode.get_string_member("admin4") : null;
                         locations.add(item);
 
-                        var layoutItem = new LocationLayoutItem(item, radioGroup);
-                        if (radioGroup == null)
-                            radioGroup = layoutItem.getRadio();
+                        var layoutItem = new LocationLayoutItem(item);
                         layoutItem.valign = Gtk.Align.START;
                         locationLayout.pack_start(layoutItem, false, false);
+
+                        layoutItem.selected.connect(() => {
+                            locationLayout.get_children().foreach(child => {
+                                if(child is LocationLayoutItem && child != layoutItem) {
+                                    ((LocationLayoutItem)child).setSelected(false);
+                                }
+                            });
+                            selectedLocation = layoutItem.getLocation();
+                            okButton.set_sensitive(true);
+                            okButton.grab_focus();
+                        });
 
                         if((index + 1) < results.get_length()) {
                             var divider = new Gtk.Separator(Gtk.Orientation.VERTICAL);
                             divider.get_style_context().add_class ("border-bottom");
+                            divider.margin_bottom = 1;
+                            divider.margin_top = 1;
                             divider.valign = Gtk.Align.START;
                             locationLayout.pack_start(divider, false);
                         }
-
-                        layoutItem.selectionChanged.connect(() => {
-                            locationLayout.foreach(child => {
-                                if(child is LocationLayoutItem && layoutItem != child) {
-                                    ((LocationLayoutItem)child).setSelected(false);
-                                }
-                            });
-                        });
                     });
 
                     show_all();
@@ -223,103 +238,5 @@ public class WidgetSettings: Gtk.Box {
                 warning("Konnte CSS nicht laden: %s", e.message);
             }
         }
-
-        private class LocationLayoutItem: Gtk.Box {
-            private Gtk.RadioButton radio;
-
-            public signal void selectionChanged();
-
-            public void setSelected(bool value) {
-                radio.set_active(value);
-                get_style_context().remove_class("selected");    
-            }
-
-            public Gtk.RadioButton getRadio() {
-                return radio;
-            }
-
-            public LocationLayoutItem(LocationItem item, Gtk.RadioButton? group) {
-                Object();
-                set_orientation(Gtk.Orientation.HORIZONTAL);
-                set_spacing(10);
-                get_style_context().add_class("list-item");
-
-                var admins = new Gee.ArrayList<string>();
-                if (item.country != null && item.country.length > 0)
-                    admins.add(item.country);
-
-                if (item.admin1 != null && item.admin1.length > 0)
-                    admins.add(item.admin1);
-
-                if (item.admin2 != null && item.admin2.length > 0)
-                    admins.add(item.admin2);
-
-                if (item.admin3 != null && item.admin3.length > 0)
-                    admins.add(item.admin3);
-
-                if (item.admin4 != null && item.admin4.length > 0)
-                    admins.add(item.admin4);
-
-                // UTF-8 Strings direkt verbinden
-                string admin_text = "";
-                bool first = true;
-                foreach (var a in admins) {
-                    if (first) {
-                        admin_text += a;
-                        first = false;
-                    } else {
-                        admin_text += ", " + a;
-                    }
-                }
-
-                radio = (group == null)
-                    ? new Gtk.RadioButton(null)
-                    : new Gtk.RadioButton.from_widget(group);
-                pack_start(radio, false);
-
-                var textLayout = new Gtk.Box(Gtk.Orientation.VERTICAL, 0);
-                textLayout.get_style_context().add_class("pt-2");
-                textLayout.get_style_context().add_class("pb-2");
-                textLayout.get_style_context().add_class("ps-3");
-                textLayout.get_style_context().add_class("pe-3");
-                pack_start(textLayout, false);
-
-                string name = item.name;
-                var nameLabel = new Gtk.Label(null);
-                nameLabel.halign = Gtk.Align.START;
-                nameLabel.valign = Gtk.Align.END;
-                nameLabel.set_text(name);
-                nameLabel.set_use_markup(false);
-                textLayout.pack_start(nameLabel, false);
-
-                if (admin_text.length > 0) {
-                    var descriptionLabel = new Gtk.Label(null);
-                    descriptionLabel.halign = Gtk.Align.START;
-                    descriptionLabel.yalign = -5.0f;
-                    descriptionLabel.valign = Gtk.Align.START;
-                    descriptionLabel.get_style_context().add_class("text-size-small");
-                    descriptionLabel.get_style_context().add_class("text-secondary");
-                    descriptionLabel.get_style_context().add_class("font-italic");
-                    descriptionLabel.set_text(admin_text);
-                    descriptionLabel.set_use_markup(false);
-                    textLayout.pack_start(descriptionLabel, false);
-                }
-
-                radio.set_size_request(24, 24);
-                radio.toggled.connect(() => {
-                    get_style_context().add_class("selected");
-                    selectionChanged();
-                });
-            }
-        }
-    }
-
-    private class LocationItem {
-        public string? name {get; set;}
-        public string? country {get; set;}
-        public string? admin1 {get; set;}
-        public string? admin2 {get; set;}
-        public string? admin3 {get; set;}
-        public string? admin4 {get; set;}
     }
 }
