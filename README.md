@@ -1,7 +1,11 @@
 # discovery-applet
 A budgie-desktop applet to show latest news, weather and custom widgets in a popover
 
-## Dependencies
+### Screenshots
+
+[here](/k8s-cloud-io/budgie-discovery/tree/development/screenshots)
+
+### Dependencies
 ```
 budgie-1.0
 gee-0.8
