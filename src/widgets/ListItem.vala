@@ -4,7 +4,7 @@ public class ListItem: Gtk.EventBox {
             private Gtk.Label primaryLabel = new Gtk.Label(null);
             private Gtk.Label secondaryLabel = new Gtk.Label(null);
 
-            private bool selectable;
+            private bool selectable = true;
             private string? primaryText;
             private string? secondaryText;
 
