@@ -148,7 +148,7 @@ public class FeedSettings: Gtk.Box {
             add_events(Gdk.EventMask.ENTER_NOTIFY_MASK | Gdk.EventMask.LEAVE_NOTIFY_MASK);
 
             var layout = new Gtk.Box(Gtk.Orientation.HORIZONTAL, 0);
-            layout.get_style_context().add_class("feed-row");
+            layout.get_style_context().add_class("list-item");
             layout.get_style_context().add_class("ps-3");
             layout.get_style_context().add_class("pe-1");
             layout.get_style_context().add_class("pt-1");

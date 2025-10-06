@@ -1,6 +1,12 @@
-public class LocationLayoutItem: Gtk.EventBox {
+public class ListItem: Gtk.EventBox {
             private Gtk.Box textLayout = new Gtk.Box(Gtk.Orientation.VERTICAL, 0);
-            private LocationItem data;
+            private Object data;
+            private Gtk.Label primaryLabel = new Gtk.Label(null);
+            private Gtk.Label secondaryLabel = new Gtk.Label(null);
+
+            private string? primaryText;
+            private string? secondaryText;
+
             public signal void selected();
 
             public void setSelected(bool value) {
@@ -11,13 +17,26 @@ public class LocationLayoutItem: Gtk.EventBox {
                 }
             }
 
-            public LocationItem getLocation() {
+            public void setPrimaryText(string? text) {
+                primaryText = text;
+                primaryLabel.set_text(primaryText);
+            }
+
+            public void setSecondaryText(string? text) {
+                secondaryText = text;
+                secondaryLabel.set_text(secondaryText);
+            }
+
+            public void setData(Object value) {
+                data = value;
+            }
+
+            public Object getData() {
                 return data;
             }
 
-            public LocationLayoutItem(LocationItem item) {
+            public ListItem() {
                 Object();
-                data = item;
 
                 textLayout.get_style_context().add_class("list-item");
                 textLayout.get_style_context().add_class("pt-2");
@@ -26,27 +45,19 @@ public class LocationLayoutItem: Gtk.EventBox {
                 textLayout.get_style_context().add_class("pe-3");
                 add(textLayout);
 
-                string name = item.name;
-                var nameLabel = new Gtk.Label(null);
-                nameLabel.halign = Gtk.Align.START;
-                nameLabel.valign = Gtk.Align.END;
-                nameLabel.set_text(name);
-                nameLabel.set_use_markup(false);
-                textLayout.pack_start(nameLabel, false);
+                primaryLabel.halign = Gtk.Align.START;
+                primaryLabel.valign = Gtk.Align.END;
+                primaryLabel.set_use_markup(false);
+                textLayout.pack_start(primaryLabel, false);
 
-                var description = item.getDescription();
-                if (description.length > 0) {
-                    var descriptionLabel = new Gtk.Label(null);
-                    descriptionLabel.halign = Gtk.Align.START;
-                    descriptionLabel.yalign = -5.0f;
-                    descriptionLabel.valign = Gtk.Align.START;
-                    descriptionLabel.get_style_context().add_class("text-size-small");
-                    descriptionLabel.get_style_context().add_class("text-secondary");
-                    descriptionLabel.get_style_context().add_class("font-italic");
-                    descriptionLabel.set_text(description);
-                    descriptionLabel.set_use_markup(false);
-                    textLayout.pack_start(descriptionLabel, false);
-                }
+                secondaryLabel.halign = Gtk.Align.START;
+                secondaryLabel.valign = Gtk.Align.START;
+                secondaryLabel.yalign = -5.0f;
+                secondaryLabel.get_style_context().add_class("text-size-small");
+                secondaryLabel.get_style_context().add_class("text-secondary");
+                secondaryLabel.get_style_context().add_class("font-italic");
+                secondaryLabel.set_use_markup(false);
+                textLayout.pack_start(secondaryLabel, false);
 
                 add_events(Gdk.EventMask.ENTER_NOTIFY_MASK | Gdk.EventMask.LEAVE_NOTIFY_MASK | Gdk.EventMask.BUTTON_PRESS_MASK);
                 this.enter_notify_event.connect(() => {

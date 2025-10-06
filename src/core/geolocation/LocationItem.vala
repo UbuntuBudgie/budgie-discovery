@@ -1,4 +1,4 @@
-public class LocationItem {
+public class LocationItem: GLib.Object {
     public string? name {get; set;}
     public string? country {get; set;}
     public string? admin1 {get; set;}

@@ -32,7 +32,8 @@ public class WidgetSettings: Gtk.Box {
             if(response == Gtk.ResponseType.OK) {
                 message("Item added");
                 var location = dialog.getLocation();
-                var layoutItem = new LocationLayoutItem(location);
+                var layoutItem = new ListItem();
+                layoutItem.setData(location);
                 widgetListLayout.pack_start(layoutItem, false);
                 widgetListLayout.show_all();
             }
@@ -200,17 +201,18 @@ public class WidgetSettings: Gtk.Box {
                         item.latitude = resultNode.has_member("longitude") ? resultNode.get_string_member("longitude") : null;
                         locations.add(item);
 
-                        var layoutItem = new LocationLayoutItem(item);
+                        var layoutItem = new ListItem();
+                        layoutItem.setData(item);
                         layoutItem.valign = Gtk.Align.START;
                         locationLayout.pack_start(layoutItem, false, false);
 
                         layoutItem.selected.connect(() => {
                             locationLayout.get_children().foreach(child => {
-                                if(child is LocationLayoutItem && child != layoutItem) {
-                                    ((LocationLayoutItem)child).setSelected(false);
+                                if(child is ListItem && child != layoutItem) {
+                                    ((ListItem)child).setSelected(false);
                                 }
                             });
-                            selectedLocation = layoutItem.getLocation();
+                            selectedLocation = (LocationItem) layoutItem.getData();
                             okButton.set_sensitive(true);
                             okButton.grab_focus();
                         });
