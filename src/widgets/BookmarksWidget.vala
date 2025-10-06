@@ -13,6 +13,9 @@ public class BookmarksWidget: Gtk.Box {
         set_spacing(10);
         get_style_context().add_class("applications-widget");
 
+        var settingsFile = SettingsUtils.getSettingsFilePath();
+        var parser = new Json.Parser();
+
         var headerWidget = new Gtk.Box(Gtk.Orientation.HORIZONTAL, 5);
         headerWidget.get_style_context().add_class ("header-widget");
         headerWidget.get_style_context().add_class ("pb-1");
@@ -66,15 +69,14 @@ public class BookmarksWidget: Gtk.Box {
         pageLayout.pack_start(bookmarksLayout, false, false, 0);
 
         var bookmarksPath = Environment.get_user_config_dir () + "/gtk-3.0/bookmarks";
-        var favoritesPath = "%s/budgie-desktop/plugins/discovery-applet/favorites.txt".printf( Environment.get_user_data_dir());
 
         var bookmarkService = new FileWatcherSevice();
         bookmarkService.watchFile(bookmarksPath);
-        bookmarkService.watchFile(favoritesPath);
+        bookmarkService.watchFile(settingsFile);
 
         bookmarkService.fileChanged.connect((path) => {
             if( path == bookmarksPath) updateBookmarksLayout();
-            if( path == favoritesPath) updateAppsLayout();
+            if( path == settingsFile) updateAppsLayout();
         });
         bookmarkService.start_service();
 
