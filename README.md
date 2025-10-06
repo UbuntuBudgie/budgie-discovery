@@ -3,7 +3,10 @@ A budgie-desktop applet to show latest news, weather and custom widgets in a pop
 
 ### Screenshots
 
-[here](/k8s-cloud-io/budgie-discovery/tree/development/screenshots)
+![image 1](https://github.com/k8s-cloud-io/budgie-discovery/blob/development/screenshots/1.png)
+![image 2](https://github.com/k8s-cloud-io/budgie-discovery/blob/development/screenshots/2.png)
+![image 3](https://github.com/k8s-cloud-io/budgie-discovery/blob/development/screenshots/3.png)
+![image 4](https://github.com/k8s-cloud-io/budgie-discovery/blob/development/screenshots/4.png)
 
 ### Dependencies
 ```
