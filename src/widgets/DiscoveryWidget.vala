@@ -10,6 +10,7 @@ public class DiscoveryWidget: Gtk.Box {
     private Gtk.Notebook notebook;
     private SettingsWindow settingsDialog;
     private SettingsService settingsService;
+    private Gtk.Button reloadButton;
 
     public DiscoveryWidget(Budgie.Popover popover) {
         Object();
@@ -26,7 +27,8 @@ public class DiscoveryWidget: Gtk.Box {
         mainLayout.hexpand = false;
         mainLayout.pack_start(widgetLayout, true, true);
 
-        var reloadButton = new Gtk.Button.from_icon_name("view-refresh-symbolic", Gtk.IconSize.SMALL_TOOLBAR);
+        reloadButton = new Gtk.Button.from_icon_name("view-refresh-symbolic", Gtk.IconSize.SMALL_TOOLBAR);
+        reloadButton.set_sensitive(false);
         greetingWidget.addButton(reloadButton);
 
         var settingsButton = new Gtk.Button.from_icon_name("preferences-system-symbolic", Gtk.IconSize.SMALL_TOOLBAR);
@@ -82,6 +84,8 @@ public class DiscoveryWidget: Gtk.Box {
                 if(parser.load_from_file(settingsFile)) {
                     var rootNode = parser.get_root().get_object();
                     var configuredFeeds = rootNode.get_array_member("feeds");
+                    reloadButton.set_sensitive(configuredFeeds.get_length() > 0);
+
                     for(var i = 0; i < configuredFeeds.get_length (); i++) {
                         var item = configuredFeeds.get_object_element(i);
                         var config = new FeedConfigItem();
@@ -153,7 +157,6 @@ public class DiscoveryWidget: Gtk.Box {
     }
 
     ~DiscoveryWidget() {
-        settingsService.stop_service();
         for(var i = 0; i < notebook.get_n_pages(); i++) {
             var page = notebook.get_nth_page(i);
             notebook.remove(page);
