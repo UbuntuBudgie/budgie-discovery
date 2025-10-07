@@ -18,6 +18,10 @@ public class FeedService: Service {
         }
     }
 
+    ~FeedService() {
+        stop_service();
+    }
+
     public new void start_service() {
         if(timer != 0) return;
         update_service(false);
@@ -28,7 +32,11 @@ public class FeedService: Service {
     }
 
     public new void stop_service() {
-        Source.remove(timer);
+        if(timer != 0) {
+            message("stop service");
+            Source.remove(timer);
+            timer = 0;
+        }
     }
 
     public new void update_service(bool force) {

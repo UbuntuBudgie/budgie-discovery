@@ -131,20 +131,17 @@ public class FeedSettings: Gtk.Box {
         private Gtk.Button deleteButton;
         private string feedName;
         private string feedUri;
-        private string uid;
+        private string feedUid;
 
         public signal void onFeedDelete(string uid);
 
-        public FeedRow(Gtk.Window parentWindow, string uid, string uri, string name) {
+        public FeedRow(Gtk.Window parentWindow, string? uid, string? uri, string? name) {
             base();
             feedUri = uri;
             feedName = name;
-            this.uid = uid;
+            feedUid = uid;
 
             setSelectable(false);
-            //set_visible_window(true); // sorgt dafür, dass EventBox Events empfängt
-            //set_above_child(false);    // Events gehen an die EventBox, nicht nur an die Kinder
-
             setPrimaryText(feedName);
             setSecondaryText(uri);
 
@@ -163,8 +160,8 @@ public class FeedSettings: Gtk.Box {
             deleteButton.set_image(deleteImage);
 
             deleteButton.button_press_event.connect(() => {
-                FeedSettings.feedLayout.remove(this);
                 onFeedDelete(uid);
+                get_parent().remove(this);
                 return true;
             });
             addActionButton(deleteButton);

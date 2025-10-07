@@ -5,6 +5,10 @@ public class SettingsService: Service {
     private string filePath;
     private static SettingsService instance;
 
+    ~SettingsService() {
+        stop_service();
+    }
+
     public static SettingsService getInstance() {
         if(instance == null) {
             instance = new SettingsService();
@@ -20,6 +24,7 @@ public class SettingsService: Service {
     }
     public new void stop_service () {
         if (timer != 0) {
+            message("stop service");
             Source.remove (timer);
             timer = 0;
         }

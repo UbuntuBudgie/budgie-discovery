@@ -3,6 +3,10 @@ public class BookmarkService: Service {
     private uint timer;
     private uint64 last_mtime = 0;
 
+    ~BookmarkService() {
+        stop_service();
+    }
+
     public new void start_service () {
         timer = Timeout.add (500, () => {
             checkBookmarks();
@@ -11,6 +15,7 @@ public class BookmarkService: Service {
     }
     public new void stop_service () {
         if (timer != 0) {
+            message("stop service");
             Source.remove (timer);
             timer = 0;
         }

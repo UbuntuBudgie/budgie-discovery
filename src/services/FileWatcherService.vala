@@ -3,6 +3,10 @@ public class FileWatcherSevice: Service {
     private uint timer;
     private static HashTable<string, uint64?> files = new GLib.HashTable<string, uint64?> (GLib.str_hash, GLib.str_equal);
 
+    ~FileWatcherSevice() {
+        stop_service();
+    }
+
     public new void start_service () {
         timer = Timeout.add (500, () => {
             checkFiles();
@@ -10,6 +14,7 @@ public class FileWatcherSevice: Service {
         });
     }
     public new void stop_service () {
+        message("stop service");
         if (timer != 0) {
             Source.remove (timer);
             timer = 0;

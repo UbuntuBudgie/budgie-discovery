@@ -83,6 +83,8 @@ public class BookmarksWidget: Gtk.Box {
                 throw new IOError.NOT_FOUND("file %s cant be created, aborting".printf(bookmarksFile));
             }
         }
+
+        SettingsUtils.checkSettingsFile();
         var settingsFile = SettingsUtils.getSettingsFilePath();
 
         var bookmarkService = new FileWatcherSevice();

@@ -9,6 +9,7 @@ public class FeedWidget: Gtk.Box {
     private Budgie.Popover popup;
     private Gtk.Notebook notebook;
     private SettingsWindow settingsDialog;
+    private SettingsService settingsService;
 
     public FeedWidget(Budgie.Popover popover) {
         Object();
@@ -59,11 +60,11 @@ public class FeedWidget: Gtk.Box {
         var settingsFile = SettingsUtils.getSettingsFilePath();
         var parser = new Json.Parser();
 
-        var service = SettingsService.getInstance();
-        if(service == null) {
+        settingsService = SettingsService.getInstance();
+        if(settingsService == null) {
             warning("unable to get service");
         }
-        service.settingsChanged.connect(() => {
+        settingsService.settingsChanged.connect(() => {
             try {
                 while (notebook.get_n_pages() > 0) {
                     var page = notebook.get_nth_page(0);
@@ -151,6 +152,22 @@ public class FeedWidget: Gtk.Box {
                 page.reload();
                 return false;
             });
+        });
+    }
+
+    ~FeedWidget() {
+        settingsService.stop_service();
+        for(var i = 0; i < notebook.get_n_pages(); i++) {
+            var page = notebook.get_nth_page(i);
+            notebook.remove(page);
+            page.destroy();
+            page = null;
+        }
+
+        widgetLayout.foreach(child => {
+            widgetLayout.remove(child);
+            child.destroy();
+            child = null;
         });
     }
 

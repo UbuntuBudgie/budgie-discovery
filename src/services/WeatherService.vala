@@ -44,8 +44,11 @@ public class WeatherService: Service {
 
     public new void stop_service() {
         parser = null;
-        message("Stop weather service");
-        Source.remove(timer);
+        if(timer != 0) {
+            message("Stop weather service");
+            Source.remove(timer);
+            timer = 0;
+        }
     }
 
     public new void update_service(bool force) {

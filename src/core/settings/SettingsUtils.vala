@@ -64,8 +64,8 @@ public class SettingsUtils {
             rootObject.set_member ("feeds", feeds_node);
 
             var feedNodeObject = new Json.Object();
-            var uri = "https://www.reddit.com/r/news/.rss";
-            feedNodeObject.set_string_member ("name", "Reddit News");
+            var uri = "http://rss.cnn.com/rss/cnn_topstories.rss";
+            feedNodeObject.set_string_member ("name", "CNN News");
             feedNodeObject.set_string_member ("uri", uri);
 
             var digest = new Checksum(ChecksumType.MD5);
