@@ -44,6 +44,11 @@ public class FeedSettings: Gtk.Box {
 
                     var settings = SettingsService.getInstance();
                     var feeds = settings.get_value("feeds");
+                    if(feeds == null) {
+                        feeds = new Json.Node(Json.NodeType.ARRAY);
+                        var feedArray = new Json.Array();
+                        feeds.set_array(feedArray);
+                    }
                     feeds.get_array().add_object_element(feedNodeObject);
                     settings.set_value("feeds", feeds);
 
@@ -57,9 +62,15 @@ public class FeedSettings: Gtk.Box {
         pack_start (plusButton, false);
 
         var settings = SettingsService.getInstance();
-        var feeds = settings.get_value("feeds").get_array();
-        for(int i = 0; i < feeds.get_length (); i++) {
-            var feed = feeds.get_object_element (i);
+        var feeds = settings.get_value("feeds");
+        if(feeds == null) {
+            feeds = new Json.Node(Json.NodeType.ARRAY);
+            var feedArray = new Json.Array();
+            feeds.set_array(feedArray);
+        }
+
+        for(int i = 0; i < feeds.get_array().get_length (); i++) {
+            var feed = feeds.get_array().get_object_element (i);
             var feedRow = new FeedRow(window, feed.get_string_member("uid"), feed.get_string_member ("uri"), feed.get_string_member ("name"));
             feedLayout.pack_start (feedRow, false);
         }
@@ -101,6 +112,12 @@ public class FeedSettings: Gtk.Box {
             deleteButton.button_press_event.connect(() => {
                 var settings = SettingsService.getInstance();
                 var feeds = settings.get_value("feeds");
+                if(feeds == null) {
+                    feeds = new Json.Node(Json.NodeType.ARRAY);
+                    var feedArray = new Json.Array();
+                    feeds.set_array(feedArray);
+                }
+
                 int index = 0;
                 feeds.get_array().foreach_element((feed) => {
                     var objectNode = feed.get_object_element(index);

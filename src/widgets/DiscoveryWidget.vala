@@ -108,11 +108,16 @@ public class DiscoveryWidget: Gtk.Box {
         removeWidgets();
 
         // read changed settings
-        var configuredFeeds = settingsService.get_value("feeds").get_array();
-        reloadButton.set_sensitive(configuredFeeds.get_length() > 0);
+        var configuredFeeds = settingsService.get_value("feeds");
+        if(configuredFeeds == null) {
+            configuredFeeds = new Json.Node(Json.NodeType.ARRAY);
+            var feedArray = new Json.Array();
+            configuredFeeds.set_array(feedArray);
+        }
+        reloadButton.set_sensitive(configuredFeeds.get_array().get_length() > 0);
 
-        for(var i = 0; i < configuredFeeds.get_length (); i++) {
-            var item = configuredFeeds.get_object_element(i);
+        for(var i = 0; i < configuredFeeds.get_array().get_length (); i++) {
+            var item = configuredFeeds.get_array().get_object_element(i);
             var config = new FeedConfigItem();
             config.name = item.get_string_member("name");
             config.uri = item.get_string_member("uri");
@@ -125,34 +130,42 @@ public class DiscoveryWidget: Gtk.Box {
             notebook.append_page(widget, label);
         }
 
-        var weatherNode = settingsService.get_value("weather").get_object();
-        if(weatherNode.has_member("locations")) {
-            var configuredLocations = weatherNode.get_array_member("locations");
-            configuredLocations.foreach_element((element, index) => {
-                var locationData = element.get_object_element(index);
-                var name = locationData.get_string_member("name");
-                var country = locationData.get_string_member("country");
-                var latitude = locationData.get_double_member("latitude");
-                var longitude = locationData.get_double_member("longitude");
-                var admin1 = locationData.has_member("admin1") ? locationData.get_string_member("admin1") : null;
-                var admin2 = locationData.has_member("admin2") ? locationData.get_string_member("admin2") : null;
-                var admin3 = locationData.has_member("admin3") ? locationData.get_string_member("admin3") : null;
-                var admin4 = locationData.has_member("admin4") ? locationData.get_string_member("admin4") : null;
-
-                var location = new LocationItem();
-                location.name = name;
-                location.country = country;
-                location.admin1 = admin1;
-                location.admin2 = admin2;
-                location.admin3 = admin3;
-                location.admin4 = admin4;
-                location.latitude = latitude;
-                location.longitude = longitude;
-
-                var widget = new WeatherWidget(location);
-                widgetLayout.pack_start(widget, false);
-            });
+        var weatherNode = settingsService.get_value("weather");
+        if(weatherNode == null) {
+            weatherNode = new Json.Node(Json.NodeType.OBJECT);
+            weatherNode.set_object(new Json.Object());
         }
+        Json.Array weatherLocations = null;
+        if(!weatherNode.get_object().has_member("locations")) {
+            weatherLocations = new Json.Array();
+            weatherNode.get_object().set_array_member("locations", weatherLocations);
+        }
+        weatherLocations = weatherNode.get_object().get_array_member("locations");
+
+        weatherLocations.foreach_element((element, index) => {
+            var locationData = element.get_object_element(index);
+            var name = locationData.get_string_member("name");
+            var country = locationData.get_string_member("country");
+            var latitude = locationData.get_double_member("latitude");
+            var longitude = locationData.get_double_member("longitude");
+            var admin1 = locationData.has_member("admin1") ? locationData.get_string_member("admin1") : null;
+            var admin2 = locationData.has_member("admin2") ? locationData.get_string_member("admin2") : null;
+            var admin3 = locationData.has_member("admin3") ? locationData.get_string_member("admin3") : null;
+            var admin4 = locationData.has_member("admin4") ? locationData.get_string_member("admin4") : null;
+
+            var location = new LocationItem();
+            location.name = name;
+            location.country = country;
+            location.admin1 = admin1;
+            location.admin2 = admin2;
+            location.admin3 = admin3;
+            location.admin4 = admin4;
+            location.latitude = latitude;
+            location.longitude = longitude;
+
+            var widget = new WeatherWidget(location);
+            widgetLayout.pack_start(widget, false);
+        });
 
         show_all();
         resizeChildren();
