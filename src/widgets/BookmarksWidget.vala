@@ -3,6 +3,7 @@ using Gee;
 public class BookmarksWidget: Gtk.Box {
     private Gtk.Grid appsLayout = new Gtk.Grid();
     private Gtk.Grid bookmarksLayout = new Gtk.Grid();
+    private Gtk.Label applicationsLabel;
     private Budgie.Popover popover;
     private static int ITEM_SIZE = 100;
     private FileWatcherSevice bookmarkService;
@@ -36,7 +37,7 @@ public class BookmarksWidget: Gtk.Box {
         scrollView.add(pageLayout);
         pack_start(scrollView, true, true, 0);
 
-        var applicationsLabel = new Gtk.Label(_("Favorite Applications"));
+        applicationsLabel = new Gtk.Label(_("Favorite Applications"));
         applicationsLabel.get_style_context().add_class("text-size-small");
         applicationsLabel.get_style_context().add_class("section-label");
         applicationsLabel.set_halign(Gtk.Align.START);
@@ -116,7 +117,15 @@ public class BookmarksWidget: Gtk.Box {
         int maxCols = 6;
 
         var items = FavoritesRepository.getFavorites();
+        if(items.size == 0) {
+            applicationsLabel.hide();
+            appsLayout.hide();
+            return;
+        }
 
+        appsLayout.get_style_context().add_class("card");
+        applicationsLabel.show();
+        
         foreach (var item in items) {
             var iconWidget = new ApplicationItemWidget(popover, item);
             iconWidget.set_size_request(ITEM_SIZE, ITEM_SIZE);
