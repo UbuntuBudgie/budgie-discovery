@@ -23,6 +23,7 @@ namespace DiscoveryApplet {
         protected Gtk.Box layout;
         protected Gtk.Label label;
         protected Gtk.Image weatherIcon;
+        private DiscoveryPopup popup;
 
         Budgie.Popover ? popover = null;
         Gtk.Orientation orient = Gtk.Orientation.HORIZONTAL;
@@ -54,7 +55,7 @@ namespace DiscoveryApplet {
             get_style_context ().add_class ("discovery-applet");
 
             // Create popup
-            var popup = new DiscoveryPopup(widget);
+            popup = new DiscoveryPopup(widget);
             popover = popup.getPopover();
 
             widget.button_press_event.connect ((e)=> {

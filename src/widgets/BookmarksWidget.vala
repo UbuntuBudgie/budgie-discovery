@@ -5,8 +5,9 @@ public class BookmarksWidget: Gtk.Box {
     private Gtk.Grid bookmarksLayout = new Gtk.Grid();
     private Budgie.Popover popover;
     private static int ITEM_SIZE = 100;
+    private FileWatcherSevice bookmarkService;
 
-    public BookmarksWidget(Budgie.Popover parent) throws IOError {
+    public BookmarksWidget(Budgie.Popover parent) {
         Object();
         popover = parent;
         set_orientation(Gtk.Orientation.VERTICAL);
@@ -72,7 +73,8 @@ public class BookmarksWidget: Gtk.Box {
             if(!FileUtils.test(bookmarksDir, GLib.FileTest.IS_DIR)) {
                 DirUtils.create_with_parents(bookmarksDir, 0700);
                 if(!FileUtils.test(bookmarksDir, GLib.FileTest.IS_DIR)) {
-                    throw new IOError.NOT_DIRECTORY("directory %s cant be created, aborting".printf(bookmarksDir));
+                    warning("directory %s cant be created, aborting".printf(bookmarksDir));
+                    Process.exit(1);
                 }
             }
 
@@ -80,14 +82,15 @@ public class BookmarksWidget: Gtk.Box {
             try {
                 GLib.File.new_for_path(bookmarksFile).create(GLib.FileCreateFlags.NONE, null);
             } catch(Error e) {
-                throw new IOError.NOT_FOUND("file %s cant be created, aborting".printf(bookmarksFile));
+                warning("file %s cant be created, aborting".printf(bookmarksFile));
+                Process.exit(1);
             }
         }
 
         SettingsUtils.checkSettingsFile();
         var settingsFile = SettingsUtils.getSettingsFilePath();
 
-        var bookmarkService = new FileWatcherSevice();
+        bookmarkService = new FileWatcherSevice();
         bookmarkService.watchFile(bookmarksFile);
         bookmarkService.watchFile(settingsFile);
 
@@ -99,6 +102,10 @@ public class BookmarksWidget: Gtk.Box {
 
         pageLayout.show_all();
         updateAppsLayout();
+    }
+
+    ~BookmarksWidget() {
+        bookmarkService.stop_service();
     }
 
     private void updateAppsLayout() {

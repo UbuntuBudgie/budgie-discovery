@@ -3,6 +3,7 @@ using Config;
 public class DiscoveryPopup {
     private Budgie.Popover popover;
     private DiscoveryPopupContent popupContentWidget;
+    private Gtk.Box popoverLayout;
     private Gdk.Screen screen;
 
     public DiscoveryPopup(Gtk.Widget parentWidget) {
@@ -18,7 +19,7 @@ public class DiscoveryPopup {
         popover.set_hexpand(false);
         popover.set_vexpand(false);
 
-        var popoverLayout = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
+        popoverLayout = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
         popoverLayout.get_style_context ().add_class ("popup-content");
         popoverLayout.set_hexpand(false);
         popoverLayout.set_halign(Gtk.Align.START);
@@ -30,6 +31,12 @@ public class DiscoveryPopup {
         popoverLayout.pack_start(popupContentWidget, true, true);
 
         load_style_sheet();
+    }
+
+    ~DiscoveryPopup() {
+        popoverLayout.remove(popupContentWidget);
+        popupContentWidget.destroy();
+        popupContentWidget = null;
     }
 
     public Budgie.Popover getPopover() {

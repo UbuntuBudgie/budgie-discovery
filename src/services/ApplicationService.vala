@@ -11,7 +11,7 @@ public class ApplicationService: Service {
     }
 
     public new void stop_service () {
-        assert_not_reached ();
+        // do nothing
     }
 
     public new void update_service (bool force) {

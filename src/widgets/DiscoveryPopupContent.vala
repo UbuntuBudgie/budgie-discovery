@@ -57,6 +57,14 @@ public class DiscoveryPopupContent: Gtk.Box {
         menu.show_all();
     }
 
+    ~DiscoveryPopupContent() {
+        stackView.foreach(child => {
+            stackView.remove(child);
+            child.destroy();
+            child = null;
+        });
+    }
+
     public override void get_preferred_width(out int minimum_width, out int natural_width) {
         int w = 0;
         stackView.get_preferred_width(out w, out w);

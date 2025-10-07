@@ -6,6 +6,7 @@ public class ApplicationsWidget: Gtk.Box {
     private SortDirection sortDirection = SortDirection.ASCENDING;
     //private Gtk.Button sortButton;
     private Budgie.Popover popover;
+    private ApplicationService appService;
 
     public ApplicationsWidget(Budgie.Popover parent) {
         Object();
@@ -76,13 +77,17 @@ public class ApplicationsWidget: Gtk.Box {
         */
     
 
-        var service = new ApplicationService ();
-        service.change.connect(onAppsChange);
+        appService = new ApplicationService ();
+        appService.change.connect(onAppsChange);
         
         Idle.add(() => {
-            service.start_service();
+            appService.start_service();
             return false;
         });
+    }
+
+    ~ApplicationsWidget() {
+        appService.stop_service();
     }
 
     private void onAppsChange(ArrayList<ApplicationItem> list) {
