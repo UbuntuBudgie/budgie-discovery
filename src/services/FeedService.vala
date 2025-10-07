@@ -33,7 +33,6 @@ public class FeedService: Service {
 
     public new void stop_service() {
         if(timer != 0) {
-            message("stop service");
             Source.remove(timer);
             timer = 0;
         }

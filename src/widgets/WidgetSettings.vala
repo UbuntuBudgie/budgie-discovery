@@ -1,5 +1,11 @@
 using Config;
 
+/*
+
+TODO adopt new settings mechanic
+
+*/
+
 public class WidgetSettings: Gtk.Box {
     private Gtk.Box widgetListLayout;
 
@@ -19,31 +25,19 @@ public class WidgetSettings: Gtk.Box {
         pack_start (widgetListScrollable, true);
 
         // Load Settings
-        SettingsUtils.checkSettingsFile();
-        var settingsFile = SettingsUtils.getSettingsFilePath();
-        var parser = new Json.Parser();
-        Json.Node rootNode = null; // reference!
-        Json.Object weatherObject = null; // reference!!
-        try {
-            parser.load_from_file(settingsFile);
-            rootNode = parser.get_root();
-            if(!rootNode.get_object().has_member("weather")) {
-                rootNode.get_object().set_object_member("weather", new Json.Object());
-            }
-            weatherObject = rootNode.get_object().get_object_member("weather");
-        } catch(Error e) {
-            warning("unable to load weather settings: %s", e.message);
-            Process.exit(1);
+        var settings = SettingsService.getInstance();
+        var weatherNode = settings.get_value("weather");
+        if(weatherNode == null) {
+            weatherNode = new Json.Node(Json.NodeType.OBJECT);
+            weatherNode.set_object(new Json.Object());
         }
-
-        var weatherLocations = new Json.Array();
-        if(weatherObject.has_member("locations")) {
-            weatherLocations = weatherObject.get_array_member("locations");
+        Json.Array weatherLocations = null;
+        if(!weatherNode.get_object().has_member("locations")) {
+            weatherLocations = new Json.Array();
+            weatherNode.get_object().set_array_member("locations", weatherLocations);
         }
-
-        var generator = new Json.Generator();
-        generator.set_pretty(true);
-
+        weatherLocations = weatherNode.get_object().get_array_member("locations");
+            
         weatherLocations.foreach_element((element, index) => {
             var record = element.get_object_element(index);
             var name = record.get_string_member("name");
@@ -72,23 +66,6 @@ public class WidgetSettings: Gtk.Box {
             layoutItem1.setSelectable(false);
             widgetListLayout.pack_start(layoutItem1, false);
 
-            layoutItem1.deleted.connect(listItem => {
-                var data = (LocationItem) listItem.getData();
-                weatherLocations.foreach_element((element, index) => {
-                    var obj = element.get_object_element(index);
-                    if(obj.get_double_member("latitude") == data.latitude && obj.get_double_member("longitude") == data.longitude) {
-                        weatherLocations.remove_element(index);
-                    }
-                });
-                try {
-                    weatherObject.set_array_member("locations", weatherLocations);
-                    generator.set_root(rootNode);
-                    generator.to_file(settingsFile);
-                } catch(Error e) {
-                    warning(e.message);
-                }
-            });
-
             widgetListLayout.show_all();
         });
 
@@ -113,23 +90,6 @@ public class WidgetSettings: Gtk.Box {
                 widgetListLayout.pack_start(layoutItem, false);
                 widgetListLayout.show_all();
 
-                layoutItem.deleted.connect(listItem => {
-                    var data = (LocationItem) listItem.getData();
-                    weatherLocations.foreach_element((element, index) => {
-                        var obj = element.get_object_element(index);
-                        if(obj.get_double_member("latitude") == data.latitude && obj.get_double_member("longitude") == data.longitude) {
-                            weatherLocations.remove_element(index);
-                        }
-                    });
-                    try {
-                        weatherObject.set_array_member("locations", weatherLocations);
-                        generator.set_root(rootNode);
-                        generator.to_file(settingsFile);
-                    } catch(Error e) {
-                        warning(e.message);
-                    }
-                });
-
                 // Save Settings
                 var locationNode = new Json.Object();
                 locationNode.set_string_member("name", location.name);
@@ -142,13 +102,7 @@ public class WidgetSettings: Gtk.Box {
                 locationNode.set_string_member("admin4", location.admin4);
 
                 weatherLocations.add_object_element(locationNode);
-                try {
-                    weatherObject.set_array_member("locations", weatherLocations);
-                    generator.set_root(rootNode);
-                    generator.to_file(settingsFile);
-                } catch(Error e) {
-                    warning(e.message);
-                }
+                settings.set_value("weather", weatherNode);
             }
             dialog.destroy();
         });
@@ -157,7 +111,6 @@ public class WidgetSettings: Gtk.Box {
 
     private class WeatherListItem: ListItem {
         private Gtk.Button deleteButton = new Gtk.Button();
-        public signal void deleted(WeatherListItem item);
 
         public WeatherListItem() {
             deleteButton.set_size_request(16, 16);
@@ -174,7 +127,27 @@ public class WidgetSettings: Gtk.Box {
             deleteButton.set_image(deleteImage);
 
             deleteButton.button_press_event.connect(() => {
-                deleted(this);
+                var data = (LocationItem) getData();
+                var settings = SettingsService.getInstance();
+                var weatherNode = settings.get_value("weather");
+                if(weatherNode == null) {
+                    weatherNode = new Json.Node(Json.NodeType.OBJECT);
+                    weatherNode.set_object(new Json.Object());
+                }
+                Json.Array weatherLocations = null;
+                if(!weatherNode.get_object().has_member("locations")) {
+                    weatherLocations = new Json.Array();
+                    weatherNode.get_object().set_array_member("locations", weatherLocations);
+                }
+                weatherLocations = weatherNode.get_object().get_array_member("locations");
+
+                weatherLocations.foreach_element((element, index) => {
+                    var obj = element.get_object_element(index);
+                    if(obj.get_double_member("latitude") == data.latitude && obj.get_double_member("longitude") == data.longitude) {
+                        weatherLocations.remove_element(index);
+                    }
+                });
+                settings.set_value("weather", weatherNode);
                 get_parent().remove(this);
                 return true;
             });

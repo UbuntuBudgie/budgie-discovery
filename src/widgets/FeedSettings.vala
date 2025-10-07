@@ -2,9 +2,6 @@ using Config;
 
 public class FeedSettings: Gtk.Box {
     private static Gtk.Box feedLayout;
-    private static string filePath;
-    public Json.Node rootNode;
-    private Json.Array feeds;
     
     public FeedSettings(Gtk.Window window) {
         Object();
@@ -45,22 +42,12 @@ public class FeedSettings: Gtk.Box {
                     digest.update(feedUri.data, feedUri.length);
                     feedNodeObject.set_string_member("uid", digest.get_string());
 
-                    var feedNode = new Json.Node (Json.NodeType.OBJECT);
-                    feedNode.set_object (feedNodeObject);
-                    feeds.add_element (feedNode);   
-                    updateSettings();
+                    var settings = SettingsService.getInstance();
+                    var feeds = settings.get_value("feeds");
+                    feeds.get_array().add_object_element(feedNodeObject);
+                    settings.set_value("feeds", feeds);
+
                     var feedRow = new FeedRow(window, digest.get_string(), feedUri, feedName);
-                    feedRow.onFeedDelete.connect(uid => {
-                        int index = 0;
-                        feeds.foreach_element((feed) => {
-                            var objectNode = feed.get_object_element(index);
-                            if(objectNode.get_string_member("uid") == uid) {
-                                feeds.remove_element(index);
-                            }
-                            index++;
-                        });
-                        updateSettings();
-                    });
                     feedLayout.pack_start (feedRow, false);
                     feedLayout.show_all ();
                 }
@@ -69,61 +56,13 @@ public class FeedSettings: Gtk.Box {
         });
         pack_start (plusButton, false);
 
-        SettingsUtils.checkSettingsFile();
-        filePath = SettingsUtils.getSettingsFilePath();
-
-        Json.Parser parser = new Json.Parser ();
-        try {
-            if(!parser.load_from_file (filePath)) {
-                stderr.printf ("Unable to parse settings file '%s'\n", filePath);
-                Process.exit (1);
-            }
-        } catch (Error e) {
-            stderr.printf ("Unable to parse settings file '%s': %s\n", filePath, e.message);
-            Process.exit (1);
-        }
-
-        // Get the root node:
-        rootNode = parser.get_root ();
-        if(rootNode.is_null ()) {
-            stderr.printf ("Root node is null\n");
-            Process.exit (1);
-        }
-
-        Json.Object rootObject = rootNode.get_object ();
-        if(rootObject == null) {
-            stderr.printf ("Root node is not an object\n");
-            Process.exit (1);
-        }
-
-        if(!rootObject.has_member ("feeds")) {
-            feeds = new Json.Array ();
-            var feeds_node = new Json.Node (Json.NodeType.ARRAY);
-            feeds_node.set_array (feeds);
-            rootObject.set_member ("feeds", feeds_node);
-        }
-        else {
-            feeds = rootObject.get_array_member ("feeds");
-        }
-
+        var settings = SettingsService.getInstance();
+        var feeds = settings.get_value("feeds").get_array();
         for(int i = 0; i < feeds.get_length (); i++) {
             var feed = feeds.get_object_element (i);
             var feedRow = new FeedRow(window, feed.get_string_member("uid"), feed.get_string_member ("uri"), feed.get_string_member ("name"));
             feedLayout.pack_start (feedRow, false);
-
-            feedRow.onFeedDelete.connect(uid => {
-                int index = 0;
-                feeds.foreach_element((feed) => {
-                    var objectNode = feed.get_object_element(index);
-                    if(objectNode.get_string_member("uid") == uid) {
-                        feeds.remove_element(index);
-                    }
-                    index++;
-                });
-                updateSettings();
-            });
         }
-
         load_style_sheet();
     }
 
@@ -160,7 +99,17 @@ public class FeedSettings: Gtk.Box {
             deleteButton.set_image(deleteImage);
 
             deleteButton.button_press_event.connect(() => {
-                onFeedDelete(uid);
+                var settings = SettingsService.getInstance();
+                var feeds = settings.get_value("feeds");
+                int index = 0;
+                feeds.get_array().foreach_element((feed) => {
+                    var objectNode = feed.get_object_element(index);
+                    if(objectNode.get_string_member("uid") == uid) {
+                        feeds.get_array().remove_element(index);
+                    }
+                    index++;
+                });
+                settings.set_value("feeds", feeds);
                 get_parent().remove(this);
                 return true;
             });
@@ -307,23 +256,6 @@ public class FeedSettings: Gtk.Box {
                 // Uri Konstruktor wirft, wenn ungültig
                 return false;
             }
-        }
-    }
-
-    private void updateSettings() {
-        try {
-            if(FileUtils.test(filePath, FileTest.EXISTS) == false) {
-                stderr.printf("Unable to read settings file '%s': file does not exists\n", filePath);
-                Process.exit (1);
-            }
-
-            var generator = new Json.Generator ();
-            generator.set_root (rootNode);
-            generator.set_pretty (true);
-            generator.to_file (filePath);
-        } catch (Error e) {
-            stderr.printf("Could not write settings file: %s\n", e.message);
-            Process.exit (1);
         }
     }
 

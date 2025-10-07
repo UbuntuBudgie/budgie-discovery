@@ -122,6 +122,9 @@ msgstr ""
 msgid "Lock Screen"
 msgstr ""
 
+msgid "Standby"
+msgstr ""
+
 msgid "Reboot"
 msgstr ""
 

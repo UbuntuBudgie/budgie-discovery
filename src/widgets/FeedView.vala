@@ -73,7 +73,9 @@ public class FeedView: Gtk.ScrolledWindow {
 
     private void onFeedFetched(ArrayList<FeedItem>? items) {
         feedLayout.foreach ((element) => {
+            feedLayout.remove(element);
             element.destroy();
+            element = null;
         });
 
         foreach(var feedItem in items) {

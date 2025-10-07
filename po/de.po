@@ -229,6 +229,9 @@ msgstr "Abmelden"
 msgid "Lock Screen"
 msgstr "Bildschirm sperren"
 
+msgid "Standby"
+msgstr "Bereitschaft"
+
 msgid "Reboot"
 msgstr "Neustarten"
 
