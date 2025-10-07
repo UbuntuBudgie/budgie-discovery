@@ -1,33 +1,32 @@
 using Config;
 
-public class DiscoveryPopup {
-    private Budgie.Popover popover;
+public class DiscoveryPopup: Budgie.Popover {
     private DiscoveryPopupContent popupContentWidget;
     private Gtk.Box popoverLayout;
-    private Gdk.Screen screen;
+    //private Gdk.Screen screen;
 
     public DiscoveryPopup(Gtk.Widget parentWidget) {
-        screen = parentWidget.get_screen();
+        Object(relative_to: parentWidget);
         var g = screen.get_display().get_primary_monitor().get_geometry();
         int popupWidth = (g.width / 3) + 150;
         int popupHeight = ((g.height / 3) * 2) + 100;
 
-        popover = new Budgie.Popover(parentWidget);
-        popover.get_style_context ().add_class ("discovery-popup");
-        popover.set_halign(Gtk.Align.START);
-        popover.set_size_request(popupWidth, popupHeight);
-        popover.set_hexpand(false);
-        popover.set_vexpand(false);
+        //popover = new Budgie.Popover(parentWidget);
+        get_style_context ().add_class ("discovery-popup");
+        set_halign(Gtk.Align.START);
+        set_size_request(popupWidth, popupHeight);
+        set_hexpand(false);
+        set_vexpand(false);
 
         popoverLayout = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
         popoverLayout.get_style_context ().add_class ("popup-content");
         popoverLayout.set_hexpand(false);
         popoverLayout.set_halign(Gtk.Align.START);
         popoverLayout.set_size_request(popupWidth, popupHeight);
-        popover.add(popoverLayout);
+        add(popoverLayout);
 
         
-        popupContentWidget = new DiscoveryPopupContent(popover);
+        popupContentWidget = new DiscoveryPopupContent(this);
         popoverLayout.pack_start(popupContentWidget, true, true);
 
         load_style_sheet();
@@ -37,10 +36,6 @@ public class DiscoveryPopup {
         popoverLayout.remove(popupContentWidget);
         popupContentWidget.destroy();
         popupContentWidget = null;
-    }
-
-    public Budgie.Popover getPopover() {
-        return popover;
     }
 
     public void set_active_index(int index) {

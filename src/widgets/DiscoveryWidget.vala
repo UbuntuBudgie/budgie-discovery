@@ -2,7 +2,7 @@ using Gee;
 using GLib;
 using Xml;
 
-public class FeedWidget: Gtk.Box {
+public class DiscoveryWidget: Gtk.Box {
     private GreetingWidget greetingWidget;
     private Gtk.Box widgetLayout = new Gtk.Box(Gtk.Orientation.VERTICAL, 10);
     private Gtk.Box mainLayout = new Gtk.Box(Gtk.Orientation.HORIZONTAL, 10);
@@ -11,7 +11,7 @@ public class FeedWidget: Gtk.Box {
     private SettingsWindow settingsDialog;
     private SettingsService settingsService;
 
-    public FeedWidget(Budgie.Popover popover) {
+    public DiscoveryWidget(Budgie.Popover popover) {
         Object();
         popup = popover;
         set_orientation(Gtk.Orientation.VERTICAL);
@@ -61,9 +61,6 @@ public class FeedWidget: Gtk.Box {
         var parser = new Json.Parser();
 
         settingsService = SettingsService.getInstance();
-        if(settingsService == null) {
-            warning("unable to get service");
-        }
         settingsService.settingsChanged.connect(() => {
             try {
                 while (notebook.get_n_pages() > 0) {
@@ -155,7 +152,7 @@ public class FeedWidget: Gtk.Box {
         });
     }
 
-    ~FeedWidget() {
+    ~DiscoveryWidget() {
         settingsService.stop_service();
         for(var i = 0; i < notebook.get_n_pages(); i++) {
             var page = notebook.get_nth_page(i);

@@ -24,8 +24,6 @@ namespace DiscoveryApplet {
         protected Gtk.Label label;
         protected Gtk.Image weatherIcon;
         private DiscoveryPopup popup;
-
-        Budgie.Popover ? popover = null;
         Gtk.Orientation orient = Gtk.Orientation.HORIZONTAL;
 
         private unowned Budgie.PopoverManager ? manager = null;
@@ -56,14 +54,13 @@ namespace DiscoveryApplet {
 
             // Create popup
             popup = new DiscoveryPopup(widget);
-            popover = popup.getPopover();
 
             widget.button_press_event.connect ((e)=> {
                 if (e.button != 1) {
                     return Gdk.EVENT_PROPAGATE;
                 }
-                if (popover.get_visible ()) {
-                    popover.hide ();
+                if (popup.get_visible ()) {
+                    popup.hide ();
                 } else {
                     popup.set_active_index(0); // Reset to first ta
                     this.manager.show_popover (widget);
@@ -75,13 +72,17 @@ namespace DiscoveryApplet {
             SettingsService.getInstance ().start_service ();
 
 
-            popover.get_child ().show_all ();
+            popup.get_child ().show_all ();
             show_all ();
+        }
+
+        ~DiscoveryApplet() {
+            popup.destroy();
         }
 
         public override void update_popovers (Budgie.PopoverManager ? manager) {
             this.manager = manager;
-            manager.register_popover (widget, popover);
+            manager.register_popover (widget, popup);
         }
     }
 }

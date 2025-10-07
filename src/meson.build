@@ -51,7 +51,7 @@ discovery_applet_sources = [
     'widgets/BookmarksWidget.vala',
     'widgets/Card.vala',
     'widgets/DiscoveryPopupContent.vala',
-    'widgets/FeedWidget.vala',
+    'widgets/DiscoveryWidget.vala',
     'widgets/FeedItemWidget.vala',
     'widgets/FeedItemImageWidget.vala',
     'widgets/FeedView.vala',
