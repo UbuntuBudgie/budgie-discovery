@@ -50,7 +50,7 @@ public class PowerMenu : Gtk.Menu {
     public PowerMenu(Budgie.Popover popover) {
         Object();
 
-        var item1 = createPowerMenuItem(_("Standby"), "system-lock-screen-symbolic");
+        var item1 = createPowerMenuItem(_("Standby"), "system-suspend-symbolic");//"system-lock-screen-symbolic");
         item1.activate.connect (() => {
             if (logind_interface == null) {
                 return;
