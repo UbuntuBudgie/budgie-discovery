@@ -42,7 +42,7 @@ public class FeedItemImageWidget : Gtk.DrawingArea {
                 imageUrl = info.fetch (1);
                 loadImage.begin();
             } else {
-                throw new Error (Quark.from_string (""), 1000, "NO IMAGE FOUND: %s", url);
+                debug ("No Image found for url %s", url);
             }
         } catch(Error e) {
             warning(e.message);
