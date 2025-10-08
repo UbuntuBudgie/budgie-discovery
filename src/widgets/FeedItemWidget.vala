@@ -25,19 +25,26 @@ public class FeedItemWidget: Card {
         image.set_size_request(120, 100);
         cardBody.pack_start(image, false);
 
-        Gtk.Label label = new Gtk.Label("");
-        label.get_style_context().add_class("card-title");
-        label.set_label(feedItem.title);
-        label.set_line_wrap(true);
-        label.set_line_wrap_mode(Pango.WrapMode.WORD);
-        label.set_lines(3);
-        label.set_ellipsize(Pango.EllipsizeMode.END);
-        label.set_justify(Gtk.Justification.LEFT);
-        label.set_halign(Gtk.Align.START);
-        label.set_valign(Gtk.Align.START);
-        label.hexpand = true;
-        label.xalign = 0;
-        cardBody.pack_start(label,true);
+        var pubDate = parseDate1(feedItem.pubDate);
+        var dateLabel = new Gtk.Label(pubDate);
+        dateLabel.get_style_context().add_class("text-size-small");
+        dateLabel.get_style_context().add_class("text-secondary");
+        dateLabel.halign = Gtk.Align.START;
+        cardBody.pack_start(dateLabel, false);
+
+        var titleLabel = new Gtk.Label("");
+        titleLabel.get_style_context().add_class("card-title");
+        titleLabel.set_label(feedItem.title);
+        titleLabel.set_line_wrap(true);
+        titleLabel.set_line_wrap_mode(Pango.WrapMode.WORD);
+        titleLabel.set_lines(3);
+        titleLabel.set_ellipsize(Pango.EllipsizeMode.END);
+        titleLabel.set_justify(Gtk.Justification.LEFT);
+        titleLabel.set_halign(Gtk.Align.START);
+        titleLabel.set_valign(Gtk.Align.START);
+        titleLabel.hexpand = true;
+        titleLabel.xalign = 0;
+        cardBody.pack_start(titleLabel,true);
 
         eventBox.button_press_event.connect((event) => {
             clicked();
@@ -70,7 +77,165 @@ public class FeedItemWidget: Card {
         });
     }
 
-    //public override void get_preferred_height_for_width (int width, out int minimum_height, out int natural_height) {
-    //    minimum_height = natural_height = width -15;
-    //}
+    private string parseDate1(string date) {
+        var day = 0;
+        var month = 0;
+        var year = 0;
+        var hour = 0;
+        var minute = 0;
+        var second = 0;
+
+        try {
+            var iso8601_1_regex = new Regex("[a-zA-Z]{3,3}, [0-9]{2,2} [a-zA-Z]{3,3} [0-9]{4,4} [0-9]{2,2}:[0-9]{2,2}:[0-9]{2,2} [\\+|\\-][0-9]{4,4}");
+            var iso8601_2_regex = new Regex("\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?(?:Z|[+-]\\d{2}:\\d{2})");
+            var rfc_1123_regex = new Regex("[a-zA-Z]{3,3}, [0-9]{2,2} [a-zA-Z]{3,3} [0-9]{4,4} [0-9]{2,2}:[0-9]{2,2}:[0-9]{2,2} [a-zA-Z]{3,3}");
+            
+            if(iso8601_1_regex.match(date)) {
+                var parts = date.split(" ");
+                for(var i = 0; i < parts.length; i++) {
+                    if(i == 0) continue;
+
+                    if(i == 1) {
+                        day = int.parse(parts[i]);
+                    }
+
+                    if(i == 2) {
+                        switch(parts[i]) {
+                            case "Jan":
+                                month = 1;
+                                break;
+                            case "Feb":
+                                month = 2;
+                                break;
+                            case "Mar":
+                                month = 3;
+                                break;
+                            case "Apr":
+                                month = 4;
+                                break;
+                            case "May":
+                                month = 5;
+                                break;
+                            case "Jun":
+                                month = 6;
+                                break;
+                            case "Jul":
+                                month = 7;
+                                break;
+                            case "Aug":
+                                month = 8;
+                                break;
+                            case "Sep":
+                                month = 9;
+                                break;
+                            case "Oct":
+                                month = 10;
+                                break;
+                            case "Nov":
+                                month = 11;
+                                break;
+                            case "Dec":
+                                month = 12;
+                                break;
+                        }
+                    }
+
+                    if(i == 3) {
+                        year = int.parse(parts[i]);
+                    }
+
+                    if(i == 4) {
+                        var timeParts = parts[i].split(":");
+                        hour = int.parse(timeParts[0]);
+                        minute = int.parse(timeParts[1]);
+                        second = int.parse(timeParts[2]);
+                    }
+                }
+            }
+            else
+            if(iso8601_2_regex.match(date)) {
+                var parts = date.split("T");
+                var dateParts = parts[0].split("-");
+                year = int.parse(dateParts[0]);
+                month = int.parse(dateParts[1]);
+                day = int.parse(dateParts[2]);
+
+                var timeParts = parts[1].split(".")[0].split(":");
+                hour = int.parse(timeParts[0]);
+                minute = int.parse(timeParts[1]);
+                second = int.parse(timeParts[2]);
+            }
+            else
+            if(rfc_1123_regex.match(date)) {
+                var parts = date.split(" ");
+                for(var i = 0; i < parts.length; i++) {
+                    if(i == 0) continue;
+
+                    if(i == 1) {
+                        day = int.parse(parts[i]);
+                    }
+
+                    if(i == 2) {
+                        switch(parts[i]) {
+                            case "Jan":
+                                month = 1;
+                                break;
+                            case "Feb":
+                                month = 2;
+                                break;
+                            case "Mar":
+                                month = 3;
+                                break;
+                            case "Apr":
+                                month = 4;
+                                break;
+                            case "May":
+                                month = 5;
+                                break;
+                            case "Jun":
+                                month = 6;
+                                break;
+                            case "Jul":
+                                month = 7;
+                                break;
+                            case "Aug":
+                                month = 8;
+                                break;
+                            case "Sep":
+                                month = 9;
+                                break;
+                            case "Oct":
+                                month = 10;
+                                break;
+                            case "Nov":
+                                month = 11;
+                                break;
+                            case "Dec":
+                                month = 12;
+                                break;
+                        }
+                    }
+
+                    if(i == 3) {
+                        year = int.parse(parts[i]);
+                    }
+
+                    if(i == 4) {
+                        var timeParts = parts[i].split(":");
+                        hour = int.parse(timeParts[0]);
+                        minute = int.parse(timeParts[1]);
+                        second = int.parse(timeParts[2]);
+                    }
+                }
+            }
+            else {
+                message("UNABLE TO PARSE DATE: %s", date);
+            }
+        } catch(Error e) {
+            warning("unable to parse date '%s': %s", date, e.message);
+        }
+
+        var formattedDate = "%4d-%02d-%02d %02d:%02d:%02d".printf(year,month,day, hour, minute, second);
+        return new DateTime.from_iso8601(formattedDate, new TimeZone.local()).to_local().format ("%x %H:%M");
+    }
 }

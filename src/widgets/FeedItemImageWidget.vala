@@ -2,59 +2,47 @@ using Gdk;
 using Soup;
 
 public class FeedItemImageWidget : Gtk.DrawingArea {
-    private Soup.Session session = new Soup.Session ();
     private Gdk.Pixbuf? pixbuf = null;
     private Gdk.Pixbuf scaled = null;
     private string imageUrl;
-    private static GLib.Regex regex;
 
     private int last_width = 0;
     private int last_height = 0;
 
     public FeedItemImageWidget (FeedItem feedItem) {
         get_style_context ().add_class ("card-image");
-
-        if(regex == null) {
-            try {
-                regex = new GLib.Regex (
-                    "<meta[^>]+property=['\"]og:image['\"][^>]+content=['\"]([^'\"]+)['\"]",
-                    GLib.RegexCompileFlags.CASELESS | GLib.RegexCompileFlags.DOTALL,
-                    0
-                );
-            } catch(Error e) {}
-        }
-
         Idle.add (() => {
-            loadFeedSource.begin(feedItem.link);
+            loadFeedSource(feedItem.link);
             return false;
         });
     }
 
-    private async void loadFeedSource(string url) {
-        try {
-            var msg = new Message ("GET", url);
-            Bytes body = yield session.send_and_read_async (msg, Priority.DEFAULT, null);
-
-            string html = (string) body.get_data ();
-
-            MatchInfo info;
-            if (regex.match (html, 0, out info)) {
-                imageUrl = info.fetch (1);
-                loadImage.begin();
-            } else {
-                debug ("No Image found for url %s", url);
-            }
-        } catch(Error e) {
-            warning(e.message);
-            // TODO load alternate pixbuf
+    private void loadFeedSource(string? url) {
+        if(url == null || url.length == 0) {
+            message("no Feed source found");
+            return;
         }
+
+        var downloader = new HTMLDownLoader ();
+        downloader.contentLoaded.connect(content => {
+            imageUrl = extractImageUrl (content, url);
+            if(imageUrl == null) return;
+
+            loadImage.begin();
+            return;
+        });
+        downloader.load_html.begin(url);
     }
 
     private async void loadImage () throws Error {
-        if (!(imageUrl.has_prefix ("http://") || imageUrl.has_prefix ("https://")))
+        if (!(imageUrl.has_prefix ("http://") || imageUrl.has_prefix ("https://"))) {
+            // load placeholder image
             return;
+        }
 
+        Soup.Session session = new Soup.Session ();
         var msg = new Soup.Message ("GET", imageUrl);
+        
         var bytes = yield session.send_and_read_async(msg, Priority.DEFAULT, null);
         uint8[] data = bytes.get_data ();
 
@@ -69,6 +57,37 @@ public class FeedItemImageWidget : Gtk.DrawingArea {
                 return false;
             });
         }
+    }
+
+    private string? extractImageUrl(string html, string source) {
+        try {
+            var meta_re = new Regex ("<meta\\b[^>]*>", RegexCompileFlags.CASELESS | RegexCompileFlags.DOTALL);
+            var prop_re = new Regex ("property=['\\\"]og:image|twitter:image['\\\"]", RegexCompileFlags.CASELESS);
+
+            var image_re = new Regex("content=['\"](.+?)['\"]", RegexCompileFlags.CASELESS | RegexCompileFlags.DOTALL);
+
+            MatchInfo meta_info;
+            if (meta_re.match (html, 0, out meta_info)) {
+                do {
+                    string tag = meta_info.fetch (0).replace("\r", "").replace("\n", "");
+
+                    MatchInfo property_info;
+                    if(prop_re.match (tag, 0, out property_info)) {
+                        MatchInfo image_info;
+                        if(image_re.match (tag, 0, out image_info)) {
+                            var image = image_info.fetch (1);
+                            if(image.index_of ("/") == 0) {
+                                image = "%s%s".printf (source.substring(0, source.index_of("/", 9)), image);
+                            }
+                            return image;
+                        }
+                    }
+                } while (meta_info.next ());
+            }
+        } catch(Error e) {
+            warning ("Unable to parse string: %s", e.message);
+        }
+        return null;
     }
 
     protected override bool draw (Cairo.Context cr) {

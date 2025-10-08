@@ -38,6 +38,7 @@ discovery_applet_sources = [
     'core/feed/FeedConfigItem.vala',
     'core/favorites/FavoritesRepository.vala',
     'core/geolocation/LocationItem.vala',
+    'core/html/HTMLDownloader.vala',
     'core/settings/SettingsUtils.vala',
     'core/SortDirection.vala',
     'core/weather/WeatherRespository.vala',
@@ -87,6 +88,7 @@ discovery_applet_deps = [
     dependency('gio-2.0', version: '>=2.48', required: true),
     dependency('libxml-2.0', version: '>=2.9'),
     dependency('goa-1.0', version: '>=3.54'),
+    dependency('webkit2gtk-4.1'),
     cc.find_library('m', required: true),
     vala.find_library('posix', required: true),
 ]
