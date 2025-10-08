@@ -1,6 +1,3 @@
-using Gtk;
-using WebKit;
-
 public class HTMLDownLoader : Object {
     public signal void contentLoaded(string? content);
 

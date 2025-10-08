@@ -78,24 +78,24 @@ cc = meson.get_compiler('c')
 vala = meson.get_compiler('vala')
 
 discovery_applet_deps = [
-    dependency('gtk+-3.0', version: '>=3.18'),
-    dependency('gobject-2.0'),
     dependency('budgie-1.0', version: '>=2'),
-    dependency('json-glib-1.0', version: '>=1.10'),
-    dependency('libsoup-3.0', version: '>=2.4'),
-    dependency('libpeas-1.0', version: '>=1.36'),
     dependency('gee-0.8', version: '>=0.20'),
     dependency('gio-2.0', version: '>=2.48', required: true),
-    dependency('libxml-2.0', version: '>=2.9'),
+    dependency('glib-2.0', version: '>=2.80'),
     dependency('goa-1.0', version: '>=3.54'),
-    dependency('webkit2gtk-4.1'),
+    dependency('gobject-2.0', version: '>=2.80'),
+    dependency('gtk+-3.0', version: '>=3.18'),
+    dependency('json-glib-1.0', version: '>=1.10'),
+    dependency('libpeas-1.0', version: '>=1.36'),
+    dependency('libsoup-3.0', version: '>=2.4'),
+    dependency('libxml-2.0', version: '>=2.9'),
     cc.find_library('m', required: true),
     vala.find_library('posix', required: true),
 ]
 
 
 discovery_applet_vala_args = [
-    '--target-glib=2.80', 
+    #'--target-glib=2.80', 
     '--pkg', 'posix', 
     '--pkg', 'glib-2.0'
 ]
