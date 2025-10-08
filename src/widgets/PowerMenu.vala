@@ -49,9 +49,41 @@ public class PowerMenu : Gtk.Menu {
 
     public PowerMenu(Budgie.Popover popover) {
         Object();
-
-        var item1 = createPowerMenuItem(_("Standby"), "system-suspend-symbolic");//"system-lock-screen-symbolic");
+        var item1 = createPowerMenuItem(_("Logout"), "system-log-out-symbolic");
         item1.activate.connect (() => {
+            if (session == null) {
+                return;
+            }
+
+            popover.hide();
+            Timeout.add(100, ()=> {    
+                session.Logout.begin(0);
+                return false;
+            });
+        });
+        append (item1);
+
+        /********************************************************/
+        var item6 = createPowerMenuItem(_("Lock Screen"), "system-lock-screen-symbolic");
+        item6.activate.connect (() => {
+            if (saver == null) {
+                return;
+            }
+
+            popover.hide();
+            Timeout.add(100, ()=> {    
+                saver.lock.begin();
+                return false;
+            });
+        });
+        append (item6);
+        /********************************************************/
+
+        var divider = new Gtk.SeparatorMenuItem();
+        append(divider);
+
+        var item2 = createPowerMenuItem(_("Standby"), "system-suspend-symbolic");
+        item2.activate.connect (() => {
             if (logind_interface == null) {
                 return;
             }
@@ -66,24 +98,7 @@ public class PowerMenu : Gtk.Menu {
                 return false;
             });
         });
-        append (item1);
-
-        var item5 = createPowerMenuItem(_("Logout"), "system-log-out-symbolic");
-        item5.activate.connect (() => {
-            if (session == null) {
-                return;
-            }
-
-            popover.hide();
-            Timeout.add(100, ()=> {    
-                session.Logout.begin(0);
-                return false;
-            });
-        });
-        append (item5);
-
-        var divider = new Gtk.SeparatorMenuItem();
-        append(divider);
+        append (item2);
 
         var item3 = createPowerMenuItem(_("Shut Down"), "system-shutdown-symbolic");
         item3.activate.connect (() => {
