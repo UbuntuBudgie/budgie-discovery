@@ -9,7 +9,6 @@ public class HTMLDownLoader : Object {
 
         var msg = new Soup.Message ("GET", url);
         msg.request_headers.append ("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8");
-        msg.request_headers.append ("Accept-Language", "de-DE,de;q=0.9,en;q=0.8");
 
         try {
             var bytes = yield session.send_and_read_async(msg, Priority.DEFAULT, null);

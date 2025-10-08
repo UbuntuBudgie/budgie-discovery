@@ -27,8 +27,6 @@ public class FeedItemImageWidget : Gtk.DrawingArea {
         var downloader = new HTMLDownLoader ();
         downloader.contentLoaded.connect(content => {
             imageUrl = extractImageUrl (content, url);
-            if(imageUrl == null) return;
-
             loadImage.begin();
             return;
         });
