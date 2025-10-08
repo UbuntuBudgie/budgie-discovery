@@ -1,5 +1,5 @@
 # discovery-applet
-A budgie-desktop applet to show latest news, weather and favorite locations and applications in a popover
+A budgie-desktop applet to show latest news, weather, favorite locations and applications in a popover
 
 ### Screenshots
 
@@ -24,6 +24,7 @@ vala
 
 ### Installing from source
 ```
+sh ./gen-mo.sh
 meson build --prefix /usr --buildtype=plain
 ninja -C build
 sudo ninja -C build install
