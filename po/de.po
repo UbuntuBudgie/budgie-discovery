@@ -237,3 +237,6 @@ msgstr "Neustarten"
 
 msgid "Shut Down"
 msgstr "Herunterfahren"
+
+msgid "updated at"
+msgstr "aktualisiert"

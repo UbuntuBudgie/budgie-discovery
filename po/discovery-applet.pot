@@ -130,3 +130,6 @@ msgstr ""
 
 msgid "Shut Down"
 msgstr ""
+
+msgid "updated at"
+msgstr ""

@@ -93,106 +93,107 @@ public class WeatherWidget: Card {
             });
 
             var current = weather.get_member ("current").get_object();
-                int currentTemperature = (int)Math.ceil(current.get_member("temperature_2m").get_int ());
-                string currentWeatherCode = current.get_member("weather_code").get_int().to_string();
-                bool isDay = current.get_member("is_day").get_int() == 1;
+            int currentTemperature = (int)Math.ceil(current.get_member("temperature_2m").get_int ());
+            string currentWeatherCode = current.get_member("weather_code").get_int().to_string();
+            bool isDay = current.get_member("is_day").get_int() == 1;
 
-                currentTemperatureLabel.set_text(currentTemperature.to_string() + "°C");
+            currentTemperatureLabel.set_text(currentTemperature.to_string() + "°");
+            var weatherCodeEntry = weatherCodesJson.get_object().get_member(currentWeatherCode);
+            if (weatherCodeEntry != null) {
+                var weatherCodeObject = weatherCodeEntry.get_object();
+                var dayObject = weatherCodeObject.get_member("day").get_object();
+                var nightObject = weatherCodeObject.get_member("night").get_object();
 
-                var currentDate = new DateTime.now().format ("%Y-%m-%d %H:%M");
-                var weatherCodeEntry = weatherCodesJson.get_object().get_member(currentWeatherCode);
-                if (weatherCodeEntry != null) {
-                    var weatherCodeObject = weatherCodeEntry.get_object();
-                    var dayObject = weatherCodeObject.get_member("day").get_object();
-                    var nightObject = weatherCodeObject.get_member("night").get_object();
-
-                    if(isDay) {
-                        get_style_context ().remove_class ("weather-widget-night");
-                        get_style_context ().add_class ("weather-widget-day");
-                        currentDescriptionLabel.set_text(_(dayObject.get_member("description").get_string()));
-                    } else {
-                        get_style_context ().remove_class ("weather-widget-day");
-                        get_style_context ().add_class ("weather-widget-night");
-                        currentDescriptionLabel.set_text(_(nightObject.get_member("description").get_string()));
-                    }
+                if(isDay) {
+                    get_style_context ().remove_class ("weather-widget-night");
+                    get_style_context ().add_class ("weather-widget-day");
+                    currentDescriptionLabel.set_text(_(dayObject.get_member("description").get_string()));
+                } else {
+                    get_style_context ().remove_class ("weather-widget-day");
+                    get_style_context ().add_class ("weather-widget-night");
+                    currentDescriptionLabel.set_text(_(nightObject.get_member("description").get_string()));
                 }
+            }
 
-                var daily = weather.get_member ("daily").get_object();
-                daily.get_member ("time")
-                    .get_array ()
-                    .get_elements ()
-                    .foreach ((date) => {
-                        var dateString = date.get_string ();
-                        WeatherForecastItem item = new WeatherForecastItem();
-                        item.date = dateString;
-                        item.isDay = isDay;
-                        forecastItems.add(item);
-                    });
+            var daily = weather.get_member ("daily").get_object();
+            daily.get_member ("time")
+                .get_array ()
+                .get_elements ()
+                .foreach ((date) => {
+                    var dateString = date.get_string ();
+                    WeatherForecastItem item = new WeatherForecastItem();
+                    item.date = dateString;
+                    item.isDay = isDay;
+                    forecastItems.add(item);
+            });
 
-                var index = 0;
-                daily.get_member("temperature_2m_max")
-                    .get_array()
-                    .get_elements()
-                    .foreach((temp) => {
-                        var tempValue = (int)Math.ceil(temp.get_double());
-                        var item = forecastItems.get(index);
-                        item.tempMax = tempValue.to_string() + "°";
-                        index++;
-                    });
+            var index = 0;
+            daily.get_member("temperature_2m_max")
+                .get_array()
+                .get_elements()
+                .foreach((temp) => {
+                    var tempValue = (int)Math.ceil(temp.get_double());
+                    var item = forecastItems.get(index);
+                    item.tempMax = tempValue.to_string() + "°";
+                    index++;
+            });
 
-                index = 0;
-                daily.get_member("temperature_2m_min")
-                    .get_array()
-                    .get_elements()
-                    .foreach((temp) => {
-                        var tempValue = (int)Math.ceil(temp.get_double());
-                        var item = forecastItems.get(index);
-                        item.tempMin = tempValue.to_string() + "°";
-                        index++;
-                    });
+            index = 0;
+            daily.get_member("temperature_2m_min")
+                .get_array()
+                .get_elements()
+                .foreach((temp) => {
+                    var tempValue = (int)Math.ceil(temp.get_double());
+                    var item = forecastItems.get(index);
+                    item.tempMin = tempValue.to_string() + "°";
+                    index++;
+            });
 
-                index = 0;
-                daily.get_member("weather_code")
-                    .get_array()
-                    .get_elements()
-                    .foreach((codeData) => {
-                        var code = codeData.get_int().to_string();
-                        var item = forecastItems.get(index);
-                        item.weatherCode = code;
+            index = 0;
+            daily.get_member("weather_code")
+                .get_array()
+                .get_elements()
+                .foreach((codeData) => {
+                    var code = codeData.get_int().to_string();
+                    var item = forecastItems.get(index);
+                    item.weatherCode = code;
 
-                        var entry = weatherCodes.get_member(code);
-                        var dayIcon = entry.get_object().get_member("day").get_object().get_member("icon").get_string();
-                        var nightIcon = entry.get_object().get_member("night").get_object().get_member("icon").get_string();
+                    var entry = weatherCodes.get_member(code);
+                    var dayIcon = entry.get_object().get_member("day").get_object().get_member("icon").get_string();
+                    var nightIcon = entry.get_object().get_member("night").get_object().get_member("icon").get_string();
 
-                        item.weatherIconDay = dayIcon;
-                        item.weatherIconNight = nightIcon;
+                    item.weatherIconDay = dayIcon;
+                    item.weatherIconNight = nightIcon;
 
-                        index++;
-                    });
+                    index++;
+            });
 
-                var entry = weatherCodes.get_member(currentWeatherCode);
-                var memberName = isDay ? "day" : "night";
-                var iconName = entry.get_object().get_member(memberName).get_object().get_member("icon").get_string();
+            var entry = weatherCodes.get_member(currentWeatherCode);
+            var memberName = isDay ? "day" : "night";
+            var iconName = entry.get_object().get_member(memberName).get_object().get_member("icon").get_string();
 
-                string iconColor = isDay ? "black" : "white";
-                var iconPath = ICONS_DIR + "/weather/" + iconColor + "/png/64x64/" + iconName + ".png";
+            string iconColor = isDay ? "black" : "white";
+            var iconPath = ICONS_DIR + "/weather/" + iconColor + "/png/64x64/" + iconName + ".png";
 
-                try {
-                    var iconFile = File.new_for_path(iconPath);
-                    var pixbuf = new Gdk.Pixbuf.from_stream(iconFile.read())
-                        .scale_simple(48, 48, Gdk.InterpType.HYPER);
-                    currentWeatherIcon.set_from_pixbuf(pixbuf);
-                } catch (Error e) {
-                    warning("Failed to load weather icon %s: %s\n", iconPath, e.message);
-                }
+            try {
+                var iconFile = File.new_for_path(iconPath);
+                var pixbuf = new Gdk.Pixbuf.from_stream(iconFile.read())
+                    .scale_simple(48, 48, Gdk.InterpType.HYPER);
+                currentWeatherIcon.set_from_pixbuf(pixbuf);
+            } catch (Error e) {
+                warning("Failed to load weather icon %s: %s\n", iconPath, e.message);
+            }
 
-                for(var i = 0; i < 5; i++) {
-                    var item = forecastItems.get(i);
-                    var forcastWidget = new WeatherForecastWidget(item);
-                    forecastBox.pack_start(forcastWidget, true, true, 2);
-                }
-                forecastBox.show_all();
-                lastUpdatedLabel.set_label (_("Last updated: %s").printf(currentDate));
+            for(var i = 0; i < 5; i++) {
+                var item = forecastItems.get(i);
+                var forcastWidget = new WeatherForecastWidget(item);
+                forecastBox.pack_start(forcastWidget, true, true, 2);
+            }
+            forecastBox.show_all();
+
+
+            var currentDate = new DateTime.now_local().format ("%x %H:%M");
+            lastUpdatedLabel.set_label (_("updated at").concat(": %s").printf(currentDate));
         });
     }
 
