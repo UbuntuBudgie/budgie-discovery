@@ -1,3 +1,4 @@
+using Config;
 using Gdk;
 using Soup;
 
@@ -34,28 +35,54 @@ public class FeedItemImageWidget : Gtk.DrawingArea {
         downloader.load_html.begin(url);
     }
 
-    private async void loadImage () throws Error {
-        if (!(imageUrl.has_prefix ("http://") || imageUrl.has_prefix ("https://"))) {
-            // load placeholder image
+    private async void loadImage () {
+        if (imageUrl == null || !(imageUrl.has_prefix ("http://") || imageUrl.has_prefix ("https://"))) {
+            loadPlaceHolder();
             return;
         }
 
-        Soup.Session session = new Soup.Session ();
-        var msg = new Soup.Message ("GET", imageUrl);
-        
-        var bytes = yield session.send_and_read_async(msg, Priority.DEFAULT, null);
-        uint8[] data = bytes.get_data ();
+        try {
+            Soup.Session session = new Soup.Session ();
+            var msg = new Soup.Message ("GET", imageUrl);
+            
+            var bytes = yield session.send_and_read_async(msg, Priority.DEFAULT, null);
+            if(bytes == null) {
+                loadPlaceHolder();
+                return;
+            }
 
-        var loader = new Gdk.PixbufLoader ();
-        loader.write (data);
-        loader.close ();
-        pixbuf = loader.get_pixbuf ();
+            uint8[] data = bytes.get_data ();
+            var loader = new Gdk.PixbufLoader ();
+            loader.write (data);
+            loader.close ();
+            pixbuf = loader.get_pixbuf ();
 
-        if (pixbuf != null) {
-            Idle.add (() => {
-                queue_draw (); // neu rendern
-                return false;
-            });
+            if (pixbuf != null) {
+                Idle.add (() => {
+                    queue_draw (); // neu rendern
+                    return false;
+                });
+            }
+        }
+        catch(Error e) {
+            warning (e.message);
+            loadPlaceHolder();
+        }
+    }
+
+    private void loadPlaceHolder() {
+        try {
+            string filePath = "%s/icons/broken-image.png".printf (RESOURCES_DIR);
+            pixbuf = new Pixbuf.from_file(filePath);
+
+            if (pixbuf != null) {
+                Idle.add (() => {
+                    queue_draw (); // neu rendern
+                    return false;
+                });
+            }
+        } catch(Error e) {
+            
         }
     }
 

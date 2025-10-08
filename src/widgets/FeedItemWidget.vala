@@ -1,6 +1,5 @@
 public class FeedItemWidget: Card {
     private FeedItem itemData;
-
     public signal void clicked();
 
     public FeedItemWidget(FeedItem feedItem) {
@@ -22,7 +21,7 @@ public class FeedItemWidget: Card {
 
         var image = new FeedItemImageWidget(feedItem);
         image.set_sensitive (false);
-        image.set_size_request(120, 100);
+        image.set_size_request(-1, 100);
         cardBody.pack_start(image, false);
 
         var pubDate = parseDate1(feedItem.pubDate);
