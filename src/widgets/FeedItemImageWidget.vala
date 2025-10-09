@@ -38,11 +38,14 @@ public class FeedItemImageWidget : Gtk.DrawingArea {
         try {
             var msg = new Soup.Message ("GET", imageUrl);
             var bytes = yield session.send_and_read_async(msg, Priority.DEFAULT, null);
-            if(bytes == null) {
+            var contentType = msg.get_response_headers().get_content_type(null);
+
+            if(bytes == null || contentType == null || contentType.index_of("image/") == -1) {
                 loadPlaceHolder();
                 return;
             }
 
+            message("loading image: %s", imageUrl);
             uint8[] data = bytes.get_data ();
             var loader = new Gdk.PixbufLoader ();
             loader.write (data);
