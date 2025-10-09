@@ -11,7 +11,7 @@ public interface LogindInterface : Object {
 }
 
 [DBus (name="org.gnome.SessionManager")]
-public interface SessionManager : Object
+public interface GLib.SessionManager : Object
 {
     public abstract async void Logout (uint mode) throws Error;
     public abstract async void Reboot() throws Error;
@@ -20,7 +20,7 @@ public interface SessionManager : Object
 
 public class PowerMenu : Gtk.Menu {
     private ScreenSaver? saver = null;
-    private SessionManager? session = null;
+    private GLib.SessionManager? session = null;
     private LogindInterface? logind_interface = null;
     private const string LOGIND_LOGIN = "org.freedesktop.login1";
     private const string UNABLE_CONTACT = "Unable to contact ";

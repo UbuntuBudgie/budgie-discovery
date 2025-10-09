@@ -6,7 +6,6 @@ public class FeedItemImageWidget : Gtk.DrawingArea {
     private Gdk.Pixbuf? pixbuf = null;
     private Gdk.Pixbuf scaled = null;
     private string imageUrl;
-    private static Soup.Session session;
     private string refererUrl;
 
     private int last_width = 0;
@@ -14,13 +13,6 @@ public class FeedItemImageWidget : Gtk.DrawingArea {
 
     public FeedItemImageWidget () {
         get_style_context ().add_class ("card-image");
-        if(session == null) {
-            session = new Soup.Session();
-            session.add_feature(new Soup.CookieJar());
-            session.add_feature(new Soup.HSTSEnforcer());
-            session.user_agent = "Mozilla/5.0 (X11; Linux x86_64; rv:131.0) Gecko/20100101 Firefox/131.0";
-            session.set_property("use-http2", true);
-        }
     }
 
     public void loadFeedSource(string? url) {
@@ -29,13 +21,13 @@ public class FeedItemImageWidget : Gtk.DrawingArea {
             return;
         }
 
+        refererUrl = url.replace("http://", "https://");
         var downloader = new HTMLDownLoader ();
-        downloader.contentLoaded.connect(content => {
+        downloader.contentLoaded.connect((content) => {
             imageUrl = extractImageUrl (content, url);
-            refererUrl = url;
             loadImage.begin();
         });
-        downloader.load_html.begin(url);
+        downloader.load_html.begin(refererUrl);
     }
 
     private async void loadImage () {
@@ -45,15 +37,26 @@ public class FeedItemImageWidget : Gtk.DrawingArea {
         }
 
         try {
-            var msg = new Soup.Message ("GET", imageUrl);
+            //imageUrl = imageUrl.replace ("quadro.burda-forward.de/ctf/", "i0.wp.com/focus.de/");
+            var origin = Uri.parse(refererUrl, GLib.UriFlags.NONE);
+            var session = SessionManager.get_default();
+
+            imageUrl = imageUrl.replace("quadro.burda-forward.de/ctf/", "p5.focus.de/");
+            var msg = new Soup.Message ("GET", imageUrl.replace("http://", "https://"));
             msg.request_headers.append ("Accept", "image/webp,image/apng,image/*,*/*;q=0.8");
             msg.request_headers.append("Referer", refererUrl);
             msg.request_headers.append ("Accept-Language", "de-DE,de;q=0.9,en;q=0.8");
+            msg.request_headers.append("User-Agent", session.user_agent);
+            msg.request_headers.append("Accept-Encoding", "gzip, deflate, br");
+            msg.request_headers.append("Connection", "keep-alive");
+            msg.request_headers.append("Cache-Control", "no-cache");
+            msg.request_headers.append("Pragma", "no-cache");
+            msg.request_headers.append("Origin", "https://%s".printf(origin.get_host()));
 
             var bytes = yield session.send_and_read_async(msg, Priority.DEFAULT, null);
             var contentType = msg.get_response_headers().get_content_type(null);
 
-            if(bytes == null || contentType == null || contentType.index_of("image/") == -1) {
+            if(msg.status_code != 200 || bytes == null || contentType == null || contentType.index_of("image/") == -1) {
                 loadPlaceHolder();
                 return;
             }
@@ -114,6 +117,9 @@ public class FeedItemImageWidget : Gtk.DrawingArea {
                             if(image.index_of ("/") == 0) {
                                 image = "%s%s".printf (source.substring(0, source.index_of("/", 9)), image);
                             }
+                            image = GLib.Uri.unescape_string (image.replace ("&amp;", "&"));
+                            if (image.has_suffix(";"))  // manchmal hängt ein ";" aus dem HTML-Tag dran
+                                image = image.substring(0, image.length - 1);
                             return image;
                         }
                     }

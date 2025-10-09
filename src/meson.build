@@ -44,6 +44,7 @@ discovery_applet_sources = [
     'core/weather/WeatherRespository.vala',
     'core/weather/WeatherForecastItem.vala',
     'core/Service.vala',
+    'core/SessionManager.vala',
 
     'widgets/ApplicationItemWidget.vala',
     'widgets/ApplicationsWidget.vala',

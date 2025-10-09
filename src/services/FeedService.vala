@@ -46,16 +46,30 @@ public class FeedService: Service {
                 return;
             }
         }
-        fetchData(force);
+        fetchData.begin(force);
     }
 
-    private void fetchData(bool force) {
+    private async void fetchData(bool force) {
         fetching = true;
         try {
-            var file = File.new_for_uri(config.uri);
-            string etag_out;
-            uint8[]? contents;
-            file.load_contents (null, out contents, out etag_out);
+            var session = SessionManager.get_default();
+            var msg = new Soup.Message ("GET", config.uri);
+            msg.request_headers.append ("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8");
+            msg.request_headers.append ("Accept-Language", "de-DE,de;q=0.9,en;q=0.8");
+            msg.request_headers.append("User-Agent", session.user_agent);
+            msg.request_headers.append ("Sec-Fetch-Dest", "image");
+            msg.request_headers.append ("Sec-Fetch-Mode", "no-cors");
+            msg.request_headers.append ("Sec-Fetch-Site", "cross-site");
+            msg.request_headers.append ("Upgrade-Insecure-Requests", "1");
+            msg.request_headers.append ("Connection", "keep-alive");
+
+            var bytes = yield session.send_and_read_async(msg, Priority.DEFAULT, null);
+            if (msg.get_status () != 200) {
+                return;
+            }
+
+            var contents = (string) bytes.get_data ();
+            contents = contents.substring (0, (int) bytes.get_size ());
             
             var cacheFilePath = "%s/%s.xml".printf(cacheDir, config.uid);
             FileUtils.set_contents(cacheFilePath, (string)contents, ((string)contents).length);
@@ -91,6 +105,7 @@ public class FeedService: Service {
                                 }
                             }
 
+                            // TODO download feed source and cache images here
                             feedList.add (feedItem);
                         }
                     }
@@ -114,14 +129,12 @@ public class FeedService: Service {
                                     feedItem.link = itemChild->get_prop("href");
                                 }
 
-                                if(itemChild->name == "id") {
-                                    //feedItem.link = itemChild->get_content();
-                                }
-
                                 if(itemChild->name == "updated") {
                                     feedItem.pubDate = itemChild->get_content ();
                                 }
                             }
+
+                            // TODO download feed source and cache images here
 
                             feedList.add (feedItem);
                         }
@@ -133,7 +146,6 @@ public class FeedService: Service {
             lastFetched = new DateTime.now_local();
         } catch (Error e) {
             warning(e.message);
-            stop_service();
         }
         fetching = false;
     }
