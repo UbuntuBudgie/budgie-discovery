@@ -1,8 +1,8 @@
 public class HTMLDownLoader : Object {
+    private Soup.Session session = new Soup.Session();
     public signal void contentLoaded(string? content);
 
     public async void load_html(string url) {
-        var session = new Soup.Session ();
         session.add_feature(new Soup.CookieJar());
         session.add_feature(new Soup.HSTSEnforcer());
         session.user_agent = "Mozilla/5.0 (X11; Linux x86_64; rv:131.0) Gecko/20100101 Firefox/131.0";

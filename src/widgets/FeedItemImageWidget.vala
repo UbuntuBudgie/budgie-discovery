@@ -6,6 +6,7 @@ public class FeedItemImageWidget : Gtk.DrawingArea {
     private Gdk.Pixbuf? pixbuf = null;
     private Gdk.Pixbuf scaled = null;
     private string imageUrl;
+    private static Soup.Session session = new Soup.Session();
 
     private int last_width = 0;
     private int last_height = 0;
@@ -35,9 +36,7 @@ public class FeedItemImageWidget : Gtk.DrawingArea {
         }
 
         try {
-            Soup.Session session = new Soup.Session ();
             var msg = new Soup.Message ("GET", imageUrl);
-            
             var bytes = yield session.send_and_read_async(msg, Priority.DEFAULT, null);
             if(bytes == null) {
                 loadPlaceHolder();
