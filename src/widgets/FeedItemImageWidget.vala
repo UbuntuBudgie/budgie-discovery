@@ -6,13 +6,21 @@ public class FeedItemImageWidget : Gtk.DrawingArea {
     private Gdk.Pixbuf? pixbuf = null;
     private Gdk.Pixbuf scaled = null;
     private string imageUrl;
-    private static Soup.Session session = new Soup.Session();
+    private static Soup.Session session;
+    private string refererUrl;
 
     private int last_width = 0;
     private int last_height = 0;
 
     public FeedItemImageWidget () {
         get_style_context ().add_class ("card-image");
+        if(session == null) {
+            session = new Soup.Session();
+            session.add_feature(new Soup.CookieJar());
+            session.add_feature(new Soup.HSTSEnforcer());
+            session.user_agent = "Mozilla/5.0 (X11; Linux x86_64; rv:131.0) Gecko/20100101 Firefox/131.0";
+            session.set_property("use-http2", true);
+        }
     }
 
     public void loadFeedSource(string? url) {
@@ -24,6 +32,7 @@ public class FeedItemImageWidget : Gtk.DrawingArea {
         var downloader = new HTMLDownLoader ();
         downloader.contentLoaded.connect(content => {
             imageUrl = extractImageUrl (content, url);
+            refererUrl = url;
             loadImage.begin();
         });
         downloader.load_html.begin(url);
@@ -37,6 +46,10 @@ public class FeedItemImageWidget : Gtk.DrawingArea {
 
         try {
             var msg = new Soup.Message ("GET", imageUrl);
+            msg.request_headers.append ("Accept", "image/webp,image/apng,image/*,*/*;q=0.8");
+            msg.request_headers.append("Referer", refererUrl);
+            msg.request_headers.append ("Accept-Language", "de-DE,de;q=0.9,en;q=0.8");
+
             var bytes = yield session.send_and_read_async(msg, Priority.DEFAULT, null);
             var contentType = msg.get_response_headers().get_content_type(null);
 
@@ -80,7 +93,7 @@ public class FeedItemImageWidget : Gtk.DrawingArea {
         }
     }
 
-    private string? extractImageUrl(string html, string source) {
+    private string? extractImageUrl(string? html, string source) {
         if(html == null) return null;
         try {
             var meta_re = new Regex ("<meta\\b[^>]*>", RegexCompileFlags.CASELESS | RegexCompileFlags.DOTALL);
