@@ -19,7 +19,7 @@ public class FeedItemWidget: Card {
         eventBox.add (cardBody);
         pack_start(eventBox, false, false,0);
 
-        var image = new FeedItemImageWidget(feedItem);
+        var image = new FeedItemImageWidget();
         image.set_sensitive (false);
         image.set_size_request(-1, 100);
         cardBody.pack_start(image, false);
@@ -74,6 +74,8 @@ public class FeedItemWidget: Card {
             get_style_context().remove_class("hover");
             return false;
         });
+
+        image.loadFeedSource(feedItem.link);
     }
 
     private string parseDate1(string date) {

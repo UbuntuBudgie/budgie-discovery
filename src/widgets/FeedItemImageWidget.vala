@@ -10,15 +10,11 @@ public class FeedItemImageWidget : Gtk.DrawingArea {
     private int last_width = 0;
     private int last_height = 0;
 
-    public FeedItemImageWidget (FeedItem feedItem) {
+    public FeedItemImageWidget () {
         get_style_context ().add_class ("card-image");
-        Idle.add (() => {
-            loadFeedSource(feedItem.link);
-            return false;
-        });
     }
 
-    private void loadFeedSource(string? url) {
+    public void loadFeedSource(string? url) {
         if(url == null || url.length == 0) {
             message("no Feed source found");
             return;
@@ -28,7 +24,6 @@ public class FeedItemImageWidget : Gtk.DrawingArea {
         downloader.contentLoaded.connect(content => {
             imageUrl = extractImageUrl (content, url);
             loadImage.begin();
-            return;
         });
         downloader.load_html.begin(url);
     }
@@ -85,6 +80,7 @@ public class FeedItemImageWidget : Gtk.DrawingArea {
     }
 
     private string? extractImageUrl(string html, string source) {
+        if(html == null) return null;
         try {
             var meta_re = new Regex ("<meta\\b[^>]*>", RegexCompileFlags.CASELESS | RegexCompileFlags.DOTALL);
             var prop_re = new Regex ("property=['\\\"]og:image|twitter:image['\\\"]", RegexCompileFlags.CASELESS);

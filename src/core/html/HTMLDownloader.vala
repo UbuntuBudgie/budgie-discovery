@@ -14,11 +14,13 @@ public class HTMLDownLoader : Object {
             var bytes = yield session.send_and_read_async(msg, Priority.DEFAULT, null);
             if (msg.get_status () != 200) {
                 warning ("HTTP error %u for %s", msg.get_status (), url);
+                contentLoaded(null);
                 return;
             }
 
             var html = (string) bytes.get_data ();
             html = html.substring (0, (int) bytes.get_size ());
+            
             contentLoaded(html);
         } catch(Error e) {
 
