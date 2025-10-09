@@ -45,7 +45,6 @@ public class FeedItemImageWidget : Gtk.DrawingArea {
                 return;
             }
 
-            message("loading image: %s", imageUrl);
             uint8[] data = bytes.get_data ();
             var loader = new Gdk.PixbufLoader ();
             loader.write (data);
