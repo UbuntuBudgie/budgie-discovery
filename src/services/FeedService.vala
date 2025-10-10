@@ -65,6 +65,7 @@ public class FeedService: Service {
 
             var bytes = yield session.send_and_read_async(msg, Priority.DEFAULT, null);
             if (msg.get_status () != 200) {
+                message("inavlid status: %d", msg.get_status());
                 return;
             }
 
@@ -96,7 +97,7 @@ public class FeedService: Service {
                                     }
                                 }
                                 
-                                if(itemChild->name == "link") {
+                                if(itemChild->name == "link" && itemChild->ns == null) {
                                     feedItem.link = itemChild->get_content ();
                                 }
 
@@ -105,7 +106,6 @@ public class FeedService: Service {
                                 }
                             }
 
-                            // TODO download feed source and cache images here
                             feedList.add (feedItem);
                         }
                     }
@@ -133,8 +133,6 @@ public class FeedService: Service {
                                     feedItem.pubDate = itemChild->get_content ();
                                 }
                             }
-
-                            // TODO download feed source and cache images here
 
                             feedList.add (feedItem);
                         }
