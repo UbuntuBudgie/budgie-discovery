@@ -41,7 +41,7 @@ public class FeedItemImageWidget : Gtk.DrawingArea {
             var origin = Uri.parse(refererUrl, GLib.UriFlags.NONE);
             var session = SessionManager.get_default();
 
-            imageUrl = imageUrl.replace("quadro.burda-forward.de/ctf/", "p5.focus.de/");
+            //imageUrl = imageUrl.replace("quadro.burda-forward.de/ctf/", "p5.focus.de/");
             var msg = new Soup.Message ("GET", imageUrl.replace("http://", "https://"));
             msg.request_headers.append ("Accept", "image/webp,image/apng,image/*,*/*;q=0.8");
             msg.request_headers.append("Referer", refererUrl);
@@ -52,6 +52,7 @@ public class FeedItemImageWidget : Gtk.DrawingArea {
             msg.request_headers.append("Cache-Control", "no-cache");
             msg.request_headers.append("Pragma", "no-cache");
             msg.request_headers.append("Origin", "https://%s".printf(origin.get_host()));
+            msg.request_headers.append("Authority", origin.get_host());
 
             var bytes = yield session.send_and_read_async(msg, Priority.DEFAULT, null);
             var contentType = msg.get_response_headers().get_content_type(null);

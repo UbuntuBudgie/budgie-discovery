@@ -1,3 +1,4 @@
+using Config;
 using Soup;
 
 public class SessionManager: Object {
@@ -40,7 +41,7 @@ public class SessionManager: Object {
             _session = (Soup.Session) Object.new_with_properties (typeof (Soup.Session), names, vals);
             
             // Features hinzufügen (CookieJar, HSTS, usw.)
-            var jar = new Soup.CookieJarText (Path.build_filename (Environment.get_user_cache_dir(), "cookies.txt"), false);
+            var jar = new Soup.CookieJarText (Path.build_filename (Environment.get_user_cache_dir(), PACKAGE_NAME, "cookies.txt"), false);
             jar.set_accept_policy (Soup.CookieJarAcceptPolicy.ALWAYS);
             _session.add_feature (jar);
             _session.add_feature (new Soup.HSTSEnforcer ());
