@@ -11,6 +11,7 @@ public class DiscoveryWidget: Gtk.Box {
     private SettingsWindow settingsDialog;
     private SettingsService settingsService;
     private Gtk.Button reloadButton;
+    private Gtk.Label messageLabel = new Gtk.Label(_("There are no feeds configured"));
 
     public DiscoveryWidget(Budgie.Popover popover) {
         Object();
@@ -51,6 +52,12 @@ public class DiscoveryWidget: Gtk.Box {
         notebook.show_border = false;
         notebook.get_style_context().add_class("no-border");
         mainLayout.pack_start(notebook, true, true, 0);
+        notebook.hide();
+
+        mainLayout.pack_start(messageLabel, true);
+        messageLabel.no_show_all = true;
+        messageLabel.get_style_context().add_class("text-secondary");
+        messageLabel.hide();
 
         /* WIDGETS */
         var widgetsLabel = new Gtk.Label("Widgets");
@@ -106,6 +113,8 @@ public class DiscoveryWidget: Gtk.Box {
 
     private void loadViewsFromSettings(string? key) {
         removeWidgets();
+        messageLabel.hide();
+        notebook.hide();
 
         // read changed settings
         var configuredFeeds = settingsService.get_value("feeds");
@@ -116,7 +125,12 @@ public class DiscoveryWidget: Gtk.Box {
         }
         reloadButton.set_sensitive(configuredFeeds.get_array().get_length() > 0);
 
-        for(var i = 0; i < configuredFeeds.get_array().get_length (); i++) {
+        var feedsLength = configuredFeeds.get_array().get_length ();
+        if(feedsLength == 0) {
+            messageLabel.show();
+        }
+
+        for(var i = 0; i < feedsLength; i++) {
             var item = configuredFeeds.get_array().get_object_element(i);
             var config = new FeedConfigItem();
             config.name = item.get_string_member("name");
@@ -167,7 +181,11 @@ public class DiscoveryWidget: Gtk.Box {
             widgetLayout.pack_start(widget, false);
         });
 
-        show_all();
+        widgetLayout.show_all();
+
+        if(notebook.get_n_pages() > 0)
+            notebook.show_all();
+
         resizeChildren();
     }
 
@@ -188,7 +206,11 @@ public class DiscoveryWidget: Gtk.Box {
             child.set_size_request(columnWidth, columnWidth);
         });
 
-        int notebookWidth = ((mainLayoutWidth / 3) - 5) * 2;
-        notebook.set_size_request(notebookWidth, -1);
+        int secondWidth = ((mainLayoutWidth / 3) - 5) * 2;
+        if(notebook.get_n_pages() == 0) {
+            messageLabel.set_size_request(secondWidth, -1);
+            return;
+        }
+        notebook.set_size_request(secondWidth, -1);
     }
 }

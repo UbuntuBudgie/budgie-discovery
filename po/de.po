@@ -240,3 +240,6 @@ msgstr "Herunterfahren"
 
 msgid "updated at"
 msgstr "aktualisiert"
+
+msgid "There are no feeds configured"
+msgstr "Es wurden noch keine Feeds eingerichtet"

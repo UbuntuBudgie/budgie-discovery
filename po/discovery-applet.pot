@@ -133,3 +133,6 @@ msgstr ""
 
 msgid "updated at"
 msgstr ""
+
+msgid ""There are no feeds configured"
+msgstr ""

@@ -86,6 +86,6 @@ public class FeedView: Gtk.ScrolledWindow {
             });
         }
 
-        show_all();
+        feedLayout.show_all();
     }
 }
