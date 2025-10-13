@@ -163,7 +163,6 @@ public class WidgetSettings: Gtk.Box {
 
         public WeatherItemDialog(Gtk.Window window, WidgetSettings parent) {
             Object(transient_for: window,
-                use_header_bar: false,
                 title: _("Add Location")
             );
 
