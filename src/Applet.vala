@@ -21,7 +21,7 @@ namespace DiscoveryApplet {
     public class DiscoveryApplet : Budgie.Applet {
         protected Gtk.EventBox widget;
         protected Gtk.Box layout;
-        protected Gtk.Label label;
+        protected Gtk.Label appletLabel;
         protected Gtk.Image weatherIcon;
         private DiscoveryPopup popup;
         Gtk.Orientation orient = Gtk.Orientation.HORIZONTAL;
@@ -46,8 +46,9 @@ namespace DiscoveryApplet {
             layout = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 0);
             widget.add (layout);
 
-            label = new Gtk.Label ("Start");
-            layout.pack_start (label, false, false, 0);
+            appletLabel = new Gtk.Label("Start");
+            layout.pack_start (appletLabel, false, false, 0);
+            appletLabel.margin_start = 10;
             add(widget);
 
             get_style_context ().add_class ("discovery-applet");

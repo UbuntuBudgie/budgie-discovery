@@ -19,20 +19,26 @@ public class FeedView: Gtk.ScrolledWindow {
         feedLayout.hexpand = true;
         add(feedLayout);
 
-        map.connect(() => {
-            hadjustment.value = 0;
-            vadjustment.value = 0;
-        });
-
         feedLayout.size_allocate.connect((allocation) => {
             resizeChildren();
         });
 
         feedService = new FeedService(c);
         feedService.feedFetched.connect(onFeedFetched);
+
         Idle.add(() => {
             feedService.start_service ();
             return false;
+        });
+        
+        map.connect(() => {
+            hadjustment.value = 0;
+            vadjustment.value = 0;
+            Idle.add(() => {
+                feedService.stop_service ();
+                feedService.start_service ();
+                return false;
+            });
         });
     }
 

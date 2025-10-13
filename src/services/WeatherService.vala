@@ -4,7 +4,7 @@ using Config;
 using Posix;
 
 public class WeatherService: Service {
-    private Json.Parser parser = new Json.Parser();
+    private Json.Parser parser;
     private LocationItem? locationItem;
     private static string? cacheDir;
     private bool fetching = false;
@@ -45,7 +45,6 @@ public class WeatherService: Service {
     public new void stop_service() {
         parser = null;
         if(timer != 0) {
-            message("Stop weather service");
             Source.remove(timer);
             timer = 0;
         }
@@ -76,6 +75,7 @@ public class WeatherService: Service {
                 string response = (string) contents;
                 lastFetched = current;
 
+                parser = new Json.Parser();
                 parser.load_from_data(response, response.length);
                 var json = parser.get_root().get_object();
                 weatherUpdated(json);

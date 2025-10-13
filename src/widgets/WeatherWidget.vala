@@ -80,10 +80,6 @@ public class WeatherWidget: Card {
         var weatherCodes = weatherCodesJson.get_object();
 
         weatherService = new WeatherService(location);
-        Idle.add(() => {
-            weatherService.start_service ();
-            return false;
-        });
 
         weatherService.weatherUpdated.connect((weather) => {
             forecastItems.clear();
@@ -194,6 +190,19 @@ public class WeatherWidget: Card {
 
             var currentDate = new DateTime.now_local().format ("%x %H:%M");
             lastUpdatedLabel.set_label (_("updated at").concat(": %s").printf(currentDate));
+        });
+
+        Idle.add(() => {
+            weatherService.start_service ();
+            return false;
+        });
+
+        map.connect(() => {
+            Idle.add(() => {
+                weatherService.stop_service ();
+                weatherService.start_service ();
+                return false;
+            });
         });
     }
 
