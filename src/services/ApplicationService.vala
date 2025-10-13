@@ -8,6 +8,10 @@ public class ApplicationService: Service {
 
     public new void start_service () {
         update_service (false);
+        AppInfoMonitor monitor = AppInfoMonitor.get();
+        monitor.changed.connect(() => {
+            update_service(true);
+        });
     }
 
     public new void stop_service () {
