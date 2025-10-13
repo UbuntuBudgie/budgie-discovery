@@ -4,3 +4,5 @@
 build
 locale
 *.iml
+debian
+obj-*

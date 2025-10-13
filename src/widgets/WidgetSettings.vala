@@ -1,11 +1,5 @@
 using Config;
 
-/*
-
-TODO adopt new settings mechanic
-
-*/
-
 public class WidgetSettings: Gtk.Box {
     private Gtk.Box widgetListLayout;
 
@@ -168,14 +162,17 @@ public class WidgetSettings: Gtk.Box {
         }
 
         public WeatherItemDialog(Gtk.Window window, WidgetSettings parent) {
-            Object();
+            Object(transient_for: window,
+                use_header_bar: false,
+                title: _("Add Location")
+            );
+
             get_style_context().add_class("settings-dialog");
             load_style_sheet();
             set_transient_for(window);
             set_type_hint(Gdk.WindowTypeHint.DIALOG);
             gravity = Gdk.Gravity.CENTER;
             set_default_size (400, 280);
-            set_title(_("Add Location"));
 
             locations = new Gee.ArrayList<LocationItem>();
 
