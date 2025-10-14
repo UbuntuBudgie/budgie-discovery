@@ -3,13 +3,14 @@ using Config;
 public class WidgetSettings: Gtk.Box {
     private Gtk.Box widgetListLayout;
 
-    public WidgetSettings(Gtk.Window window) {
+    public WidgetSettings() {
         set_orientation(Gtk.Orientation.VERTICAL);
         get_style_context().add_class("settings-page");
 
         var widgetListScrollable = new Gtk.ScrolledWindow (null, null);
         widgetListScrollable.get_style_context().add_class("feed-list");
         widgetListScrollable.get_style_context().add_class("mb-2");
+        widgetListScrollable.get_style_context().add_class("bg-white");
         widgetListScrollable.set_policy (Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC);
         widgetListScrollable.vexpand = true;
         widgetListScrollable.hexpand = true;
@@ -72,7 +73,7 @@ public class WidgetSettings: Gtk.Box {
         plusButton.set_always_show_image(true);
         plusButton.get_style_context().add_class("border-1");
         plusButton.clicked.connect(() => {
-            var dialog = new WeatherItemDialog(window, this);
+            var dialog = new WeatherItemDialog(this);
             int response = dialog.run();
             if(response == Gtk.ResponseType.OK) {
                 var location = dialog.getLocation();
@@ -164,14 +165,11 @@ public class WidgetSettings: Gtk.Box {
             return selectedLocation;
         }
 
-        public WeatherItemDialog(Gtk.Window window, WidgetSettings parent) {
-            Object(transient_for: window,
-                title: _("Add Location")
-            );
+        public WeatherItemDialog(WidgetSettings parent) {
+            Object(title: _("Add Location"));
 
             get_style_context().add_class("settings-dialog");
             load_style_sheet();
-            set_transient_for(window);
             set_type_hint(Gdk.WindowTypeHint.DIALOG);
             gravity = Gdk.Gravity.CENTER;
             set_default_size (400, 280);

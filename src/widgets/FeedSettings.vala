@@ -3,7 +3,7 @@ using Config;
 public class FeedSettings: Gtk.Box {
     private static Gtk.Box feedLayout;
     
-    public FeedSettings(Gtk.Window window) {
+    public FeedSettings() {
         Object();
         set_orientation(Gtk.Orientation.VERTICAL);
         get_style_context().add_class("settings-page");
@@ -11,6 +11,7 @@ public class FeedSettings: Gtk.Box {
         var feedScroll = new Gtk.ScrolledWindow (null, null);
         feedScroll.get_style_context().add_class("feed-list");
         feedScroll.get_style_context().add_class("mb-2");
+        feedScroll.get_style_context().add_class("bg-white");
         feedScroll.set_policy (Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC);
         feedScroll.vexpand = true;
         feedScroll.hexpand = true;
@@ -28,7 +29,7 @@ public class FeedSettings: Gtk.Box {
         plusButton.set_always_show_image(true);
         plusButton.get_style_context().add_class("border-1");
         plusButton.clicked.connect(() => {
-            var dialog = new FeedItemDialog(window);
+            var dialog = new FeedItemDialog();
             int response = dialog.run();
             if(response == Gtk.ResponseType.OK) {
                 var feedName = dialog.get_feed_name();
@@ -52,7 +53,7 @@ public class FeedSettings: Gtk.Box {
                     feeds.get_array().add_object_element(feedNodeObject);
                     settings.set_value("feeds", feeds);
 
-                    var feedRow = new FeedRow(window, digest.get_string(), feedUri, feedName);
+                    var feedRow = new FeedRow(digest.get_string(), feedUri, feedName);
                     feedLayout.pack_start (feedRow, false);
                     feedLayout.show_all ();
                 }
@@ -71,7 +72,7 @@ public class FeedSettings: Gtk.Box {
 
         for(int i = 0; i < feeds.get_array().get_length (); i++) {
             var feed = feeds.get_array().get_object_element (i);
-            var feedRow = new FeedRow(window, feed.get_string_member("uid"), feed.get_string_member ("uri"), feed.get_string_member ("name"));
+            var feedRow = new FeedRow(feed.get_string_member("uid"), feed.get_string_member ("uri"), feed.get_string_member ("name"));
             feedLayout.pack_start (feedRow, false);
         }
         load_style_sheet();
@@ -85,7 +86,7 @@ public class FeedSettings: Gtk.Box {
 
         public signal void onFeedDelete(string uid);
 
-        public FeedRow(Gtk.Window parentWindow, string? uid, string? uri, string? name) {
+        public FeedRow(string? uid, string? uri, string? name) {
             base();
             feedUri = uri;
             feedName = name;
@@ -138,11 +139,10 @@ public class FeedSettings: Gtk.Box {
         private Gtk.Entry nameEntry;
         private Gtk.Entry uriEntry;
 
-        public FeedItemDialog(Gtk.Window parent) {
+        public FeedItemDialog() {
             Object();
             get_style_context().add_class("settings-dialog");
             load_style_sheet();
-            set_transient_for(parent);
             set_type_hint(Gdk.WindowTypeHint.DIALOG);
             gravity = Gdk.Gravity.CENTER;
             set_default_size (400, 200);

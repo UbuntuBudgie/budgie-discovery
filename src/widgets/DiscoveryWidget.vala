@@ -8,7 +8,6 @@ public class DiscoveryWidget: Gtk.Box {
     private Gtk.Box mainLayout = new Gtk.Box(Gtk.Orientation.HORIZONTAL, 10);
     private Budgie.Popover popup;
     private Gtk.Notebook notebook;
-    private SettingsWindow settingsDialog;
     private SettingsService settingsService;
     private Gtk.Button reloadButton;
     private Gtk.Label messageLabel = new Gtk.Label(_("There are no feeds configured"));
@@ -31,21 +30,6 @@ public class DiscoveryWidget: Gtk.Box {
         reloadButton = new Gtk.Button.from_icon_name("view-refresh-symbolic", Gtk.IconSize.SMALL_TOOLBAR);
         reloadButton.set_sensitive(false);
         greetingWidget.addButton(reloadButton);
-
-        var settingsButton = new Gtk.Button.from_icon_name("preferences-system-symbolic", Gtk.IconSize.SMALL_TOOLBAR);
-        greetingWidget.addButton(settingsButton);
-
-        settingsButton.button_press_event.connect((event) => {
-            if(settingsDialog != null) {
-                settingsDialog.destroy();
-                settingsDialog = null;
-            }
-            settingsDialog = new SettingsWindow();
-            settingsDialog.show_all();
-            settingsDialog.present();
-            popover.hide();
-            return true;
-        });
 
         notebook = new Gtk.Notebook();
         notebook.scrollable = true;

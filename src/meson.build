@@ -61,7 +61,7 @@ discovery_applet_sources = [
     'widgets/GreetingWidget.vala',
     'widgets/ListItem.vala',
     'widgets/PowerMenu.vala',
-    'widgets/SettingsWindow.vala',
+    'widgets/SettingsWidget.vala',
     'widgets/WeatherForecastWidget.vala',
     'widgets/WeatherWidget.vala',
     'widgets/WidgetSettings.vala',

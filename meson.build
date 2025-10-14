@@ -1,6 +1,6 @@
 project('discovery-applet',
         ['vala', 'c'],
-        version: '1.0.3-dev',
+        version: '1.0.4-dev',
         meson_version: '>=0.50.0',
         license: 'GPL2')
 
