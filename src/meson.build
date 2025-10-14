@@ -15,7 +15,7 @@ conf_data.set_quoted('LOCALE_DIR', join_paths(prefix, localedir))
 conf_data.set_quoted('PLUGIN_DIR', lib_install_dir)
 conf_data.set_quoted('ICONS_DIR', join_paths(lib_install_dir, 'resources', 'icons'))
 conf_data.set_quoted('RESOURCES_DIR', join_paths(lib_install_dir, 'resources'))
-conf_data.set_quoted('GETTEXT_DIR', join_paths(lib_install_dir, 'resources', 'locale'))
+conf_data.set_quoted('GETTEXT_DIR', join_paths(prefix, localedir, project_name))
 
 config_header = configure_file(
     input: 'config.vala.in',
@@ -96,7 +96,6 @@ discovery_applet_deps = [
 
 
 discovery_applet_vala_args = [
-    #'--target-glib=2.80', 
     '--pkg', 'posix', 
     '--pkg', 'glib-2.0'
 ]

@@ -5,7 +5,9 @@ project('discovery-applet',
         license: 'GPL2')
 
 lib_install_dir = join_paths(get_option('prefix'), get_option('libdir'), 'budgie-desktop', 'plugins', meson.project_name())
-gettext_dir = join_paths(lib_install_dir, 'resources', 'locale')
+prefix = get_option('prefix')
+localedir = get_option('localedir')
+gettext_dir = join_paths(prefix, localedir, meson.project_name())
 
 add_project_arguments([
     '-DGETTEXT_DIR="@0@"'.format(gettext_dir),
@@ -20,12 +22,12 @@ add_project_arguments([
 
 i18n = import('i18n')
 i18n.gettext(meson.project_name(),
-  install_dir: join_paths(lib_install_dir, 'resources', 'locale')
+  install_dir: gettext_dir
 )
 
 subdir('src')
 
-run_result = run_command('bash', './gen-mo.sh', check: false)
+run_result = run_command('/bin/sh', './gen-mo.sh', check: false)
 if run_result.returncode() != 0
   error('Script schlug fehl: ' + run_result.stdout())
 endif
@@ -35,9 +37,8 @@ install_data('src/discovery-applet.plugin',
 )
 
 install_subdir('locale',
-  install_dir : join_paths(lib_install_dir, 'resources')
+  install_dir : gettext_dir
 )
 
 install_data('src/style.css', install_dir: lib_install_dir)
 
-run_command('gen-mo.sh', capture:true, check:false)
