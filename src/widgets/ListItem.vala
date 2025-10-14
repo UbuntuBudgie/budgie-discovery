@@ -50,11 +50,14 @@ public class ListItem: Gtk.EventBox {
     public ListItem() {
         Object();
 
-        mainLayout.get_style_context().add_class("list-item");
-        mainLayout.get_style_context().add_class("pt-2");
-        mainLayout.get_style_context().add_class("pb-2");
-        mainLayout.get_style_context().add_class("ps-3");
-        mainLayout.get_style_context().add_class("pe-3");
+        this.realize.connect(() => {
+            mainLayout.get_style_context().add_class("list-item");
+            mainLayout.get_style_context().add_class("pt-2");
+            mainLayout.get_style_context().add_class("pb-2");
+            mainLayout.get_style_context().add_class("ps-3");
+            mainLayout.get_style_context().add_class("pe-3");
+        });
+
         add(mainLayout);
 
         primaryLabel.halign = Gtk.Align.START;
