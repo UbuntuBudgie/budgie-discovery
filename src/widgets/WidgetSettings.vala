@@ -76,27 +76,29 @@ public class WidgetSettings: Gtk.Box {
             int response = dialog.run();
             if(response == Gtk.ResponseType.OK) {
                 var location = dialog.getLocation();
-                var layoutItem = new WeatherListItem();
-                layoutItem.setData(location);
-                layoutItem.setPrimaryText(location.name);
-                layoutItem.setSecondaryText(location.getDescription());
-                layoutItem.setSelectable(false);
-                widgetListLayout.pack_start(layoutItem, false);
-                widgetListLayout.show_all();
+                if(location != null) {
+                    var layoutItem = new WeatherListItem();
+                    layoutItem.setData(location);
+                    layoutItem.setPrimaryText(location.name);
+                    layoutItem.setSecondaryText(location.getDescription());
+                    layoutItem.setSelectable(false);
+                    widgetListLayout.pack_start(layoutItem, false);
+                    widgetListLayout.show_all();
 
-                // Save Settings
-                var locationNode = new Json.Object();
-                locationNode.set_string_member("name", location.name);
-                locationNode.set_string_member("country", location.country);
-                locationNode.set_double_member("latitude", location.latitude);
-                locationNode.set_double_member("longitude", location.longitude);
-                locationNode.set_string_member("admin1", location.admin1);
-                locationNode.set_string_member("admin2", location.admin2);
-                locationNode.set_string_member("admin3", location.admin3);
-                locationNode.set_string_member("admin4", location.admin4);
+                    // Save Settings
+                    var locationNode = new Json.Object();
+                    locationNode.set_string_member("name", location.name);
+                    locationNode.set_string_member("country", location.country);
+                    locationNode.set_double_member("latitude", location.latitude);
+                    locationNode.set_double_member("longitude", location.longitude);
+                    locationNode.set_string_member("admin1", location.admin1);
+                    locationNode.set_string_member("admin2", location.admin2);
+                    locationNode.set_string_member("admin3", location.admin3);
+                    locationNode.set_string_member("admin4", location.admin4);
 
-                weatherLocations.add_object_element(locationNode);
-                settings.set_value("weather", weatherNode);
+                    weatherLocations.add_object_element(locationNode);
+                    settings.set_value("weather", weatherNode);
+                }
             }
             dialog.destroy();
         });
