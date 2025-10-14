@@ -139,6 +139,7 @@ public class WidgetSettings: Gtk.Box {
 
                 weatherLocations.foreach_element((element, index) => {
                     var obj = element.get_object_element(index);
+                    if(!obj.has_member("latitude") || !obj.has_member("longitude")) return;
                     if(obj.get_double_member("latitude") == data.latitude && obj.get_double_member("longitude") == data.longitude) {
                         weatherLocations.remove_element(index);
                     }
@@ -237,9 +238,9 @@ public class WidgetSettings: Gtk.Box {
 
             map.connect(() => {
                 locations.clear();
-                    locationLayout.foreach((child) => {
-                        locationLayout.remove(child);
-                    });
+                locationLayout.foreach((child) => {
+                    locationLayout.remove(child);
+                });
             });
 
             searchButton.clicked.connect(() => {
@@ -331,7 +332,7 @@ public class WidgetSettings: Gtk.Box {
                         });
 
                         if((index + 1) < results.get_length()) {
-                            var divider = new Gtk.Separator(Gtk.Orientation.VERTICAL);
+                            var divider = new Gtk.Separator(Gtk.Orientation.HORIZONTAL);
                             divider.get_style_context().add_class ("border-bottom");
                             divider.margin_bottom = 1;
                             divider.margin_top = 1;
