@@ -1,13 +1,13 @@
 project('discovery-applet',
         ['vala', 'c'],
-        version: '1.0.1-dev',
+        version: '1.0.3-dev',
         meson_version: '>=0.50.0',
         license: 'GPL2')
 
 lib_install_dir = join_paths(get_option('prefix'), get_option('libdir'), 'budgie-desktop', 'plugins', meson.project_name())
 prefix = get_option('prefix')
 localedir = get_option('localedir')
-gettext_dir = join_paths(prefix, localedir, meson.project_name())
+gettext_dir = join_paths(prefix, localedir)
 
 add_project_arguments([
     '-DGETTEXT_DIR="@0@"'.format(gettext_dir),
@@ -36,7 +36,7 @@ install_data('src/discovery-applet.plugin',
   install_dir : join_paths(get_option('libdir'), 'budgie-desktop', 'plugins', 'discovery-applet')
 )
 
-install_subdir('locale',
+install_subdir('locale/de',
   install_dir : gettext_dir
 )
 
