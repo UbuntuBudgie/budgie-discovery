@@ -10,7 +10,7 @@ public class WidgetSettings: Gtk.Box {
         var widgetListScrollable = new Gtk.ScrolledWindow (null, null);
         widgetListScrollable.get_style_context().add_class("feed-list");
         widgetListScrollable.get_style_context().add_class("mb-2");
-        widgetListScrollable.get_style_context().add_class("bg-white");
+        widgetListScrollable.get_style_context().add_class("sidebar");
         widgetListScrollable.set_policy (Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC);
         widgetListScrollable.vexpand = true;
         widgetListScrollable.hexpand = true;
@@ -71,9 +71,15 @@ public class WidgetSettings: Gtk.Box {
         plusButton.set_label(_("Add"));
         plusButton.set_halign (Gtk.Align.START);
         plusButton.set_always_show_image(true);
-        plusButton.get_style_context().add_class("border-1");
+        plusButton.get_style_context().add_class("flat");
         plusButton.clicked.connect(() => {
             var dialog = new WeatherItemDialog(this);
+            dialog.set_transient_for(get_toplevel() as Gtk.Window);
+            dialog.set_modal(false); // NICHT blockierend
+            dialog.set_destroy_with_parent(true); // automatisch schließen, wenn Parent geschlossen wird
+            dialog.set_keep_above(true); // immer "über" dem Popover
+            dialog.show();
+            /*
             int response = dialog.run();
             if(response == Gtk.ResponseType.OK) {
                 var location = dialog.getLocation();
@@ -102,6 +108,7 @@ public class WidgetSettings: Gtk.Box {
                 }
             }
             dialog.destroy();
+            */
         });
         pack_start (plusButton, false);
     }
@@ -113,7 +120,7 @@ public class WidgetSettings: Gtk.Box {
             deleteButton.set_size_request(16, 16);
             deleteButton.get_style_context().add_class("p-0");
             deleteButton.get_style_context().add_class("m-0");
-            deleteButton.get_style_context().add_class("no-border");
+            deleteButton.get_style_context().add_class("flat");
             deleteButton.get_style_context().add_class("no-background");
 
             var deleteImage = new Gtk.Image();
@@ -153,7 +160,7 @@ public class WidgetSettings: Gtk.Box {
         }
     }
 
-    private class WeatherItemDialog: Gtk.Dialog {
+    private class WeatherItemDialog: Gtk.Window {
         private Gtk.Entry nameEntry;
         private Gtk.Button okButton;
         private Gee.ArrayList<LocationItem> locations;
@@ -170,21 +177,20 @@ public class WidgetSettings: Gtk.Box {
 
             get_style_context().add_class("settings-dialog");
             load_style_sheet();
-            set_type_hint(Gdk.WindowTypeHint.DIALOG);
             gravity = Gdk.Gravity.CENTER;
             set_default_size (400, 280);
+            set_keep_above(true);
+            set_transient_for(get_toplevel() as Gtk.Window);
 
             locations = new Gee.ArrayList<LocationItem>();
 
-            var contentArea = get_content_area();
             var layout = new Gtk.Box(Gtk.Orientation.VERTICAL, 10);
             layout.set_margin_top (10);
             layout.set_margin_bottom (10);
             layout.set_margin_start (10);
             layout.set_margin_end (10);
             layout.vexpand = true;
-            contentArea.get_style_context().add_class("no-border");
-            contentArea.add(layout);
+            add(layout);
 
             var nameLabel = new Gtk.Label("%s:".printf(_("Location")));
             nameLabel.set_halign (Gtk.Align.START);
@@ -227,11 +233,11 @@ public class WidgetSettings: Gtk.Box {
             buttonBox.pack_end (cancelButton, false, false, 0);
 
             cancelButton.clicked.connect(() => {
-                response(Gtk.ResponseType.CANCEL);
+                //response(Gtk.ResponseType.CANCEL);
             });
 
             okButton.clicked.connect((e) => {
-                response(Gtk.ResponseType.OK);
+                //response(Gtk.ResponseType.OK);
             });
 
             map.connect(() => {
@@ -243,9 +249,12 @@ public class WidgetSettings: Gtk.Box {
 
             searchButton.clicked.connect(() => {
                 Idle.add(() => {
-                    searchLocation();
+                    GLib.MainContext.@default().invoke(() => {
+                        searchLocation();
+                        return false;
+                    }, Priority.DEFAULT);
                     return false;
-                }, 0);
+                });
             });
             layout.show_all();
         }
@@ -287,9 +296,10 @@ public class WidgetSettings: Gtk.Box {
                 var parser = new Json.Parser();
                 parser.load_from_data(data, data.length);
 
-                var root = parser.get_root()?.get_object();
-                if (root != null && root.has_member("results")) {
-                    var results = root.get_array_member("results");
+                var root = parser.get_root();
+                var rootObject = root.get_object();
+                if (root != null && rootObject.has_member("results")) {
+                    var results = rootObject.get_array_member("results");
 
                     locationLayout.foreach(child => {
                         locationLayout.remove(child);
