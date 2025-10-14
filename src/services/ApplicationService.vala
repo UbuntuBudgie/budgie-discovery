@@ -1,8 +1,6 @@
 using Gee;
 using GLib;
 
-/* TODO generate applications cache file: generate appId to support favorites */
-
 public class ApplicationService: Service {
     public signal void change(ArrayList<ApplicationItem> apps);
 
