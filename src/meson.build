@@ -80,17 +80,17 @@ cc = meson.get_compiler('c')
 vala = meson.get_compiler('vala')
 
 discovery_applet_deps = [
-    dependency('budgie-1.0', version: '>=2'),
-    dependency('gee-0.8', version: '>=0.20'),
-    dependency('gio-2.0', version: '>=2.48', required: true),
-    dependency('glib-2.0', version: '>=2.80'),
-    dependency('goa-1.0', version: '>=3.54'),
-    dependency('gobject-2.0', version: '>=2.80'),
-    dependency('gtk+-3.0', version: '>=3.18'),
-    dependency('json-glib-1.0', version: '>=1.10'),
-    dependency('libpeas-1.0', version: '>=1.36'),
-    dependency('libsoup-3.0', version: '>=2.4'),
-    dependency('libxml-2.0', version: '>=2.9'),
+    dependency('budgie-1.0', version: '>=2',       required: true),
+    dependency('gee-0.8', version: '>=0.20',       required: true),
+    dependency('gio-2.0', version: '>=2.48',       required: true),
+    dependency('glib-2.0', version: '>=2.80',      required: true),
+    dependency('goa-1.0', version: '>=3.54',       required: true),
+    dependency('gobject-2.0', version: '>=2.80',   required: true),
+    dependency('gtk+-3.0', version: '>=3.18',      required: true),
+    dependency('json-glib-1.0', version: '>=1.10', required: true),
+    dependency('libpeas-1.0', version: '>=1.36',   required: true),
+    dependency('libsoup-3.0', version: '>=2.4',    required: true),
+    dependency('libxml-2.0', version: '>=2.9',     required: true),
     cc.find_library('m', required: true),
     vala.find_library('posix', required: true),
 ]

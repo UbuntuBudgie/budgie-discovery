@@ -132,12 +132,24 @@ public class PowerMenu : Gtk.Menu {
     }
 
     private Gtk.MenuItem createPowerMenuItem(string text, string? iconName) {
-        var item = new Gtk.ImageMenuItem.with_label(text);
         var image = new Gtk.Image.from_icon_name(iconName, Gtk.IconSize.MENU);
         image.get_style_context().add_class("ms-4");
         image.valign = Gtk.Align.CENTER;
-        item.image = image;
-        item.always_show_image = true;
+
+        var label = new Gtk.Label(text);
+        label.halign = Gtk.Align.START;
+
+        var item = new Gtk.MenuItem();
+        item.set_use_underline (false);
+        item.set_label (""); 
+
+        var itemLayout = new Gtk.Box(Gtk.Orientation.HORIZONTAL, 10);
+        itemLayout.pack_start(image, false);
+        itemLayout.pack_start(label, true);
+
+        item.get_children().foreach(child => item.remove(child));
+        item.add(itemLayout);
+
         return item;
     }
 }
