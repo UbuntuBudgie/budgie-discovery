@@ -50,49 +50,51 @@ public class ListItem: Gtk.EventBox {
     public ListItem() {
         Object();
 
+        add_events(Gdk.EventMask.ENTER_NOTIFY_MASK | Gdk.EventMask.LEAVE_NOTIFY_MASK | Gdk.EventMask.BUTTON_PRESS_MASK);
+        add(mainLayout);
+
         this.realize.connect(() => {
             mainLayout.get_style_context().add_class("list-item");
             mainLayout.get_style_context().add_class("pt-2");
             mainLayout.get_style_context().add_class("pb-2");
             mainLayout.get_style_context().add_class("ps-3");
             mainLayout.get_style_context().add_class("pe-3");
-        });
 
-        add(mainLayout);
+            primaryLabel.halign = Gtk.Align.START;
+            primaryLabel.valign = Gtk.Align.END;
+            primaryLabel.set_use_markup(false);
+            textLayout.pack_start(primaryLabel, false);
 
-        primaryLabel.halign = Gtk.Align.START;
-        primaryLabel.valign = Gtk.Align.END;
-        primaryLabel.set_use_markup(false);
-        textLayout.pack_start(primaryLabel, false);
+            secondaryLabel.halign = Gtk.Align.START;
+            secondaryLabel.valign = Gtk.Align.START;
+            secondaryLabel.yalign = -5.0f;
+            secondaryLabel.get_style_context().add_class("text-size-small");
+            secondaryLabel.get_style_context().add_class("text-secondary");
+            secondaryLabel.get_style_context().add_class("font-italic");
+            secondaryLabel.set_use_markup(false);
+            textLayout.pack_start(secondaryLabel, false);
 
-        secondaryLabel.halign = Gtk.Align.START;
-        secondaryLabel.valign = Gtk.Align.START;
-        secondaryLabel.yalign = -5.0f;
-        secondaryLabel.get_style_context().add_class("text-size-small");
-        secondaryLabel.get_style_context().add_class("text-secondary");
-        secondaryLabel.get_style_context().add_class("font-italic");
-        secondaryLabel.set_use_markup(false);
-        textLayout.pack_start(secondaryLabel, false);
+            mainLayout.pack_start(textLayout, true, true);
+            mainLayout.pack_end(actionLayout, false);
 
-        mainLayout.pack_start(textLayout, true, true);
-        mainLayout.pack_end(actionLayout, false);
+            this.enter_notify_event.connect(() => {
+                if(!mainLayout.get_style_context().has_class("selected"))
+                    mainLayout.get_style_context().add_class("hover");
+                return true;
+            });
+            this.leave_notify_event.connect(() => {
+                mainLayout.get_style_context().remove_class("hover");
+                return true;
+            });
+            this.button_press_event.connect(() => {
+                if(!selectable) return true;
+                this.setSelected(true);
+                mainLayout.get_style_context().remove_class("hover");
+                selected();
+                return true;
+            });
 
-        add_events(Gdk.EventMask.ENTER_NOTIFY_MASK | Gdk.EventMask.LEAVE_NOTIFY_MASK | Gdk.EventMask.BUTTON_PRESS_MASK);
-        this.enter_notify_event.connect(() => {
-            if(!mainLayout.get_style_context().has_class("selected"))
-                mainLayout.get_style_context().add_class("hover");
-            return true;
-        });
-        this.leave_notify_event.connect(() => {
-            mainLayout.get_style_context().remove_class("hover");
-            return true;
-        });
-        this.button_press_event.connect(() => {
-            if(!selectable) return true;
-            this.setSelected(true);
-            mainLayout.get_style_context().remove_class("hover");
-            selected();
-            return true;
+            show_all();
         });
     }
 }

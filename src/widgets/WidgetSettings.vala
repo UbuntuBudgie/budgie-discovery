@@ -2,36 +2,128 @@ using Config;
 
 public class WidgetSettings: Gtk.Box {
     private Gtk.Box widgetListLayout;
+    private Gtk.Overlay overlay;
+    private WeatherItemDialog dialogLayer;
+    private SettingsService settings;
+    private Json.Array weatherLocations;
 
     public WidgetSettings() {
         set_orientation(Gtk.Orientation.VERTICAL);
         get_style_context().add_class("settings-page");
 
+        settings = SettingsService.getInstance();
+        overlay = new Gtk.Overlay();
+        pack_start(overlay, true, true, 0);
+
+        var contentBox = new Gtk.Box(Gtk.Orientation.VERTICAL, 0);
+        overlay.add(contentBox);
+
         var widgetListScrollable = new Gtk.ScrolledWindow (null, null);
         widgetListScrollable.get_style_context().add_class("feed-list");
         widgetListScrollable.get_style_context().add_class("mb-2");
-        widgetListScrollable.get_style_context().add_class("sidebar");
         widgetListScrollable.set_policy (Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC);
         widgetListScrollable.vexpand = true;
         widgetListScrollable.hexpand = true;
 
         widgetListLayout = new Gtk.Box (Gtk.Orientation.VERTICAL, 5);
         widgetListScrollable.add (widgetListLayout);
-        pack_start (widgetListScrollable, true);
+        contentBox.pack_start (widgetListScrollable, true);
 
-        // Load Settings
-        var settings = SettingsService.getInstance();
+        var plusButton = new Gtk.Button();
+        var plusImage = new Gtk.Image.from_icon_name("list-add-symbolic", Gtk.IconSize.BUTTON);
+        plusImage.pixel_size = 16;
+        plusButton.set_image(plusImage);
+        plusButton.set_label(_("Add"));
+        plusButton.set_halign (Gtk.Align.START);
+        plusButton.set_always_show_image(true);
+        plusButton.get_style_context().add_class("flat");
+        plusButton.clicked.connect(() => {
+            if (dialogLayer != null) {
+                dialogLayer.destroy();
+            }
+
+            dialogLayer = new WeatherItemDialog();
+            
+
+            dialogLayer.ok_button_pressed.connect((dialog) => {
+                var location = dialogLayer.getLocation();
+                if(location != null) {
+                    var layoutItem = new WeatherListItem();
+                    layoutItem.setData(location);
+                    layoutItem.setPrimaryText(location.name);
+                    layoutItem.setSecondaryText(location.getDescription());
+                    layoutItem.setSelectable(false);
+                    widgetListLayout.pack_start(layoutItem, false);
+                    widgetListLayout.show_all();
+
+                    // Save Settings
+                    var weatherNode = settings.get_value("weather");
+                    if(weatherNode == null) {
+                        weatherNode = new Json.Node(Json.NodeType.OBJECT);
+                        weatherNode.set_object(new Json.Object());
+                    }
+
+                    var locationNode = new Json.Object();
+                    locationNode.set_string_member("name", location.name);
+                    locationNode.set_string_member("country", location.country);
+                    locationNode.set_double_member("latitude", location.latitude);
+                    locationNode.set_double_member("longitude", location.longitude);
+                    locationNode.set_string_member("admin1", location.admin1);
+                    locationNode.set_string_member("admin2", location.admin2);
+                    locationNode.set_string_member("admin3", location.admin3);
+                    locationNode.set_string_member("admin4", location.admin4);
+
+                    weatherLocations.add_object_element(locationNode);
+                    weatherNode.get_object().set_array_member("locations", weatherLocations);
+                    settings.set_value("weather", weatherNode);
+
+                    loadLocations();
+                }
+                destroyDialog();
+            });
+
+            dialogLayer.cancel_button_pressed.connect(() => {
+                destroyDialog();
+            });
+
+            GLib.Idle.add(() => {
+                overlay.add_overlay(dialogLayer);
+                overlay.show_all();
+                return false;
+            });
+        });
+        contentBox.pack_start (plusButton, false);
+
+        this.map.connect(() => {
+            if (overlay.get_parent() == null)
+                pack_start(overlay, true, true, 0);
+            loadLocations();
+        });
+
+        this.unmap.connect(() => {
+            destroyDialog();
+        });
+    }
+
+    private void loadLocations() {
+        settings = SettingsService.getInstance();
         var weatherNode = settings.get_value("weather");
         if(weatherNode == null) {
             weatherNode = new Json.Node(Json.NodeType.OBJECT);
             weatherNode.set_object(new Json.Object());
         }
-        Json.Array weatherLocations = null;
+        
         if(!weatherNode.get_object().has_member("locations")) {
             weatherLocations = new Json.Array();
             weatherNode.get_object().set_array_member("locations", weatherLocations);
+        } else {
+            weatherLocations = weatherNode.get_object().get_array_member("locations");
         }
-        weatherLocations = weatherNode.get_object().get_array_member("locations");
+
+        widgetListLayout.forall((child) => {
+            widgetListLayout.remove(child);
+            child = null;
+        });
             
         weatherLocations.foreach_element((element, index) => {
             var record = element.get_object_element(index);
@@ -60,63 +152,24 @@ public class WidgetSettings: Gtk.Box {
             layoutItem1.setSecondaryText(location1.getDescription());
             layoutItem1.setSelectable(false);
             widgetListLayout.pack_start(layoutItem1, false);
-
-            widgetListLayout.show_all();
         });
+        widgetListLayout.show_all();
+    }
 
-        var plusButton = new Gtk.Button();
-        var plusImage = new Gtk.Image.from_icon_name("list-add-symbolic", Gtk.IconSize.BUTTON);
-        plusImage.pixel_size = 16;
-        plusButton.set_image(plusImage);
-        plusButton.set_label(_("Add"));
-        plusButton.set_halign (Gtk.Align.START);
-        plusButton.set_always_show_image(true);
-        plusButton.get_style_context().add_class("flat");
-        plusButton.clicked.connect(() => {
-            var dialog = new WeatherItemDialog(this);
-            dialog.set_transient_for(get_toplevel() as Gtk.Window);
-            dialog.set_modal(false); // NICHT blockierend
-            dialog.set_destroy_with_parent(true); // automatisch schließen, wenn Parent geschlossen wird
-            dialog.set_keep_above(true); // immer "über" dem Popover
-            dialog.show();
-            /*
-            int response = dialog.run();
-            if(response == Gtk.ResponseType.OK) {
-                var location = dialog.getLocation();
-                if(location != null) {
-                    var layoutItem = new WeatherListItem();
-                    layoutItem.setData(location);
-                    layoutItem.setPrimaryText(location.name);
-                    layoutItem.setSecondaryText(location.getDescription());
-                    layoutItem.setSelectable(false);
-                    widgetListLayout.pack_start(layoutItem, false);
-                    widgetListLayout.show_all();
-
-                    // Save Settings
-                    var locationNode = new Json.Object();
-                    locationNode.set_string_member("name", location.name);
-                    locationNode.set_string_member("country", location.country);
-                    locationNode.set_double_member("latitude", location.latitude);
-                    locationNode.set_double_member("longitude", location.longitude);
-                    locationNode.set_string_member("admin1", location.admin1);
-                    locationNode.set_string_member("admin2", location.admin2);
-                    locationNode.set_string_member("admin3", location.admin3);
-                    locationNode.set_string_member("admin4", location.admin4);
-
-                    weatherLocations.add_object_element(locationNode);
-                    settings.set_value("weather", weatherNode);
-                }
-            }
-            dialog.destroy();
-            */
-        });
-        pack_start (plusButton, false);
+    private void destroyDialog() {
+        if(dialogLayer != null) {
+            overlay.remove(dialogLayer);
+            dialogLayer.destroy();
+            dialogLayer = null;
+            overlay.queue_draw();
+        }
     }
 
     private class WeatherListItem: ListItem {
         private Gtk.Button deleteButton = new Gtk.Button();
 
         public WeatherListItem() {
+            base();
             deleteButton.set_size_request(16, 16);
             deleteButton.get_style_context().add_class("p-0");
             deleteButton.get_style_context().add_class("m-0");
@@ -138,13 +191,10 @@ public class WidgetSettings: Gtk.Box {
                     weatherNode = new Json.Node(Json.NodeType.OBJECT);
                     weatherNode.set_object(new Json.Object());
                 }
-                Json.Array weatherLocations = null;
-                if(!weatherNode.get_object().has_member("locations")) {
-                    weatherLocations = new Json.Array();
-                    weatherNode.get_object().set_array_member("locations", weatherLocations);
-                }
-                weatherLocations = weatherNode.get_object().get_array_member("locations");
-
+                
+                var weatherNodeObject = weatherNode.get_object();
+                var weatherLocations = weatherNodeObject.has_member("locations") ? weatherNodeObject.get_array_member("locations") : new Json.Array();
+                
                 weatherLocations.foreach_element((element, index) => {
                     var obj = element.get_object_element(index);
                     if(!obj.has_member("latitude") || !obj.has_member("longitude")) return;
@@ -152,6 +202,8 @@ public class WidgetSettings: Gtk.Box {
                         weatherLocations.remove_element(index);
                     }
                 });
+
+                weatherNode.get_object().set_array_member("locations", weatherLocations);
                 settings.set_value("weather", weatherNode);
                 get_parent().remove(this);
                 return true;
@@ -160,40 +212,32 @@ public class WidgetSettings: Gtk.Box {
         }
     }
 
-    private class WeatherItemDialog: Gtk.Window {
+    private class WeatherItemDialog: OverlayDialog {
+        private Gtk.ScrolledWindow scrollArea;
         private Gtk.Entry nameEntry;
-        private Gtk.Button okButton;
-        private Gee.ArrayList<LocationItem> locations;
-        private Gtk.Box locationLayout = new Gtk.Box(Gtk.Orientation.VERTICAL, 0);
+        private Gee.ArrayList<LocationItem> locations = new Gee.ArrayList<LocationItem>();
+        public Gtk.Box locationLayout = new Gtk.Box(Gtk.Orientation.VERTICAL, 0);
         private static string OPEN_METEO_SEARCH_URL = "https://geocoding-api.open-meteo.com/v1/search?name=%s&count=10&language=%s";
         private LocationItem selectedLocation;
+
+        public signal void configured();
 
         public LocationItem getLocation() {
             return selectedLocation;
         }
 
-        public WeatherItemDialog(WidgetSettings parent) {
-            Object(title: _("Add Location"));
+        public WeatherItemDialog() {
+            base();
+            setTitle(_("Add Location"));
 
-            get_style_context().add_class("settings-dialog");
-            load_style_sheet();
-            gravity = Gdk.Gravity.CENTER;
-            set_default_size (400, 280);
-            set_keep_above(true);
-            set_transient_for(get_toplevel() as Gtk.Window);
-
-            locations = new Gee.ArrayList<LocationItem>();
-
-            var layout = new Gtk.Box(Gtk.Orientation.VERTICAL, 10);
-            layout.set_margin_top (10);
-            layout.set_margin_bottom (10);
-            layout.set_margin_start (10);
-            layout.set_margin_end (10);
+            var layout = new Gtk.Box(Gtk.Orientation.VERTICAL, 0);
             layout.vexpand = true;
-            add(layout);
+            layout.hexpand = true;
+            getContentArea().pack_start(layout, true);
 
             var nameLabel = new Gtk.Label("%s:".printf(_("Location")));
             nameLabel.set_halign (Gtk.Align.START);
+            nameLabel.margin_bottom = 5;
             layout.pack_start(nameLabel, false);
 
             nameEntry = new Gtk.Entry();
@@ -201,9 +245,10 @@ public class WidgetSettings: Gtk.Box {
             var searchBox = new Gtk.Box(Gtk.Orientation.HORIZONTAL, 0);
             searchBox.pack_start(nameEntry, true, true);
             searchBox.pack_start(searchButton, false);
+            searchBox.margin_bottom = 10;
             layout.pack_start(searchBox, false, true);
 
-            var scrollArea = new Gtk.ScrolledWindow(null, null);
+            scrollArea = new Gtk.ScrolledWindow(null, null);
             scrollArea.overlay_scrolling = false;
             scrollArea.border_width = 0;
             scrollArea.set_policy (Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC);
@@ -211,6 +256,8 @@ public class WidgetSettings: Gtk.Box {
             scrollArea.hexpand = true;
             scrollArea.get_style_context().add_class("feed-list");
             scrollArea.add(locationLayout);
+            scrollArea.set_no_show_all(true);
+            scrollArea.set_size_request(-1, 200);
             layout.pack_start(scrollArea, true);
 
             var nameErrorLabel = new Gtk.Label("Please enter a location name");
@@ -220,32 +267,7 @@ public class WidgetSettings: Gtk.Box {
             nameErrorLabel.hide();
             layout.pack_start(nameErrorLabel, false);
 
-            var buttonBox = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 6);
-            layout.pack_end (buttonBox, false, false, 0);
-
-            okButton = new Gtk.Button.with_label (_("OK"));
-            okButton.set_can_default (true);
-            okButton.grab_default ();
             okButton.set_sensitive(false);
-            buttonBox.pack_end (okButton, false, false, 0);
-
-            var cancelButton = new Gtk.Button.with_label(_("Cancel"));
-            buttonBox.pack_end (cancelButton, false, false, 0);
-
-            cancelButton.clicked.connect(() => {
-                //response(Gtk.ResponseType.CANCEL);
-            });
-
-            okButton.clicked.connect((e) => {
-                //response(Gtk.ResponseType.OK);
-            });
-
-            map.connect(() => {
-                locations.clear();
-                locationLayout.foreach((child) => {
-                    locationLayout.remove(child);
-                });
-            });
 
             searchButton.clicked.connect(() => {
                 Idle.add(() => {
@@ -256,12 +278,22 @@ public class WidgetSettings: Gtk.Box {
                     return false;
                 });
             });
+
+            map.connect(() => {
+                locations.clear();
+                locationLayout.foreach((child) => {
+                    locationLayout.remove(child);
+                });
+            });
+
             layout.show_all();
+            scrollArea.hide();
         }
 
         private void searchLocation() {
             selectedLocation = null;
             okButton.set_sensitive(false);
+            scrollArea.hide();
 
             string searchText = nameEntry.get_text().chomp();
             if (searchText.length == 0) return;
@@ -348,27 +380,14 @@ public class WidgetSettings: Gtk.Box {
                             locationLayout.pack_start(divider, false);
                         }
                     });
-
-                    show_all();
+                    if(results.get_length() > 0) {
+                        locationLayout.show_all();
+                        scrollArea.show();
+                    }
                 }
 
             } catch (Error e) {
                 warning("Fehler beim Abrufen der Daten: %s", e.message);
-            }
-        }
-
-        private void load_style_sheet() {
-            var css = new Gtk.CssProvider();
-            try {
-                string css_path = PLUGIN_DIR + "/style.css";
-                css.load_from_path(css_path);
-                Gtk.StyleContext.add_provider_for_screen(
-                    Gdk.Screen.get_default(),
-                    css,
-                    Gtk.STYLE_PROVIDER_PRIORITY_USER
-                );
-            } catch (Error e) {
-                warning("Konnte CSS nicht laden: %s", e.message);
             }
         }
     }

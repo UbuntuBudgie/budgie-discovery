@@ -2,23 +2,30 @@ using Config;
 
 public class FeedSettings: Gtk.Box {
     private static Gtk.Box feedLayout;
+    private FeedItemDialog dialogLayer;
+    private Gtk.Overlay overlay;
     
     public FeedSettings() {
         Object();
         set_orientation(Gtk.Orientation.VERTICAL);
         get_style_context().add_class("settings-page");
 
+        overlay = new Gtk.Overlay();
+        pack_start(overlay, true, true, 0);
+
+        var contentBox = new Gtk.Box(Gtk.Orientation.VERTICAL, 0);
+        overlay.add(contentBox);
+
         var feedScroll = new Gtk.ScrolledWindow (null, null);
         feedScroll.get_style_context().add_class("feed-list");
         feedScroll.get_style_context().add_class("mb-2");
-        feedScroll.get_style_context().add_class("bg-white");
         feedScroll.set_policy (Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC);
         feedScroll.vexpand = true;
         feedScroll.hexpand = true;
 
         feedLayout = new Gtk.Box (Gtk.Orientation.VERTICAL, 5);
         feedScroll.add (feedLayout);
-        pack_start (feedScroll, true);
+        contentBox.pack_start (feedScroll, true);
 
         var plusButton = new Gtk.Button();
         var plusImage = new Gtk.Image.from_icon_name("list-add-symbolic", Gtk.IconSize.BUTTON);
@@ -27,13 +34,17 @@ public class FeedSettings: Gtk.Box {
         plusButton.set_label(_("Add"));
         plusButton.set_halign (Gtk.Align.START);
         plusButton.set_always_show_image(true);
-        plusButton.get_style_context().add_class("border-1");
+        plusButton.get_style_context().add_class("flat");
         plusButton.clicked.connect(() => {
-            var dialog = new FeedItemDialog();
-            int response = dialog.run();
-            if(response == Gtk.ResponseType.OK) {
-                var feedName = dialog.get_feed_name();
-                var feedUri = dialog.get_feed_uri();
+            if (dialogLayer != null) {
+                dialogLayer.destroy();
+            }
+
+            dialogLayer = new FeedItemDialog(this);
+
+            dialogLayer.configured.connect((dialog) => {
+                var feedName = dialogLayer.get_feed_name();
+                var feedUri = dialogLayer.get_feed_uri();
                 if(feedName.length > 0 && feedUri.length > 0) {
                     var feedNodeObject = new Json.Object();
                     feedNodeObject.set_string_member ("name", feedName);
@@ -57,11 +68,37 @@ public class FeedSettings: Gtk.Box {
                     feedLayout.pack_start (feedRow, false);
                     feedLayout.show_all ();
                 }
-            }
-            dialog.destroy();
-        });
-        pack_start (plusButton, false);
+                destroyDialog();
+            });
 
+            dialogLayer.cancel_button_pressed.connect(() => {
+                destroyDialog();
+            });
+
+            GLib.Idle.add(() => {
+                overlay.add_overlay(dialogLayer);
+                overlay.show_all();
+                return false;
+            });
+        });
+        contentBox.pack_start (plusButton, false);
+
+        map.connect(() => {
+            loadFeeds();
+        });
+        load_style_sheet();
+    }
+
+    private void destroyDialog() {
+        if(dialogLayer != null) {
+            overlay.remove(dialogLayer);
+            dialogLayer.destroy();
+            dialogLayer = null;
+            overlay.queue_draw();
+        }
+    }
+
+    private void loadFeeds() {
         var settings = SettingsService.getInstance();
         var feeds = settings.get_value("feeds");
         if(feeds == null) {
@@ -70,12 +107,17 @@ public class FeedSettings: Gtk.Box {
             feeds.set_array(feedArray);
         }
 
+        feedLayout.foreach((child) => {
+            feedLayout.remove(child);
+            child.destroy();
+            child = null;
+        });
+
         for(int i = 0; i < feeds.get_array().get_length (); i++) {
             var feed = feeds.get_array().get_object_element (i);
             var feedRow = new FeedRow(feed.get_string_member("uid"), feed.get_string_member ("uri"), feed.get_string_member ("name"));
             feedLayout.pack_start (feedRow, false);
         }
-        load_style_sheet();
     }
 
     private class FeedRow: ListItem {
@@ -100,7 +142,7 @@ public class FeedSettings: Gtk.Box {
             deleteButton.set_size_request(16, 16);
             deleteButton.get_style_context().add_class("p-0");
             deleteButton.get_style_context().add_class("m-0");
-            deleteButton.get_style_context().add_class("no-border");
+            deleteButton.get_style_context().add_class("flat");
             deleteButton.get_style_context().add_class("no-background");
 
             var deleteImage = new Gtk.Image();
@@ -135,30 +177,24 @@ public class FeedSettings: Gtk.Box {
         }
     }
 
-    private class FeedItemDialog: Gtk.Dialog {
+    private class FeedItemDialog: OverlayDialog {
         private Gtk.Entry nameEntry;
         private Gtk.Entry uriEntry;
 
-        public FeedItemDialog() {
-            Object();
-            get_style_context().add_class("settings-dialog");
-            load_style_sheet();
-            set_type_hint(Gdk.WindowTypeHint.DIALOG);
-            gravity = Gdk.Gravity.CENTER;
-            set_default_size (400, 200);
-            set_title(_("Add Feed"));
+        public signal void configured();
 
-            var contentArea = get_content_area();
-            var layout = new Gtk.Box(Gtk.Orientation.VERTICAL, 10);
-            layout.set_margin_top (10);
-            layout.set_margin_bottom (10);
-            layout.set_margin_start (10);
-            layout.set_margin_end (10);
+        public FeedItemDialog(FeedSettings parent) {
+            base();
+            setTitle(_("Add Feed"));
+
+            var layout = new Gtk.Box(Gtk.Orientation.VERTICAL, 0);
             layout.vexpand = true;
-            contentArea.add(layout);
+            layout.hexpand = true;
+            getContentArea().pack_start(layout, true);
 
             var nameLabel = new Gtk.Label("Name:");
             nameLabel.set_halign (Gtk.Align.START);
+            nameLabel.margin_bottom = 5;
             layout.pack_start(nameLabel, false);
 
             nameEntry = new Gtk.Entry();
@@ -166,12 +202,17 @@ public class FeedSettings: Gtk.Box {
 
             var nameErrorLabel = new Gtk.Label("Please enter a name");
             nameErrorLabel.get_style_context ().add_class ("text-danger");
+            nameErrorLabel.get_style_context ().add_class ("text-size-small");
             nameErrorLabel.set_halign (Gtk.Align.START);
+            nameErrorLabel.margin_top = 5;
+            nameErrorLabel.set_no_show_all(true);
             nameErrorLabel.hide();
             layout.pack_start(nameErrorLabel, false);
 
             var uriLabel = new Gtk.Label("URI:");
             uriLabel.set_halign (Gtk.Align.START);
+            uriLabel.margin_top = 15;
+            uriLabel.margin_bottom = 5;
             layout.pack_start(uriLabel, false);
 
             uriEntry = new Gtk.Entry();
@@ -179,54 +220,37 @@ public class FeedSettings: Gtk.Box {
 
             var uriErrorLabel = new Gtk.Label("Please enter a valid uri (http:// or https://)");
             uriErrorLabel.get_style_context ().add_class ("text-danger");
+            uriErrorLabel.get_style_context ().add_class ("text-size-small");
             uriErrorLabel.set_halign (Gtk.Align.START);
+            uriErrorLabel.margin_top = 5;
+            uriErrorLabel.set_no_show_all(true);
             uriErrorLabel.hide();
             layout.pack_start(uriErrorLabel, false);
 
-            var dummy = new Gtk.Box(Gtk.Orientation.VERTICAL, 0);
-            layout.pack_start(dummy, true, true);
-
-            var buttonBox = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 6);
-            layout.pack_end (buttonBox, false, false, 0);
-
-            var okButton = new Gtk.Button.with_label (_("OK"));
-            okButton.set_can_default (true);
-            okButton.grab_default ();
-            buttonBox.pack_end (okButton, false, false, 0);
-
-            var cancelButton = new Gtk.Button.with_label(_("Cancel"));
-            buttonBox.pack_end (cancelButton, false, false, 0);
-
-            cancelButton.clicked.connect(() => {
-                response(Gtk.ResponseType.CANCEL);
-            });
-
-            okButton.clicked.connect((e) => {
+            ok_button_pressed.connect((e) => {
                 nameErrorLabel.set_visible(false);
                 uriErrorLabel.set_visible(false);
-                layout.queue_resize();
+                queue_resize();
 
                 var name = nameEntry.get_text().chomp();
                 var uri = uriEntry.get_text();
 
                 if(name.length == 0) {
                     nameErrorLabel.set_visible(true);
-                    layout.queue_resize();
+                    queue_resize();
                     return;
                 }
 
                 if(!isValidUrl(uri)) {
                     uriErrorLabel.set_visible(true);
-                    layout.queue_resize();
+                    queue_resize();
                     return;
                 }
 
-                // TODO request HEAD for content type negotiation
-
-                response(Gtk.ResponseType.OK);
+                configured();
             });
 
-            show_all();
+            layout.show_all();
             nameErrorLabel.hide();
             uriErrorLabel.hide();
         }
@@ -237,21 +261,6 @@ public class FeedSettings: Gtk.Box {
 
         public string get_feed_uri() {
             return uriEntry.get_text();
-        }
-
-        private void load_style_sheet() {
-            var css = new Gtk.CssProvider();
-            try {
-                string css_path = PLUGIN_DIR + "/style.css";
-                css.load_from_path(css_path);
-                Gtk.StyleContext.add_provider_for_screen(
-                    Gdk.Screen.get_default(),
-                    css,
-                    Gtk.STYLE_PROVIDER_PRIORITY_USER
-                );
-            } catch (Error e) {
-                warning("Konnte CSS nicht laden: %s", e.message);
-            }
         }
 
         public static bool isValidUrl(string url) {

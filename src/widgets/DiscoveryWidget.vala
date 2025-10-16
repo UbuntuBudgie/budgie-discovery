@@ -29,6 +29,7 @@ public class DiscoveryWidget: Gtk.Box {
 
         reloadButton = new Gtk.Button.from_icon_name("view-refresh-symbolic", Gtk.IconSize.SMALL_TOOLBAR);
         reloadButton.set_sensitive(false);
+        //reloadButton.get_style_context().add_class("flat");
         greetingWidget.addButton(reloadButton);
 
         notebook = new Gtk.Notebook();
