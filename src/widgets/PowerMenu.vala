@@ -138,6 +138,7 @@ public class PowerMenu : Gtk.Menu {
 
         var label = new Gtk.Label(text);
         label.halign = Gtk.Align.START;
+        label.valign = Gtk.Align.CENTER;
 
         var item = new Gtk.MenuItem();
         item.set_use_underline (false);
