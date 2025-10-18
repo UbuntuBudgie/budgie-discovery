@@ -504,6 +504,6 @@ button.active {
     box-shadow: 0 0 8px rgba(0, 0, 0, .5);
 }
 
-menu menuitem box {
+.discovery-popup menu menuitem box {
     margin-left: -24px;
 }
