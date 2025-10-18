@@ -161,14 +161,10 @@ public class FeedSettings: Gtk.Box {
                     feeds.set_array(feedArray);
                 }
 
-                int index = 0;
-                feeds.get_array().foreach_element((feed) => {
-                    var objectNode = feed.get_object_element(index);
-                    if(objectNode.get_string_member("uid") == uid) {
-                        feeds.get_array().remove_element(index);
-                    }
-                    index++;
-                });
+                int index = get_parent().get_children().index(this);
+                if(index >= 0)
+                    feeds.get_array().remove_element(index);
+                
                 settings.set_value("feeds", feeds);
                 get_parent().remove(this);
                 return true;
