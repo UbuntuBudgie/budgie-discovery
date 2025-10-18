@@ -194,14 +194,10 @@ public class WidgetSettings: Gtk.Box {
                 
                 var weatherNodeObject = weatherNode.get_object();
                 var weatherLocations = weatherNodeObject.has_member("locations") ? weatherNodeObject.get_array_member("locations") : new Json.Array();
-                
-                weatherLocations.foreach_element((element, index) => {
-                    var obj = element.get_object_element(index);
-                    if(!obj.has_member("latitude") || !obj.has_member("longitude")) return;
-                    if(obj.get_double_member("latitude") == data.latitude && obj.get_double_member("longitude") == data.longitude) {
-                        weatherLocations.remove_element(index);
-                    }
-                });
+                var index = get_parent().get_children().index(this);
+                if(index >= 0) {
+                    weatherLocations.remove_element(index);
+                }
 
                 weatherNode.get_object().set_array_member("locations", weatherLocations);
                 settings.set_value("weather", weatherNode);
