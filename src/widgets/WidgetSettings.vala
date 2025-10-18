@@ -184,7 +184,6 @@ public class WidgetSettings: Gtk.Box {
             deleteButton.set_image(deleteImage);
 
             deleteButton.button_press_event.connect(() => {
-                var data = (LocationItem) getData();
                 var settings = SettingsService.getInstance();
                 var weatherNode = settings.get_value("weather");
                 if(weatherNode == null) {
