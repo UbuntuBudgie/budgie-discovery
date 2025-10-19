@@ -109,7 +109,9 @@ public class FeedSettings: Gtk.Box {
 
         feedLayout.foreach((child) => {
             feedLayout.remove(child);
-            child.destroy();
+            if(child is Gtk.Widget) {
+                child.destroy();
+            }
             child = null;
         });
 
