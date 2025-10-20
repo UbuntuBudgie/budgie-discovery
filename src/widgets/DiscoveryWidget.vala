@@ -9,6 +9,7 @@ public class DiscoveryWidget: Gtk.Box {
     private Budgie.Popover popup;
     private Gtk.Notebook notebook;
     private SettingsService settingsService;
+    private Gtk.ScrolledWindow widgetScrollView;
     private Gtk.Button reloadButton;
     private Gtk.Label messageLabel = new Gtk.Label(_("There are no feeds configured"));
 
@@ -25,7 +26,14 @@ public class DiscoveryWidget: Gtk.Box {
         pack_start(mainLayout, true);
 
         mainLayout.hexpand = false;
-        mainLayout.pack_start(widgetLayout, true, true);
+
+        widgetScrollView = new Gtk.ScrolledWindow(null, null);
+        widgetScrollView.overlay_scrolling = false;
+        widgetScrollView.vexpand = true;
+        widgetScrollView.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC);
+        widgetScrollView.get_style_context().add_class("feed-list");
+        widgetScrollView.add(widgetLayout);
+        mainLayout.pack_start(widgetScrollView, true, true);
 
         reloadButton = new Gtk.Button.from_icon_name("view-refresh-symbolic", Gtk.IconSize.SMALL_TOOLBAR);
         reloadButton.set_sensitive(false);
@@ -179,7 +187,7 @@ public class DiscoveryWidget: Gtk.Box {
         if(mainLayoutWidth <= 1) return;
 
         int columnWidth = (mainLayoutWidth / 3) - 15;
-        widgetLayout.set_size_request(columnWidth, -1);
+        widgetScrollView.set_size_request(columnWidth, -1);
         
         int index = 0;
         widgetLayout.get_children().foreach(child => {

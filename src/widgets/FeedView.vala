@@ -14,7 +14,7 @@ public class FeedView: Gtk.ScrolledWindow {
         get_style_context().add_class("news-feed-layout");
         get_style_context().add_class("feed-list");
         overlay_scrolling = false;
-        set_policy (Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC);
+        set_policy (Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC);
 
         feedLayout.hexpand = true;
         add(feedLayout);
