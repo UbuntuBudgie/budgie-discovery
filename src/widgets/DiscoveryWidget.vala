@@ -196,7 +196,7 @@ public class DiscoveryWidget: Gtk.Box {
                 return;
             }
 
-            child.set_size_request(columnWidth, columnWidth);
+            child.set_size_request(columnWidth, columnWidth-7);
         });
 
         int secondWidth = ((mainLayoutWidth / 3) - 5) * 2;
