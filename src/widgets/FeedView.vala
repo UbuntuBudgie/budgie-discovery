@@ -12,8 +12,6 @@ public class FeedView: Gtk.ScrolledWindow {
         vexpand = true;
         margin_top = 10;
         overlay_scrolling = false;
-        get_style_context().add_class("news-feed-layout");
-        get_style_context().add_class("feed-list");
         set_policy (Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC);
 
         feedLayout.hexpand = true;
@@ -29,6 +27,9 @@ public class FeedView: Gtk.ScrolledWindow {
         map.connect(() => {
             hadjustment.value = 0;
             vadjustment.value = 0;
+            get_style_context().add_class("news-feed-layout");
+            get_style_context().add_class("feed-list");
+
             Idle.add(() => {
                 feedService.stop_service ();
                 feedService.start_service ();

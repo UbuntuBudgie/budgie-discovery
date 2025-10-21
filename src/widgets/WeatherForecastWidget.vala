@@ -8,7 +8,6 @@ public class WeatherForecastWidget: Card {
 
     public WeatherForecastWidget(WeatherForecastItem item) {
         base();
-        get_style_context().add_class("weather-forecast-widget");
         set_spacing (1);
 
         pack_start(dateLabel, false);
@@ -37,6 +36,7 @@ public class WeatherForecastWidget: Card {
         var iconPath = ICONS_DIR + "/weather/" + iconColor + "/svg/" + item.weatherIconDay + ".svg";
 
         map.connect(() => {
+            get_style_context().add_class("weather-forecast-widget");
             try {
                 var iconFile = File.new_for_path(iconPath);
                 var pixbuf = new Gdk.Pixbuf.from_stream(iconFile.read()).scale_simple(22, 22, Gdk.InterpType.HYPER);

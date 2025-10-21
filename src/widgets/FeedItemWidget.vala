@@ -12,10 +12,6 @@ public class FeedItemWidget: Card {
         
         var eventBox = new Gtk.EventBox ();
         eventBox.set_visible_window(true);
-        eventBox.add_events(Gdk.EventMask.POINTER_MOTION_MASK |
-                Gdk.EventMask.ENTER_NOTIFY_MASK |
-                Gdk.EventMask.LEAVE_NOTIFY_MASK);
-
         eventBox.add (cardBody);
         pack_start(eventBox, false, false,0);
 
@@ -76,6 +72,9 @@ public class FeedItemWidget: Card {
         });
 
         map.connect(() => {
+            eventBox.add_events(Gdk.EventMask.POINTER_MOTION_MASK |
+                Gdk.EventMask.ENTER_NOTIFY_MASK |
+                Gdk.EventMask.LEAVE_NOTIFY_MASK);
             image.loadFeedSource(feedItem.link);
         });
     }

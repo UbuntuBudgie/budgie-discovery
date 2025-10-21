@@ -86,9 +86,9 @@ public class FeedSettings: Gtk.Box {
         contentBox.pack_start (plusButton, false);
 
         map.connect(() => {
+            get_style_context().add_class("settings-page");
             loadFeeds();
         });
-        load_style_sheet();
     }
 
     private void destroyDialog() {
@@ -281,21 +281,6 @@ public class FeedSettings: Gtk.Box {
                 // Uri Konstruktor wirft, wenn ungültig
                 return false;
             }
-        }
-    }
-
-    private void load_style_sheet() {
-        var css = new Gtk.CssProvider();
-        try {
-            string css_path = PLUGIN_DIR + "/style.css";
-            css.load_from_path(css_path);
-            Gtk.StyleContext.add_provider_for_screen(
-                Gdk.Screen.get_default(),
-                css,
-                Gtk.STYLE_PROVIDER_PRIORITY_USER
-            );
-        } catch (Error e) {
-            warning("Konnte CSS nicht laden: %s", e.message);
         }
     }
 }

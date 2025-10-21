@@ -8,26 +8,10 @@ public class WeatherWidget: Card {
     private Gtk.Label lastUpdatedLabel = new Gtk.Label("");
     private ArrayList <WeatherForecastItem> forecastItems = new ArrayList<WeatherForecastItem>();
     private WeatherService weatherService;
+    private static Json.Object weatherCodes;
 
     public WeatherWidget(LocationItem location) {
         base();
-        //get_style_context ().add_class ("no-border");
-        get_style_context ().add_class ("weather-widget");
-        get_style_context ().add_class ("weather-widget-night");
-
-        string weatherCodesFile = RESOURCES_DIR + "/weather-codes.json";
-        Json.Parser parser = new Json.Parser();
-
-        try {
-            parser.load_from_file(weatherCodesFile);
-        } catch(Error e) {
-            warning("Failed to load weather codes from %s: %s\n", weatherCodesFile, e.message);
-        }   
-        
-        var weatherCodesJson = parser.get_root();
-        if (weatherCodesJson == null) {
-            warning("Failed to load weather codes from %s\n", weatherCodesFile);
-        }
 
         var locationLabel = new Gtk.Label(location.name);
         locationLabel.set_halign (Gtk.Align.START);
@@ -77,11 +61,9 @@ public class WeatherWidget: Card {
         lastUpdatedLabel.set_valign (Gtk.Align.END);
         pack_end (lastUpdatedLabel,false);
 
-        var weatherCodes = weatherCodesJson.get_object();
-
         weatherService = new WeatherService(location);
-
         weatherService.weatherUpdated.connect((weather) => {
+
             forecastItems.clear();
             forecastBox.get_children().foreach((child) => {
                 forecastBox.remove(child);
@@ -93,7 +75,7 @@ public class WeatherWidget: Card {
             bool isDay = current.get_member("is_day").get_int() == 1;
 
             currentTemperatureLabel.set_text(currentTemperature.to_string() + "°");
-            var weatherCodeEntry = weatherCodesJson.get_object().get_member(currentWeatherCode);
+            var weatherCodeEntry = weatherCodes.get_member(currentWeatherCode);
             if (weatherCodeEntry != null) {
                 var weatherCodeObject = weatherCodeEntry.get_object();
                 var dayObject = weatherCodeObject.get_member("day").get_object();
@@ -192,7 +174,26 @@ public class WeatherWidget: Card {
         });
 
         map.connect(() => {
+            get_style_context ().add_class ("weather-widget");
+            get_style_context ().add_class ("weather-widget-night");
             Idle.add(() => {
+                if(weatherCodes == null) {
+                    string weatherCodesFile = RESOURCES_DIR + "/weather-codes.json";
+                    Json.Parser parser = new Json.Parser();
+
+                    try {
+                        parser.load_from_file(weatherCodesFile);
+                    } catch(Error e) {
+                        warning("Failed to load weather codes from %s: %s\n", weatherCodesFile, e.message);
+                    }   
+                    
+                    var weatherCodesJson = parser.get_root();
+                    if (weatherCodesJson == null) {
+                        warning("Failed to load weather codes from %s\n", weatherCodesFile);
+                    }
+                    weatherCodes = weatherCodesJson.get_object();
+                }
+
                 weatherService.stop_service ();
                 weatherService.start_service ();
                 return false;

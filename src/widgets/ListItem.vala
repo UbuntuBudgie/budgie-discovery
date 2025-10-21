@@ -49,11 +49,11 @@ public class ListItem: Gtk.EventBox {
 
     public ListItem() {
         Object();
-
-        add_events(Gdk.EventMask.ENTER_NOTIFY_MASK | Gdk.EventMask.LEAVE_NOTIFY_MASK | Gdk.EventMask.BUTTON_PRESS_MASK);
         add(mainLayout);
 
         this.realize.connect(() => {
+            add_events(Gdk.EventMask.ENTER_NOTIFY_MASK | Gdk.EventMask.LEAVE_NOTIFY_MASK | Gdk.EventMask.BUTTON_PRESS_MASK);
+            
             mainLayout.get_style_context().add_class("list-item");
             mainLayout.get_style_context().add_class("pt-2");
             mainLayout.get_style_context().add_class("pb-2");

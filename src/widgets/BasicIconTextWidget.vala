@@ -6,9 +6,6 @@ public class BasicIconTextWidget: Gtk.EventBox {
 
     public BasicIconTextWidget() {
         Object();
-        add_events(Gdk.EventMask.POINTER_MOTION_MASK |
-                Gdk.EventMask.ENTER_NOTIFY_MASK |
-                Gdk.EventMask.LEAVE_NOTIFY_MASK);
 
         var layout = new Gtk.Box(Gtk.Orientation.VERTICAL, 5);
         layout.get_style_context().add_class("application-item");
@@ -30,6 +27,12 @@ public class BasicIconTextWidget: Gtk.EventBox {
         layout.pack_start(icon, false, false, 0);
         layout.pack_start(label, true, true, 0);
         add(layout);
+
+        realize.connect(() => {
+            add_events(Gdk.EventMask.POINTER_MOTION_MASK |
+                Gdk.EventMask.ENTER_NOTIFY_MASK |
+                Gdk.EventMask.LEAVE_NOTIFY_MASK);
+        });
 
         this.enter_notify_event.connect((event) => {
             //layout.get_style_context().add_class("hover");

@@ -13,7 +13,9 @@ public class FeedItemImageWidget : Gtk.DrawingArea {
 
     public FeedItemImageWidget () {
         Object();
-        get_style_context ().add_class ("card-image");
+        map.connect(() => {
+            get_style_context ().add_class ("card-image");
+        });
     }
 
     public void loadFeedSource(string? url) {

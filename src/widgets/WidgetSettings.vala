@@ -8,8 +8,7 @@ public class WidgetSettings: Gtk.Box {
     private Json.Array weatherLocations;
 
     public WidgetSettings() {
-        set_orientation(Gtk.Orientation.VERTICAL);
-        get_style_context().add_class("settings-page");
+        Object(orientation: Gtk.Orientation.VERTICAL, spacing: 0);
 
         settings = SettingsService.getInstance();
         overlay = new Gtk.Overlay();
@@ -96,6 +95,7 @@ public class WidgetSettings: Gtk.Box {
         contentBox.pack_start (plusButton, false);
 
         this.map.connect(() => {
+            get_style_context().add_class("settings-page");
             if (overlay.get_parent() == null)
                 pack_start(overlay, true, true, 0);
             loadLocations();
