@@ -25,11 +25,6 @@ public class FeedView: Gtk.ScrolledWindow {
 
         feedService = new FeedService(c);
         feedService.feedFetched.connect(onFeedFetched);
-
-        Idle.add(() => {
-            feedService.start_service ();
-            return false;
-        });
         
         map.connect(() => {
             hadjustment.value = 0;
@@ -78,20 +73,22 @@ public class FeedView: Gtk.ScrolledWindow {
     }
 
     private void onFeedFetched(ArrayList<FeedItem>? items) {
-        feedLayout.foreach ((element) => {
-            feedLayout.remove(element);
-            element.destroy();
-            element = null;
-        });
-
-        foreach(var feedItem in items) {
-            var card = new FeedItemWidget(feedItem);
-            feedLayout.add(card);
-            card.clicked.connect(() => {
-                popover.hide();
+        GLib.MainContext.@default().invoke(() => {
+            feedLayout.foreach ((element) => {
+                feedLayout.remove(element);
+                element = null;
             });
-        }
 
-        feedLayout.show_all();
+            foreach(var feedItem in items) {
+                var card = new FeedItemWidget(feedItem);
+                feedLayout.add(card);
+                card.clicked.connect(() => {
+                    popover.hide();
+                });
+            }
+
+            feedLayout.show_all();
+            return false;
+        });
     }
 }

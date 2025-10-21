@@ -79,17 +79,20 @@ public class ListItem: Gtk.EventBox {
 
             this.enter_notify_event.connect(() => {
                 if(!mainLayout.get_style_context().has_class("selected"))
-                    mainLayout.get_style_context().add_class("hover");
+                    set_state_flags(Gtk.StateFlags.PRELIGHT, false);
+                    //mainLayout.get_style_context().add_class("hover");
                 return true;
             });
             this.leave_notify_event.connect(() => {
-                mainLayout.get_style_context().remove_class("hover");
+                //mainLayout.get_style_context().remove_class("hover");
+                unset_state_flags(Gtk.StateFlags.PRELIGHT);
                 return true;
             });
             this.button_press_event.connect(() => {
                 if(!selectable) return true;
                 this.setSelected(true);
-                mainLayout.get_style_context().remove_class("hover");
+                unset_state_flags(Gtk.StateFlags.PRELIGHT);
+                //mainLayout.get_style_context().remove_class("hover");
                 selected();
                 return true;
             });

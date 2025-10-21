@@ -20,6 +20,7 @@ public class WidgetSettings: Gtk.Box {
 
         var widgetListScrollable = new Gtk.ScrolledWindow (null, null);
         widgetListScrollable.get_style_context().add_class("feed-list");
+        widgetListScrollable.get_style_context().add_class("frame");
         widgetListScrollable.get_style_context().add_class("mb-2");
         widgetListScrollable.set_policy (Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC);
         widgetListScrollable.vexpand = true;
@@ -108,7 +109,7 @@ public class WidgetSettings: Gtk.Box {
     private void loadLocations() {
         settings = SettingsService.getInstance();
         var weatherNode = settings.get_value("weather");
-        if(weatherNode == null) {
+        if (weatherNode == null || weatherNode.get_node_type() != Json.NodeType.OBJECT) {
             weatherNode = new Json.Node(Json.NodeType.OBJECT);
             weatherNode.set_object(new Json.Object());
         }

@@ -40,6 +40,7 @@ public class ApplicationsWidget: Gtk.Box {
 
         appsLayout = new Gtk.Grid ();
         appsLayout.get_style_context().add_class("card");
+        appsLayout.get_style_context().add_class("frame");
         appsLayout.get_style_context().add_class("p-3");
         appsLayout.set_row_spacing(10);
         appsLayout.set_column_spacing(10);

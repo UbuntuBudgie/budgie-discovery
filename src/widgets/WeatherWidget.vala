@@ -192,11 +192,6 @@ public class WeatherWidget: Card {
             lastUpdatedLabel.set_label (_("updated at").concat(": %s").printf(currentDate));
         });
 
-        Idle.add(() => {
-            weatherService.start_service ();
-            return false;
-        });
-
         map.connect(() => {
             Idle.add(() => {
                 weatherService.stop_service ();

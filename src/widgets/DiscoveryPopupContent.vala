@@ -51,7 +51,8 @@ public class DiscoveryPopupContent: Gtk.Box {
         var buttonBox = new Gtk.Box(Gtk.Orientation.HORIZONTAL, 5);
         var menuButton = new Gtk.MenuButton();
         menuButton.set_image(new Gtk.Image.from_icon_name("system-shutdown-symbolic", Gtk.IconSize.SMALL_TOOLBAR));
-        //menuButton.get_style_context().add_class("flat");
+        menuButton.get_style_context().add_class("no-border");
+        menuButton.get_style_context().add_class("no-shadow");
         menuButton.valign = Gtk.Align.END;
         
         buttonBox.pack_start(menuButton, false);
@@ -66,7 +67,6 @@ public class DiscoveryPopupContent: Gtk.Box {
     ~DiscoveryPopupContent() {
         stackView.foreach(child => {
             stackView.remove(child);
-            child.destroy();
             child = null;
         });
     }
@@ -92,7 +92,8 @@ public class DiscoveryPopupContent: Gtk.Box {
 
         var icon = new Gtk.Image.from_icon_name(iconName, Gtk.IconSize.SMALL_TOOLBAR);
         tabButton.set_image(icon);
-        //tabButton.get_style_context().add_class("flat");
+        tabButton.get_style_context().add_class("no-border");
+        tabButton.get_style_context().add_class("no-shadow");
         navigationBox.pack_start(tabButton, false, false, 0);
     }
 

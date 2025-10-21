@@ -45,7 +45,7 @@ public class BookmarksWidget: Gtk.Box {
         pageLayout.pack_start(applicationsLabel, false, false, 0);
 
         appsLayout.get_style_context().add_class("card");
-        // appsLayout.get_style_context().add_class("sidebar");
+        appsLayout.get_style_context().add_class("frame");
         appsLayout.get_style_context().add_class("p-3");
         appsLayout.get_style_context().add_class("mb-5");
         appsLayout.set_row_spacing(10);
@@ -61,7 +61,7 @@ public class BookmarksWidget: Gtk.Box {
         pageLayout.pack_start(locationsLabel, false, false, 0);
 
         bookmarksLayout.get_style_context().add_class("card");
-        //bookmarksLayout.get_style_context().add_class("sidebar");
+        bookmarksLayout.get_style_context().add_class("frame");
         bookmarksLayout.get_style_context().add_class("p-3");
         bookmarksLayout.set_row_spacing(10);
         bookmarksLayout.set_column_spacing(10);

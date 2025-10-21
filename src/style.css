@@ -1,12 +1,13 @@
 .discovery-popup {
-    background-color: rgba(250, 250, 250, .975);
+    /*background-color: rgba(250, 250, 250, .975);*/
+    border: 0 none;
 }
 .popup-content {
     margin: 10px;
     font-size: 1em;
     font-family: "Roboto Regular", sans-serif;
     font-weight: 400;
-    color: #444;
+    /*color: #444;*/
 }
 
 .navigation-box {
@@ -16,7 +17,7 @@
 
 button {
     background: none;
-    color: #444;
+    /*color: #444;*/
 }
 
 .header-label {
@@ -34,7 +35,7 @@ button {
 }
 
 .text-secondary {
-    color: #777;
+    /*color: #777;*/
 }
 
 .text-size-small {
@@ -292,37 +293,9 @@ button {
     margin-bottom: 1em;
 }
 
-.bg-red {
-    background: red;
-}
-.bg-green {
-    background: green;
-}
-
-.bg-white {
-    background: #fff;
-}
-.bg-yellow {
-    background: yellow;
-}
-
 .middot-medium {
     margin-left: 8px;
     margin-right: 8px;
-}
-
-.power-widget {
-    margin-top: 10px;
-    padding-top: 10px;
-    border-top: 1px solid #ccc;
-}
-
-button.hover {
-    background: #f6f6f6;
-}
-
-button.active {
-    background: #e6e6e6;
 }
 
 .no-border {
@@ -343,8 +316,6 @@ button.active {
 
 .card {
     border-radius: 10px;
-    border: 1px solid rgba(222, 222, 222, .75);
-    box-shadow: 2px 2px 2px rgba(222, 222, 222, .5);
     transition: box-shadow 250ms ease-in;
 }
 
@@ -406,7 +377,7 @@ button.active {
 
 .feed-widget .card,
 .applications-widget .card {
-    background-color: #fff;
+    /*background-color: #fff;*/
     transition: background-color 250ms ease-in-out, box-shadow 250ms ease-in-out, border 250ms ease-in-out;
 }
 
@@ -419,7 +390,7 @@ button.active {
 .feed-widget notebook > header, 
 .feed-widget notebook > header tab {
     background-color: transparent;
-    border: none;
+    border: 0 none;
 }
 
 .feed-widget notebook > header {
@@ -430,7 +401,7 @@ button.active {
     padding-bottom: 0;
     padding-left: 10px;
     padding-right: 10px;
-    color: #444;
+    /*color: #444;*/
 }
 
 .weather-widget-day {
@@ -463,8 +434,8 @@ button.active {
 }
 
 .settings-page .feed-list {
-    background-color: #fff;
-    border: 1px solid #d9d9d9;
+    /*background-color: #fff;
+    border: 1px solid #d9d9d9;*/
     border-radius: 5px;
     padding: 5px;
 }
@@ -502,8 +473,15 @@ button.active {
     border-radius: 8px;
     padding: 10px;
     box-shadow: 0 0 8px rgba(0, 0, 0, .5);
+    border: 0 none;
 }
 
 .discovery-popup menu menuitem box {
     margin-left: -24px;
+}
+.discovery-popup button.no-border {
+    border: 0 none;
+}
+.discovery-popup button.no-shadow {
+    border: 0 none;
 }

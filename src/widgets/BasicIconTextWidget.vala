@@ -32,11 +32,13 @@ public class BasicIconTextWidget: Gtk.EventBox {
         add(layout);
 
         this.enter_notify_event.connect((event) => {
-            layout.get_style_context().add_class("hover");
+            //layout.get_style_context().add_class("hover");
+            layout.set_state_flags(Gtk.StateFlags.PRELIGHT, false); // aktiviert :hover
             return false;
         });
         this.leave_notify_event.connect((event) => {
-            layout.get_style_context().remove_class("hover");
+            //layout.get_style_context().remove_class("hover");
+            layout.unset_state_flags(Gtk.StateFlags.PRELIGHT); // deaktiviert :hover
             return false;
         });
     }

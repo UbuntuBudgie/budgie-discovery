@@ -18,12 +18,15 @@ public class FeedSettings: Gtk.Box {
 
         var feedScroll = new Gtk.ScrolledWindow (null, null);
         feedScroll.get_style_context().add_class("feed-list");
+        feedScroll.get_style_context().add_class("list");
+        feedScroll.get_style_context().add_class("frame");
         feedScroll.get_style_context().add_class("mb-2");
         feedScroll.set_policy (Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC);
         feedScroll.vexpand = true;
         feedScroll.hexpand = true;
 
         feedLayout = new Gtk.Box (Gtk.Orientation.VERTICAL, 5);
+        feedLayout.get_style_context().add_class("list");
         feedScroll.add (feedLayout);
         contentBox.pack_start (feedScroll, true);
 
@@ -101,10 +104,9 @@ public class FeedSettings: Gtk.Box {
     private void loadFeeds() {
         var settings = SettingsService.getInstance();
         var feeds = settings.get_value("feeds");
-        if(feeds == null) {
+        if (feeds == null || feeds.get_node_type() != Json.NodeType.ARRAY) {
             feeds = new Json.Node(Json.NodeType.ARRAY);
-            var feedArray = new Json.Array();
-            feeds.set_array(feedArray);
+            feeds.set_array(new Json.Array());
         }
 
         feedLayout.foreach((child) => {
@@ -172,6 +174,8 @@ public class FeedSettings: Gtk.Box {
                 return true;
             });
             addActionButton(deleteButton);
+
+
         }
     }
 
