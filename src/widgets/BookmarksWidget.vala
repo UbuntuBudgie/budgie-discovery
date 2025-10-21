@@ -9,10 +9,8 @@ public class BookmarksWidget: Gtk.Box {
     private FileWatcherSevice bookmarkService;
 
     public BookmarksWidget(Budgie.Popover parent) {
-        Object();
+        Object(orientation: Gtk.Orientation.VERTICAL, spacing: 10);
         popover = parent;
-        set_orientation(Gtk.Orientation.VERTICAL);
-        set_spacing(10);
         get_style_context().add_class("applications-widget");
 
         var headerWidget = new Gtk.Box(Gtk.Orientation.HORIZONTAL, 5);
@@ -104,7 +102,10 @@ public class BookmarksWidget: Gtk.Box {
         bookmarkService.start_service();
 
         pageLayout.show_all();
-        updateAppsLayout();
+        
+        map.connect(() => {
+            updateAppsLayout();
+        });
     }
 
     ~BookmarksWidget() {

@@ -12,6 +12,7 @@ public class FeedItemImageWidget : Gtk.DrawingArea {
     private int last_height = 0;
 
     public FeedItemImageWidget () {
+        Object();
         get_style_context ().add_class ("card-image");
     }
 

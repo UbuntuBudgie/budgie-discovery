@@ -107,54 +107,58 @@ public class WidgetSettings: Gtk.Box {
     }
 
     private void loadLocations() {
-        settings = SettingsService.getInstance();
-        var weatherNode = settings.get_value("weather");
-        if (weatherNode == null || weatherNode.get_node_type() != Json.NodeType.OBJECT) {
-            weatherNode = new Json.Node(Json.NodeType.OBJECT);
-            weatherNode.set_object(new Json.Object());
-        }
-        
-        if(!weatherNode.get_object().has_member("locations")) {
-            weatherLocations = new Json.Array();
-            weatherNode.get_object().set_array_member("locations", weatherLocations);
-        } else {
-            weatherLocations = weatherNode.get_object().get_array_member("locations");
-        }
-
-        widgetListLayout.forall((child) => {
-            widgetListLayout.remove(child);
-            child = null;
-        });
+        Idle.add(() => {
+            settings = SettingsService.getInstance();
+            var weatherNode = settings.get_value("weather");
+            if (weatherNode == null || weatherNode.get_node_type() != Json.NodeType.OBJECT) {
+                weatherNode = new Json.Node(Json.NodeType.OBJECT);
+                weatherNode.set_object(new Json.Object());
+            }
             
-        weatherLocations.foreach_element((element, index) => {
-            var record = element.get_object_element(index);
-            var name = record.get_string_member("name");
-            var country = record.get_string_member("country");
-            var latitude = record.get_double_member("latitude");
-            var longitude = record.get_double_member("longitude");
-            var admin1 = record.has_member("admin1") ? record.get_string_member("admin1") : null;
-            var admin2 = record.has_member("admin2") ? record.get_string_member("admin2") : null;
-            var admin3 = record.has_member("admin3") ? record.get_string_member("admin3") : null;
-            var admin4 = record.has_member("admin4") ? record.get_string_member("admin4") : null;
+            if(!weatherNode.get_object().has_member("locations")) {
+                weatherLocations = new Json.Array();
+                weatherNode.get_object().set_array_member("locations", weatherLocations);
+            } else {
+                weatherLocations = weatherNode.get_object().get_array_member("locations");
+            }
 
-            var location1 = new LocationItem();
-            location1.name = name;
-            location1.country = country;
-            location1.latitude = latitude;
-            location1.longitude = longitude;
-            location1.admin1 = admin1;
-            location1.admin2 = admin2;
-            location1.admin3 = admin3;
-            location1.admin4 = admin4;
+            widgetListLayout.forall((child) => {
+                widgetListLayout.remove(child);
+                child = null;
+            });
+                
+            weatherLocations.foreach_element((element, index) => {
+                var record = element.get_object_element(index);
+                var name = record.get_string_member("name");
+                var country = record.get_string_member("country");
+                var latitude = record.get_double_member("latitude");
+                var longitude = record.get_double_member("longitude");
+                var admin1 = record.has_member("admin1") ? record.get_string_member("admin1") : null;
+                var admin2 = record.has_member("admin2") ? record.get_string_member("admin2") : null;
+                var admin3 = record.has_member("admin3") ? record.get_string_member("admin3") : null;
+                var admin4 = record.has_member("admin4") ? record.get_string_member("admin4") : null;
 
-            var layoutItem1 = new WeatherListItem();
-            layoutItem1.setData(location1);
-            layoutItem1.setPrimaryText(location1.name);
-            layoutItem1.setSecondaryText(location1.getDescription());
-            layoutItem1.setSelectable(false);
-            widgetListLayout.pack_start(layoutItem1, false);
-        });
-        widgetListLayout.show_all();
+                var location1 = new LocationItem();
+                location1.name = name;
+                location1.country = country;
+                location1.latitude = latitude;
+                location1.longitude = longitude;
+                location1.admin1 = admin1;
+                location1.admin2 = admin2;
+                location1.admin3 = admin3;
+                location1.admin4 = admin4;
+
+                var layoutItem1 = new WeatherListItem();
+                layoutItem1.setData(location1);
+                layoutItem1.setPrimaryText(location1.name);
+                layoutItem1.setSecondaryText(location1.getDescription());
+                layoutItem1.setSelectable(false);
+                widgetListLayout.pack_start(layoutItem1, false);
+            });
+            widgetListLayout.show_all();
+            
+            return false;
+        }, Priority.DEFAULT);
     }
 
     private void destroyDialog() {

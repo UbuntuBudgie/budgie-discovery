@@ -36,12 +36,14 @@ public class WeatherForecastWidget: Card {
         string iconColor = item.isDay ? "black" : "white";
         var iconPath = ICONS_DIR + "/weather/" + iconColor + "/svg/" + item.weatherIconDay + ".svg";
 
-        try {
-            var iconFile = File.new_for_path(iconPath);
-            var pixbuf = new Gdk.Pixbuf.from_stream(iconFile.read()).scale_simple(22, 22, Gdk.InterpType.HYPER);
-            weatherIcon.set_from_pixbuf(pixbuf);
-        } catch (Error e) {
-            warning("Failed to load weather icon %s: %s\n", iconPath, e.message);
-        }
+        map.connect(() => {
+            try {
+                var iconFile = File.new_for_path(iconPath);
+                var pixbuf = new Gdk.Pixbuf.from_stream(iconFile.read()).scale_simple(22, 22, Gdk.InterpType.HYPER);
+                weatherIcon.set_from_pixbuf(pixbuf);
+            } catch (Error e) {
+                warning("Failed to load weather icon %s: %s\n", iconPath, e.message);
+            }
+        });
     }
 }

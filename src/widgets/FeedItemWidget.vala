@@ -75,7 +75,9 @@ public class FeedItemWidget: Card {
             return false;
         });
 
-        image.loadFeedSource(feedItem.link);
+        map.connect(() => {
+            image.loadFeedSource(feedItem.link);
+        });
     }
 
     private string parseDate1(string date) {

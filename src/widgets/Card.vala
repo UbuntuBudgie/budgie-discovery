@@ -1,8 +1,7 @@
 public class Card: Gtk.Box {
     
     public Card() {
-        set_orientation(Gtk.Orientation.VERTICAL);
-        set_spacing(0);
+        Object(orientation: Gtk.Orientation.VERTICAL, spacing: 0);
         get_style_context().add_class("card");
         get_style_context().add_class("frame");
         get_style_context().add_class("shadowed");

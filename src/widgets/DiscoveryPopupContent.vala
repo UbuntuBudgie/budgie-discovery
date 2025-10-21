@@ -7,10 +7,8 @@ public class DiscoveryPopupContent: Gtk.Box {
     private Budgie.Popover popover;
 
     public DiscoveryPopupContent(Budgie.Popover? parent) {
-        Object();
+        Object(orientation: Gtk.Orientation.HORIZONTAL, spacing: 5);
         popover = parent;
-        set_orientation(Gtk.Orientation.HORIZONTAL);
-        set_spacing(5);
         hexpand = false;
         get_style_context().add_class("discovery-popup-content");
 

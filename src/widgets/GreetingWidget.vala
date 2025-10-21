@@ -4,8 +4,7 @@ public class GreetingWidget: Gtk.Box {
     private Gtk.Box rightLayout = new Gtk.Box(Gtk.Orientation.HORIZONTAL, 5);
 
     public GreetingWidget() {
-        Object();
-        set_orientation(Gtk.Orientation.HORIZONTAL);
+        Object(orientation: Gtk.Orientation.HORIZONTAL, spacing: 0);
         get_style_context().add_class("header-widget");
         get_style_context().add_class ("pb-5");
 

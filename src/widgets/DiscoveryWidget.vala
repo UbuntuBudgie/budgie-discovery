@@ -14,10 +14,8 @@ public class DiscoveryWidget: Gtk.Box {
     private Gtk.Label messageLabel = new Gtk.Label(_("There are no feeds configured"));
 
     public DiscoveryWidget(Budgie.Popover popover) {
-        Object();
+        Object(orientation: Gtk.Orientation.VERTICAL, spacing: 0);
         popup = popover;
-        set_orientation(Gtk.Orientation.VERTICAL);
-        set_spacing(0);
         get_style_context().add_class("feed-widget");
 
         greetingWidget = new GreetingWidget();
@@ -91,9 +89,6 @@ public class DiscoveryWidget: Gtk.Box {
         while (notebook.get_n_pages() > 0) {
             var page = notebook.get_nth_page(0);
             notebook.remove_page(0);
-            if (page != null && page is Gtk.Widget) {
-                page.destroy();
-            }
             page = null;
         }
 

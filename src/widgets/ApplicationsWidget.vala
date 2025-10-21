@@ -9,10 +9,8 @@ public class ApplicationsWidget: Gtk.Box {
     private ApplicationService appService;
 
     public ApplicationsWidget(Budgie.Popover parent) {
-        Object();
+        Object(orientation: Gtk.Orientation.VERTICAL, spacing: 10);
         popover = parent;
-        set_orientation(Gtk.Orientation.VERTICAL);
-        set_spacing(10);
         get_style_context().add_class("applications-widget");
 
         var headerWidget = new Gtk.Box(Gtk.Orientation.HORIZONTAL, 5);

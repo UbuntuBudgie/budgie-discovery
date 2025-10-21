@@ -29,7 +29,9 @@ public class DiscoveryPopup: Budgie.Popover {
         popupContentWidget = new DiscoveryPopupContent(this);
         popoverLayout.pack_start(popupContentWidget, true, true);
 
-        load_style_sheet();
+        map.connect(() => {
+            load_style_sheet();
+        });
     }
 
     ~DiscoveryPopup() {

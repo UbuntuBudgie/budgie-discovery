@@ -6,14 +6,14 @@ public class FeedView: Gtk.ScrolledWindow {
     private FeedService feedService;
 
     public FeedView(Budgie.Popover bp, FeedConfigItem c) {
-        Object();
+        Object(hadjustment: null, vadjustment: null);
         popover = bp;
         hexpand = true;
         vexpand = true;
         margin_top = 10;
+        overlay_scrolling = false;
         get_style_context().add_class("news-feed-layout");
         get_style_context().add_class("feed-list");
-        overlay_scrolling = false;
         set_policy (Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC);
 
         feedLayout.hexpand = true;

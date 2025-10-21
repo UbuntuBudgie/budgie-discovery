@@ -84,7 +84,6 @@ public class WeatherWidget: Card {
         weatherService.weatherUpdated.connect((weather) => {
             forecastItems.clear();
             forecastBox.get_children().foreach((child) => {
-                child.destroy ();
                 forecastBox.remove(child);
             });
 

@@ -6,8 +6,7 @@ public class FeedSettings: Gtk.Box {
     private Gtk.Overlay overlay;
     
     public FeedSettings() {
-        Object();
-        set_orientation(Gtk.Orientation.VERTICAL);
+        Object(orientation: Gtk.Orientation.VERTICAL, spacing: 0);
         get_style_context().add_class("settings-page");
 
         overlay = new Gtk.Overlay();
@@ -102,26 +101,26 @@ public class FeedSettings: Gtk.Box {
     }
 
     private void loadFeeds() {
-        var settings = SettingsService.getInstance();
-        var feeds = settings.get_value("feeds");
-        if (feeds == null || feeds.get_node_type() != Json.NodeType.ARRAY) {
-            feeds = new Json.Node(Json.NodeType.ARRAY);
-            feeds.set_array(new Json.Array());
-        }
-
-        feedLayout.foreach((child) => {
-            feedLayout.remove(child);
-            if(child is Gtk.Widget) {
-                child.destroy();
+        Idle.add(() => {
+            var settings = SettingsService.getInstance();
+            var feeds = settings.get_value("feeds");
+            if (feeds == null || feeds.get_node_type() != Json.NodeType.ARRAY) {
+                feeds = new Json.Node(Json.NodeType.ARRAY);
+                feeds.set_array(new Json.Array());
             }
-            child = null;
-        });
 
-        for(int i = 0; i < feeds.get_array().get_length (); i++) {
-            var feed = feeds.get_array().get_object_element (i);
-            var feedRow = new FeedRow(feed.get_string_member("uid"), feed.get_string_member ("uri"), feed.get_string_member ("name"));
-            feedLayout.pack_start (feedRow, false);
-        }
+            feedLayout.foreach((child) => {
+                feedLayout.remove(child);
+                child = null;
+            });
+
+            for(int i = 0; i < feeds.get_array().get_length (); i++) {
+                var feed = feeds.get_array().get_object_element (i);
+                var feedRow = new FeedRow(feed.get_string_member("uid"), feed.get_string_member ("uri"), feed.get_string_member ("name"));
+                feedLayout.pack_start (feedRow, false);
+            }
+            return false;
+        }, Priority.DEFAULT);
     }
 
     private class FeedRow: ListItem {
@@ -174,8 +173,6 @@ public class FeedSettings: Gtk.Box {
                 return true;
             });
             addActionButton(deleteButton);
-
-
         }
     }
 
