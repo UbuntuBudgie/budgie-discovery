@@ -4,6 +4,7 @@ public class SettingsWidget: Gtk.Box {
 
     public SettingsWidget() {
         Object(orientation: Gtk.Orientation.VERTICAL, spacing: 10);
+        get_style_context().add_class("feed-widget");
 
         var headerLabel = new Gtk.Label(_("Applet Settings"));
         headerLabel.set_halign(Gtk.Align.START);
@@ -24,7 +25,6 @@ public class SettingsWidget: Gtk.Box {
         notebook.append_page(widgetSettings, new Gtk.Label(_("Weather")));
 
         this.map.connect(() => {
-            get_style_context().add_class("feed-widget");
             notebook.set_current_page (0);
         });
     }

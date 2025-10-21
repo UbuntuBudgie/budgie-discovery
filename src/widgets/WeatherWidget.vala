@@ -168,14 +168,11 @@ public class WeatherWidget: Card {
             }
             forecastBox.show_all();
 
-
             var currentDate = new DateTime.now_local().format ("%x %H:%M");
             lastUpdatedLabel.set_label (_("updated at").concat(": %s").printf(currentDate));
         });
 
         map.connect(() => {
-            get_style_context ().add_class ("weather-widget");
-            get_style_context ().add_class ("weather-widget-night");
             Idle.add(() => {
                 if(weatherCodes == null) {
                     string weatherCodesFile = RESOURCES_DIR + "/weather-codes.json";
@@ -193,6 +190,9 @@ public class WeatherWidget: Card {
                     }
                     weatherCodes = weatherCodesJson.get_object();
                 }
+
+                get_style_context ().add_class ("weather-widget");
+                get_style_context ().add_class ("weather-widget-night");
 
                 weatherService.stop_service ();
                 weatherService.start_service ();
