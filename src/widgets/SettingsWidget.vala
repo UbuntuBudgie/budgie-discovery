@@ -25,7 +25,7 @@ public class SettingsWidget: Gtk.Box {
         notebook.append_page(widgetSettings, new Gtk.Label(_("Weather")));
 
         this.map.connect(() => {
-            notebook.set_current_page (0);
+            //notebook.set_current_page (0);
         });
     }
 }

@@ -1,4 +1,4 @@
-public class ListItem: Gtk.EventBox {
+public class CustomListItem: Gtk.EventBox {
     private Gtk.Box mainLayout = new Gtk.Box(Gtk.Orientation.HORIZONTAL, 10);
     private Gtk.Box textLayout = new Gtk.Box(Gtk.Orientation.VERTICAL, 0);
     private Gtk.Box actionLayout = new Gtk.Box(Gtk.Orientation.HORIZONTAL, 5);
@@ -47,7 +47,7 @@ public class ListItem: Gtk.EventBox {
         actionLayout.pack_start(btn, false);
     }
 
-    public ListItem() {
+    public CustomListItem() {
         Object();
         add(mainLayout);
 

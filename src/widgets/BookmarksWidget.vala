@@ -146,55 +146,58 @@ public class BookmarksWidget: Gtk.Box {
     private void updateBookmarksLayout() {
         bookmarksLayout.foreach((child) => bookmarksLayout.remove(child));
 
-        int col = 0;
-        int row = 0;
-        int maxCols = 6;
+        Idle.add(() => {
+            int col = 0;
+            int row = 0;
+            int maxCols = 6;
 
-        var items = BookmarkRepository.getBookmarks();
-        foreach (var item in items) {
-            var bookmarkWidget = new BookmarkItemWidget(popover, item);
-            bookmarkWidget.button_press_event.connect((event) => {
-                if (event.button == 1) {
-                    string uri = item.uri;
-                    if (!uri.contains("://")) {
-                        var f = File.new_for_path(uri);
-                        uri = f.get_uri();
-                    }
-
-                    try {
-                        if(uri.index_of("smb://") == 0) {
-                            var f = File.new_for_uri(item.uri);
-                            var op = new MountOperation();
-                        
-                            f.mount_enclosing_volume.begin(MountMountFlags.NONE, op, null, (obj, res) => {
-                                try {
-                                    f.mount_enclosing_volume.end(res);
-                                    AppInfo.launch_default_for_uri(item.uri, null);
-                                } catch (Error e) {
-                                    warning("Mount failed: %s", e.message);
-                                }
-                            });
-                        } else {
-                            AppInfo.launch_default_for_uri(uri, null);
+            var items = BookmarkRepository.getBookmarks();
+            foreach (var item in items) {
+                var bookmarkWidget = new BookmarkItemWidget(popover, item);
+                bookmarkWidget.button_press_event.connect((event) => {
+                    if (event.button == 1) {
+                        string uri = item.uri;
+                        if (!uri.contains("://")) {
+                            var f = File.new_for_path(uri);
+                            uri = f.get_uri();
                         }
-                        popover.hide();
-                    } catch (Error e) {
-                        message(e.message);
+
+                        try {
+                            if(uri.index_of("smb://") == 0) {
+                                var f = File.new_for_uri(item.uri);
+                                var op = new MountOperation();
+                            
+                                f.mount_enclosing_volume.begin(MountMountFlags.NONE, op, null, (obj, res) => {
+                                    try {
+                                        f.mount_enclosing_volume.end(res);
+                                        AppInfo.launch_default_for_uri(item.uri, null);
+                                    } catch (Error e) {
+                                        warning("Mount failed: %s", e.message);
+                                    }
+                                });
+                            } else {
+                                AppInfo.launch_default_for_uri(uri, null);
+                            }
+                            popover.hide();
+                        } catch (Error e) {
+                            message(e.message);
+                        }
                     }
+                    return true;
+                });
+
+                bookmarkWidget.set_size_request(ITEM_SIZE, ITEM_SIZE);
+                bookmarksLayout.attach(bookmarkWidget, col, row, 1, 1);
+
+                col++;
+                if (col >= maxCols) {
+                    col = 0;
+                    row++;
                 }
-                return true;
-            });
-
-            bookmarkWidget.set_size_request(ITEM_SIZE, ITEM_SIZE);
-            bookmarksLayout.attach(bookmarkWidget, col, row, 1, 1);
-
-            col++;
-            if (col >= maxCols) {
-                col = 0;
-                row++;
             }
-        }
 
-        bookmarksLayout.show_all();
+            bookmarksLayout.show_all();
+            return false;
+        }, Priority.DEFAULT);
     }
 }

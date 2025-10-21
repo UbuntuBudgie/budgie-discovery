@@ -123,7 +123,7 @@ public class FeedSettings: Gtk.Box {
         }, Priority.DEFAULT);
     }
 
-    private class FeedRow: ListItem {
+    private class FeedRow: CustomListItem {
         private Gtk.Button deleteButton;
         private string feedName;
         private string feedUri;

@@ -107,9 +107,10 @@ public class WidgetSettings: Gtk.Box {
     }
 
     private void loadLocations() {
-        Idle.add(() => {
-            settings = SettingsService.getInstance();
-            var weatherNode = settings.get_value("weather");
+        settings = SettingsService.getInstance();
+        var weatherNode = settings.get_value("weather");
+
+        GLib.MainContext.@default().invoke(() => {
             if (weatherNode == null || weatherNode.get_node_type() != Json.NodeType.OBJECT) {
                 weatherNode = new Json.Node(Json.NodeType.OBJECT);
                 weatherNode.set_object(new Json.Object());
@@ -158,7 +159,7 @@ public class WidgetSettings: Gtk.Box {
             widgetListLayout.show_all();
             
             return false;
-        }, Priority.DEFAULT);
+        });
     }
 
     private void destroyDialog() {
@@ -170,7 +171,7 @@ public class WidgetSettings: Gtk.Box {
         }
     }
 
-    private class WeatherListItem: ListItem {
+    private class WeatherListItem: CustomListItem {
         private Gtk.Button deleteButton = new Gtk.Button();
 
         public WeatherListItem() {
@@ -271,10 +272,7 @@ public class WidgetSettings: Gtk.Box {
 
             searchButton.clicked.connect(() => {
                 Idle.add(() => {
-                    GLib.MainContext.@default().invoke(() => {
-                        searchLocation();
-                        return false;
-                    }, Priority.DEFAULT);
+                    searchLocation();
                     return false;
                 });
             });
@@ -317,77 +315,83 @@ public class WidgetSettings: Gtk.Box {
                     return;
                 }
 
-                // Lies den Body als UTF-8-Text
-                var data_stream = new GLib.MemoryInputStream.from_bytes (response);
-                var dis = new GLib.DataInputStream (data_stream);
-                string? data = dis.read_upto ("", 0, null); // liest gesamten Stream
+                GLib.MainContext.@default().invoke(() => {
+                    try {
+                        var data_stream = new GLib.MemoryInputStream.from_bytes (response);
+                        var dis = new GLib.DataInputStream (data_stream);
+                        string? data = dis.read_upto ("", 0, null); // liest gesamten Stream
 
-                if (data == null)
-                    data = "";
+                        if (data == null)
+                            data = "";
 
-                var parser = new Json.Parser();
-                parser.load_from_data(data, data.length);
+                        var parser = new Json.Parser();
+                        parser.load_from_data(data, data.length);
 
-                var root = parser.get_root();
-                var rootObject = root.get_object();
-                if (root != null && rootObject.has_member("results")) {
-                    var results = rootObject.get_array_member("results");
+                        var root = parser.get_root();
+                        var rootObject = root.get_object();
+                        if (root != null && rootObject.has_member("results")) {
+                            var results = rootObject.get_array_member("results");
 
-                    locationLayout.foreach(child => {
-                        locationLayout.remove(child);
-                        child = null;
-                    });
+                            locationLayout.foreach(child => {
+                                locationLayout.remove(child);
+                                child = null;
+                            });
 
-                    locations.clear();
+                            locations.clear();
 
-                    results.foreach_element((element, index) => {
-                        var resultNode = element.get_object_element(index);
-                        LocationItem item = new LocationItem();
-                        item.name = resultNode.get_string_member("name");
-                        item.country = resultNode.get_string_member("country");
-                        item.admin1 = resultNode.has_member("admin1") ? resultNode.get_string_member("admin1") : null;
-                        item.admin2 = resultNode.has_member("admin2") ? resultNode.get_string_member("admin2") : null;
-                        item.admin3 = resultNode.has_member("admin3") ? resultNode.get_string_member("admin3") : null;
-                        item.admin4 = resultNode.has_member("admin4") ? resultNode.get_string_member("admin4") : null;
-                        item.latitude = resultNode.has_member("latitude") ? resultNode.get_double_member("latitude") : 0;
-                        item.longitude = resultNode.has_member("longitude") ? resultNode.get_double_member("longitude") : 0;
-                        locations.add(item);
+                            results.foreach_element((element, index) => {
+                                var resultNode = element.get_object_element(index);
+                                LocationItem item = new LocationItem();
+                                item.name = resultNode.get_string_member("name");
+                                item.country = resultNode.get_string_member("country");
+                                item.admin1 = resultNode.has_member("admin1") ? resultNode.get_string_member("admin1") : null;
+                                item.admin2 = resultNode.has_member("admin2") ? resultNode.get_string_member("admin2") : null;
+                                item.admin3 = resultNode.has_member("admin3") ? resultNode.get_string_member("admin3") : null;
+                                item.admin4 = resultNode.has_member("admin4") ? resultNode.get_string_member("admin4") : null;
+                                item.latitude = resultNode.has_member("latitude") ? resultNode.get_double_member("latitude") : 0;
+                                item.longitude = resultNode.has_member("longitude") ? resultNode.get_double_member("longitude") : 0;
+                                locations.add(item);
 
-                        var layoutItem = new ListItem();
-                        layoutItem.setData(item);
-                        layoutItem.setPrimaryText(item.name);
-                        layoutItem.setSecondaryText(item.getDescription());
-                        layoutItem.valign = Gtk.Align.START;
-                        locationLayout.pack_start(layoutItem, false, false);
+                                var layoutItem = new CustomListItem();
+                                layoutItem.setData(item);
+                                layoutItem.setPrimaryText(item.name);
+                                layoutItem.setSecondaryText(item.getDescription());
+                                layoutItem.valign = Gtk.Align.START;
+                                locationLayout.pack_start(layoutItem, false, false);
 
-                        layoutItem.selected.connect(() => {
-                            locationLayout.get_children().foreach(child => {
-                                if(child is ListItem && child != layoutItem) {
-                                    ((ListItem)child).setSelected(false);
+                                layoutItem.selected.connect(() => {
+                                    locationLayout.get_children().foreach(child => {
+                                        if(child is CustomListItem && child != layoutItem) {
+                                            ((CustomListItem)child).setSelected(false);
+                                        }
+                                    });
+                                    selectedLocation = (LocationItem) layoutItem.getData();
+                                    okButton.set_sensitive(true);
+                                    okButton.grab_focus();
+                                });
+
+                                if((index + 1) < results.get_length()) {
+                                    var divider = new Gtk.Separator(Gtk.Orientation.HORIZONTAL);
+                                    divider.get_style_context().add_class ("border-bottom");
+                                    divider.margin_bottom = 1;
+                                    divider.margin_top = 1;
+                                    divider.valign = Gtk.Align.START;
+                                    locationLayout.pack_start(divider, false);
                                 }
                             });
-                            selectedLocation = (LocationItem) layoutItem.getData();
-                            okButton.set_sensitive(true);
-                            okButton.grab_focus();
-                        });
-
-                        if((index + 1) < results.get_length()) {
-                            var divider = new Gtk.Separator(Gtk.Orientation.HORIZONTAL);
-                            divider.get_style_context().add_class ("border-bottom");
-                            divider.margin_bottom = 1;
-                            divider.margin_top = 1;
-                            divider.valign = Gtk.Align.START;
-                            locationLayout.pack_start(divider, false);
+                            if(results.get_length() > 0) {
+                                locationLayout.show_all();
+                                scrollArea.show();
+                            }
                         }
-                    });
-                    if(results.get_length() > 0) {
-                        locationLayout.show_all();
-                        scrollArea.show();
+                    } catch(Error e) {
+                        warning("Error on rendering weather locations: %s", e.message);
                     }
-                }
+                    return false;
+                }, Priority.DEFAULT);
 
             } catch (Error e) {
-                warning("Fehler beim Abrufen der Daten: %s", e.message);
+                warning("error on requesting weather locations: %s", e.message);
             }
         }
     }

@@ -7,6 +7,9 @@ public class FeedView: Gtk.ScrolledWindow {
 
     public FeedView(Budgie.Popover bp, FeedConfigItem c) {
         Object(hadjustment: null, vadjustment: null);
+        get_style_context().add_class("news-feed-layout");
+        get_style_context().add_class("feed-list");
+
         popover = bp;
         hexpand = true;
         vexpand = true;
@@ -27,14 +30,11 @@ public class FeedView: Gtk.ScrolledWindow {
         map.connect(() => {
             hadjustment.value = 0;
             vadjustment.value = 0;
-            get_style_context().add_class("news-feed-layout");
-            get_style_context().add_class("feed-list");
+        });
 
-            Idle.add(() => {
-                feedService.stop_service ();
-                feedService.start_service ();
-                return false;
-            });
+        Idle.add(() => {
+            feedService.start_service ();
+            return false;
         });
     }
 
@@ -89,6 +89,7 @@ public class FeedView: Gtk.ScrolledWindow {
             }
 
             feedLayout.show_all();
+            resizeChildren();
             return false;
         });
     }

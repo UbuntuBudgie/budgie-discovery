@@ -71,12 +71,13 @@ public class FeedItemWidget: Card {
             return false;
         });
 
-        map.connect(() => {
+        realize.connect(() => {
             eventBox.add_events(Gdk.EventMask.POINTER_MOTION_MASK |
                 Gdk.EventMask.ENTER_NOTIFY_MASK |
                 Gdk.EventMask.LEAVE_NOTIFY_MASK);
-            image.loadFeedSource(feedItem.link);
         });
+
+        image.loadFeedSource(feedItem.link);
     }
 
     private string parseDate1(string date) {

@@ -172,32 +172,30 @@ public class WeatherWidget: Card {
             lastUpdatedLabel.set_label (_("updated at").concat(": %s").printf(currentDate));
         });
 
-        map.connect(() => {
-            Idle.add(() => {
-                if(weatherCodes == null) {
-                    string weatherCodesFile = RESOURCES_DIR + "/weather-codes.json";
-                    Json.Parser parser = new Json.Parser();
+        Idle.add(() => {
+            if(weatherCodes == null) {
+                string weatherCodesFile = RESOURCES_DIR + "/weather-codes.json";
+                Json.Parser parser = new Json.Parser();
 
-                    try {
-                        parser.load_from_file(weatherCodesFile);
-                    } catch(Error e) {
-                        warning("Failed to load weather codes from %s: %s\n", weatherCodesFile, e.message);
-                    }   
-                    
-                    var weatherCodesJson = parser.get_root();
-                    if (weatherCodesJson == null) {
-                        warning("Failed to load weather codes from %s\n", weatherCodesFile);
-                    }
-                    weatherCodes = weatherCodesJson.get_object();
+                try {
+                    parser.load_from_file(weatherCodesFile);
+                } catch(Error e) {
+                    warning("Failed to load weather codes from %s: %s\n", weatherCodesFile, e.message);
+                }   
+                
+                var weatherCodesJson = parser.get_root();
+                if (weatherCodesJson == null) {
+                    warning("Failed to load weather codes from %s\n", weatherCodesFile);
                 }
+                weatherCodes = weatherCodesJson.get_object();
+            }
 
-                get_style_context ().add_class ("weather-widget");
-                get_style_context ().add_class ("weather-widget-night");
+            get_style_context ().add_class ("weather-widget");
+            get_style_context ().add_class ("weather-widget-night");
 
-                weatherService.stop_service ();
-                weatherService.start_service ();
-                return false;
-            });
+            weatherService.stop_service ();
+            weatherService.start_service ();
+            return false;
         });
     }
 

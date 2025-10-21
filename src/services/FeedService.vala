@@ -14,7 +14,7 @@ public class FeedService: Service {
         config = configItem;
         if(cacheDir == null) {
             cacheDir = "%s/discovery-applet".printf(Environment.get_user_cache_dir());
-            DirUtils.create_with_parents(cacheDir, 0700);
+            DirUtils.create_with_parents(cacheDir, 0755);
         }
     }
 
