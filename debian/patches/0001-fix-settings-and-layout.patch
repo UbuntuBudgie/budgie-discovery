@@ -1,0 +1,589 @@
+From e278ab6938c39942440470f910b3dd58e18da4a0 Mon Sep 17 00:00:00 2001
+From: Andreas Bratfisch <duskman72@gmail.com>
+Date: Tue, 21 Oct 2025 15:01:30 +0200
+Subject: [PATCH] fix settings and layout; support Ubuntu 24.04 library
+ mistakes
+
+---
+ src/meson.build                               |   2 +-
+ src/services/FeedService.vala                 |   2 +-
+ src/widgets/BookmarksWidget.vala              |  89 +++++-----
+ src/widgets/Card.vala                         |  38 +++--
+ .../{ListItem.vala => CustomListItem.vala}    |   4 +-
+ src/widgets/FeedItemImageWidget.vala          |   4 +-
+ src/widgets/FeedItemWidget.vala               |   5 +-
+ src/widgets/FeedSettings.vala                 |   2 +-
+ src/widgets/FeedView.vala                     |  15 +-
+ src/widgets/SettingsWidget.vala               |   2 +-
+ src/widgets/WeatherWidget.vala                |  44 +++--
+ src/widgets/WidgetSettings.vala               | 152 +++++++++---------
+ 12 files changed, 181 insertions(+), 178 deletions(-)
+ rename src/widgets/{ListItem.vala => CustomListItem.vala} (97%)
+
+diff --git a/src/meson.build b/src/meson.build
+index cb9bd19..b1f23bc 100644
+--- a/src/meson.build
++++ b/src/meson.build
+@@ -59,7 +59,7 @@ discovery_applet_sources = [
+     'widgets/FeedView.vala',
+     'widgets/FeedSettings.vala',
+     'widgets/GreetingWidget.vala',
+-    'widgets/ListItem.vala',
++    'widgets/CustomListItem.vala',
+     'widgets/OverlayDialog.vala',
+     'widgets/PowerMenu.vala',
+     'widgets/SettingsWidget.vala',
+diff --git a/src/services/FeedService.vala b/src/services/FeedService.vala
+index 10359f0..11d0ded 100644
+--- a/src/services/FeedService.vala
++++ b/src/services/FeedService.vala
+@@ -14,7 +14,7 @@ public class FeedService: Service {
+         config = configItem;
+         if(cacheDir == null) {
+             cacheDir = "%s/discovery-applet".printf(Environment.get_user_cache_dir());
+-            DirUtils.create_with_parents(cacheDir, 0700);
++            DirUtils.create_with_parents(cacheDir, 0755);
+         }
+     }
+ 
+diff --git a/src/widgets/BookmarksWidget.vala b/src/widgets/BookmarksWidget.vala
+index 4fdc6e8..a7b6bf2 100644
+--- a/src/widgets/BookmarksWidget.vala
++++ b/src/widgets/BookmarksWidget.vala
+@@ -146,55 +146,58 @@ public class BookmarksWidget: Gtk.Box {
+     private void updateBookmarksLayout() {
+         bookmarksLayout.foreach((child) => bookmarksLayout.remove(child));
+ 
+-        int col = 0;
+-        int row = 0;
+-        int maxCols = 6;
+-
+-        var items = BookmarkRepository.getBookmarks();
+-        foreach (var item in items) {
+-            var bookmarkWidget = new BookmarkItemWidget(popover, item);
+-            bookmarkWidget.button_press_event.connect((event) => {
+-                if (event.button == 1) {
+-                    string uri = item.uri;
+-                    if (!uri.contains("://")) {
+-                        var f = File.new_for_path(uri);
+-                        uri = f.get_uri();
+-                    }
++        Idle.add(() => {
++            int col = 0;
++            int row = 0;
++            int maxCols = 6;
++
++            var items = BookmarkRepository.getBookmarks();
++            foreach (var item in items) {
++                var bookmarkWidget = new BookmarkItemWidget(popover, item);
++                bookmarkWidget.button_press_event.connect((event) => {
++                    if (event.button == 1) {
++                        string uri = item.uri;
++                        if (!uri.contains("://")) {
++                            var f = File.new_for_path(uri);
++                            uri = f.get_uri();
++                        }
+ 
+-                    try {
+-                        if(uri.index_of("smb://") == 0) {
+-                            var f = File.new_for_uri(item.uri);
+-                            var op = new MountOperation();
+-                        
+-                            f.mount_enclosing_volume.begin(MountMountFlags.NONE, op, null, (obj, res) => {
+-                                try {
+-                                    f.mount_enclosing_volume.end(res);
+-                                    AppInfo.launch_default_for_uri(item.uri, null);
+-                                } catch (Error e) {
+-                                    warning("Mount failed: %s", e.message);
+-                                }
+-                            });
+-                        } else {
+-                            AppInfo.launch_default_for_uri(uri, null);
++                        try {
++                            if(uri.index_of("smb://") == 0) {
++                                var f = File.new_for_uri(item.uri);
++                                var op = new MountOperation();
++                            
++                                f.mount_enclosing_volume.begin(MountMountFlags.NONE, op, null, (obj, res) => {
++                                    try {
++                                        f.mount_enclosing_volume.end(res);
++                                        AppInfo.launch_default_for_uri(item.uri, null);
++                                    } catch (Error e) {
++                                        warning("Mount failed: %s", e.message);
++                                    }
++                                });
++                            } else {
++                                AppInfo.launch_default_for_uri(uri, null);
++                            }
++                            popover.hide();
++                        } catch (Error e) {
++                            message(e.message);
+                         }
+-                        popover.hide();
+-                    } catch (Error e) {
+-                        message(e.message);
+                     }
+-                }
+-                return true;
+-            });
++                    return true;
++                });
+ 
+-            bookmarkWidget.set_size_request(ITEM_SIZE, ITEM_SIZE);
+-            bookmarksLayout.attach(bookmarkWidget, col, row, 1, 1);
++                bookmarkWidget.set_size_request(ITEM_SIZE, ITEM_SIZE);
++                bookmarksLayout.attach(bookmarkWidget, col, row, 1, 1);
+ 
+-            col++;
+-            if (col >= maxCols) {
+-                col = 0;
+-                row++;
++                col++;
++                if (col >= maxCols) {
++                    col = 0;
++                    row++;
++                }
+             }
+-        }
+ 
+-        bookmarksLayout.show_all();
++            bookmarksLayout.show_all();
++            return false;
++        }, Priority.DEFAULT);
+     }
+ }
+\ No newline at end of file
+diff --git a/src/widgets/Card.vala b/src/widgets/Card.vala
+index 7c8207c..29da5d3 100644
+--- a/src/widgets/Card.vala
++++ b/src/widgets/Card.vala
+@@ -2,27 +2,25 @@ public class Card: Gtk.Box {
+     
+     public Card() {
+         Object(orientation: Gtk.Orientation.VERTICAL, spacing: 0);
+-        map.connect (() => {
+-            get_style_context().add_class("card");
+-            get_style_context().add_class("frame");
+-            get_style_context().add_class("shadowed");
++        get_style_context().add_class("card");
++        get_style_context().add_class("frame");
++        get_style_context().add_class("shadowed");
+ 
+-            try {
+-                var css_provider = new Gtk.CssProvider();
+-                css_provider.load_from_data("""
+-                .shadowed {
+-                    background-color: @theme_base_color;
+-                    box-shadow: 0 0 3px rgba(0,0,0,0.125);
+-                }
+-                """);
+-                Gtk.StyleContext.add_provider_for_screen(
+-                    Gdk.Screen.get_default(),
+-                    css_provider,
+-                    Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
+-                );
+-            } catch(Error e) {
+-                // not handled
++        try {
++            var css_provider = new Gtk.CssProvider();
++            css_provider.load_from_data("""
++            .shadowed {
++                background-color: @theme_base_color;
++                box-shadow: 0 0 3px rgba(0,0,0,0.125);
+             }
+-        });
++            """);
++            Gtk.StyleContext.add_provider_for_screen(
++                Gdk.Screen.get_default(),
++                css_provider,
++                Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
++            );
++        } catch(Error e) {
++            // not handled
++        }
+     }
+ }
+\ No newline at end of file
+diff --git a/src/widgets/ListItem.vala b/src/widgets/CustomListItem.vala
+similarity index 97%
+rename from src/widgets/ListItem.vala
+rename to src/widgets/CustomListItem.vala
+index 3112035..8b5abde 100644
+--- a/src/widgets/ListItem.vala
++++ b/src/widgets/CustomListItem.vala
+@@ -1,4 +1,4 @@
+-public class ListItem: Gtk.EventBox {
++public class CustomListItem: Gtk.EventBox {
+     private Gtk.Box mainLayout = new Gtk.Box(Gtk.Orientation.HORIZONTAL, 10);
+     private Gtk.Box textLayout = new Gtk.Box(Gtk.Orientation.VERTICAL, 0);
+     private Gtk.Box actionLayout = new Gtk.Box(Gtk.Orientation.HORIZONTAL, 5);
+@@ -47,7 +47,7 @@ public class ListItem: Gtk.EventBox {
+         actionLayout.pack_start(btn, false);
+     }
+ 
+-    public ListItem() {
++    public CustomListItem() {
+         Object();
+         add(mainLayout);
+ 
+diff --git a/src/widgets/FeedItemImageWidget.vala b/src/widgets/FeedItemImageWidget.vala
+index 606f66c..7def87a 100644
+--- a/src/widgets/FeedItemImageWidget.vala
++++ b/src/widgets/FeedItemImageWidget.vala
+@@ -13,9 +13,7 @@ public class FeedItemImageWidget : Gtk.DrawingArea {
+ 
+     public FeedItemImageWidget () {
+         Object();
+-        map.connect(() => {
+-            get_style_context ().add_class ("card-image");
+-        });
++        get_style_context ().add_class ("card-image");;
+     }
+ 
+     public void loadFeedSource(string? url) {
+diff --git a/src/widgets/FeedItemWidget.vala b/src/widgets/FeedItemWidget.vala
+index 84b43da..8d6fda5 100644
+--- a/src/widgets/FeedItemWidget.vala
++++ b/src/widgets/FeedItemWidget.vala
+@@ -71,12 +71,13 @@ public class FeedItemWidget: Card {
+             return false;
+         });
+ 
+-        map.connect(() => {
++        realize.connect(() => {
+             eventBox.add_events(Gdk.EventMask.POINTER_MOTION_MASK |
+                 Gdk.EventMask.ENTER_NOTIFY_MASK |
+                 Gdk.EventMask.LEAVE_NOTIFY_MASK);
+-            image.loadFeedSource(feedItem.link);
+         });
++
++        image.loadFeedSource(feedItem.link);
+     }
+ 
+     private string parseDate1(string date) {
+diff --git a/src/widgets/FeedSettings.vala b/src/widgets/FeedSettings.vala
+index 1d2c9dd..1781395 100644
+--- a/src/widgets/FeedSettings.vala
++++ b/src/widgets/FeedSettings.vala
+@@ -123,7 +123,7 @@ public class FeedSettings: Gtk.Box {
+         }, Priority.DEFAULT);
+     }
+ 
+-    private class FeedRow: ListItem {
++    private class FeedRow: CustomListItem {
+         private Gtk.Button deleteButton;
+         private string feedName;
+         private string feedUri;
+diff --git a/src/widgets/FeedView.vala b/src/widgets/FeedView.vala
+index 165c3a4..63a9353 100644
+--- a/src/widgets/FeedView.vala
++++ b/src/widgets/FeedView.vala
+@@ -7,6 +7,9 @@ public class FeedView: Gtk.ScrolledWindow {
+ 
+     public FeedView(Budgie.Popover bp, FeedConfigItem c) {
+         Object(hadjustment: null, vadjustment: null);
++        get_style_context().add_class("news-feed-layout");
++        get_style_context().add_class("feed-list");
++
+         popover = bp;
+         hexpand = true;
+         vexpand = true;
+@@ -27,14 +30,11 @@ public class FeedView: Gtk.ScrolledWindow {
+         map.connect(() => {
+             hadjustment.value = 0;
+             vadjustment.value = 0;
+-            get_style_context().add_class("news-feed-layout");
+-            get_style_context().add_class("feed-list");
++        });
+ 
+-            Idle.add(() => {
+-                feedService.stop_service ();
+-                feedService.start_service ();
+-                return false;
+-            });
++        Idle.add(() => {
++            feedService.start_service ();
++            return false;
+         });
+     }
+ 
+@@ -89,6 +89,7 @@ public class FeedView: Gtk.ScrolledWindow {
+             }
+ 
+             feedLayout.show_all();
++            resizeChildren();
+             return false;
+         });
+     }
+diff --git a/src/widgets/SettingsWidget.vala b/src/widgets/SettingsWidget.vala
+index c08a4d4..0c3b42b 100644
+--- a/src/widgets/SettingsWidget.vala
++++ b/src/widgets/SettingsWidget.vala
+@@ -25,7 +25,7 @@ public class SettingsWidget: Gtk.Box {
+         notebook.append_page(widgetSettings, new Gtk.Label(_("Weather")));
+ 
+         this.map.connect(() => {
+-            notebook.set_current_page (0);
++            //notebook.set_current_page (0);
+         });
+     }
+ }
+\ No newline at end of file
+diff --git a/src/widgets/WeatherWidget.vala b/src/widgets/WeatherWidget.vala
+index 35b4828..4b24f7c 100644
+--- a/src/widgets/WeatherWidget.vala
++++ b/src/widgets/WeatherWidget.vala
+@@ -172,32 +172,30 @@ public class WeatherWidget: Card {
+             lastUpdatedLabel.set_label (_("updated at").concat(": %s").printf(currentDate));
+         });
+ 
+-        map.connect(() => {
+-            Idle.add(() => {
+-                if(weatherCodes == null) {
+-                    string weatherCodesFile = RESOURCES_DIR + "/weather-codes.json";
+-                    Json.Parser parser = new Json.Parser();
+-
+-                    try {
+-                        parser.load_from_file(weatherCodesFile);
+-                    } catch(Error e) {
+-                        warning("Failed to load weather codes from %s: %s\n", weatherCodesFile, e.message);
+-                    }   
+-                    
+-                    var weatherCodesJson = parser.get_root();
+-                    if (weatherCodesJson == null) {
+-                        warning("Failed to load weather codes from %s\n", weatherCodesFile);
+-                    }
+-                    weatherCodes = weatherCodesJson.get_object();
++        Idle.add(() => {
++            if(weatherCodes == null) {
++                string weatherCodesFile = RESOURCES_DIR + "/weather-codes.json";
++                Json.Parser parser = new Json.Parser();
++
++                try {
++                    parser.load_from_file(weatherCodesFile);
++                } catch(Error e) {
++                    warning("Failed to load weather codes from %s: %s\n", weatherCodesFile, e.message);
++                }   
++                
++                var weatherCodesJson = parser.get_root();
++                if (weatherCodesJson == null) {
++                    warning("Failed to load weather codes from %s\n", weatherCodesFile);
+                 }
++                weatherCodes = weatherCodesJson.get_object();
++            }
+ 
+-                get_style_context ().add_class ("weather-widget");
+-                get_style_context ().add_class ("weather-widget-night");
++            get_style_context ().add_class ("weather-widget");
++            get_style_context ().add_class ("weather-widget-night");
+ 
+-                weatherService.stop_service ();
+-                weatherService.start_service ();
+-                return false;
+-            });
++            weatherService.stop_service ();
++            weatherService.start_service ();
++            return false;
+         });
+     }
+ 
+diff --git a/src/widgets/WidgetSettings.vala b/src/widgets/WidgetSettings.vala
+index 459d3f0..a1fe019 100644
+--- a/src/widgets/WidgetSettings.vala
++++ b/src/widgets/WidgetSettings.vala
+@@ -107,9 +107,10 @@ public class WidgetSettings: Gtk.Box {
+     }
+ 
+     private void loadLocations() {
+-        Idle.add(() => {
+-            settings = SettingsService.getInstance();
+-            var weatherNode = settings.get_value("weather");
++        settings = SettingsService.getInstance();
++        var weatherNode = settings.get_value("weather");
++
++        GLib.MainContext.@default().invoke(() => {
+             if (weatherNode == null || weatherNode.get_node_type() != Json.NodeType.OBJECT) {
+                 weatherNode = new Json.Node(Json.NodeType.OBJECT);
+                 weatherNode.set_object(new Json.Object());
+@@ -158,7 +159,7 @@ public class WidgetSettings: Gtk.Box {
+             widgetListLayout.show_all();
+             
+             return false;
+-        }, Priority.DEFAULT);
++        });
+     }
+ 
+     private void destroyDialog() {
+@@ -170,7 +171,7 @@ public class WidgetSettings: Gtk.Box {
+         }
+     }
+ 
+-    private class WeatherListItem: ListItem {
++    private class WeatherListItem: CustomListItem {
+         private Gtk.Button deleteButton = new Gtk.Button();
+ 
+         public WeatherListItem() {
+@@ -271,10 +272,7 @@ public class WidgetSettings: Gtk.Box {
+ 
+             searchButton.clicked.connect(() => {
+                 Idle.add(() => {
+-                    GLib.MainContext.@default().invoke(() => {
+-                        searchLocation();
+-                        return false;
+-                    }, Priority.DEFAULT);
++                    searchLocation();
+                     return false;
+                 });
+             });
+@@ -317,77 +315,83 @@ public class WidgetSettings: Gtk.Box {
+                     return;
+                 }
+ 
+-                // Lies den Body als UTF-8-Text
+-                var data_stream = new GLib.MemoryInputStream.from_bytes (response);
+-                var dis = new GLib.DataInputStream (data_stream);
+-                string? data = dis.read_upto ("", 0, null); // liest gesamten Stream
+-
+-                if (data == null)
+-                    data = "";
+-
+-                var parser = new Json.Parser();
+-                parser.load_from_data(data, data.length);
+-
+-                var root = parser.get_root();
+-                var rootObject = root.get_object();
+-                if (root != null && rootObject.has_member("results")) {
+-                    var results = rootObject.get_array_member("results");
+-
+-                    locationLayout.foreach(child => {
+-                        locationLayout.remove(child);
+-                        child = null;
+-                    });
+-
+-                    locations.clear();
+-
+-                    results.foreach_element((element, index) => {
+-                        var resultNode = element.get_object_element(index);
+-                        LocationItem item = new LocationItem();
+-                        item.name = resultNode.get_string_member("name");
+-                        item.country = resultNode.get_string_member("country");
+-                        item.admin1 = resultNode.has_member("admin1") ? resultNode.get_string_member("admin1") : null;
+-                        item.admin2 = resultNode.has_member("admin2") ? resultNode.get_string_member("admin2") : null;
+-                        item.admin3 = resultNode.has_member("admin3") ? resultNode.get_string_member("admin3") : null;
+-                        item.admin4 = resultNode.has_member("admin4") ? resultNode.get_string_member("admin4") : null;
+-                        item.latitude = resultNode.has_member("latitude") ? resultNode.get_double_member("latitude") : 0;
+-                        item.longitude = resultNode.has_member("longitude") ? resultNode.get_double_member("longitude") : 0;
+-                        locations.add(item);
+-
+-                        var layoutItem = new ListItem();
+-                        layoutItem.setData(item);
+-                        layoutItem.setPrimaryText(item.name);
+-                        layoutItem.setSecondaryText(item.getDescription());
+-                        layoutItem.valign = Gtk.Align.START;
+-                        locationLayout.pack_start(layoutItem, false, false);
+-
+-                        layoutItem.selected.connect(() => {
+-                            locationLayout.get_children().foreach(child => {
+-                                if(child is ListItem && child != layoutItem) {
+-                                    ((ListItem)child).setSelected(false);
++                GLib.MainContext.@default().invoke(() => {
++                    try {
++                        var data_stream = new GLib.MemoryInputStream.from_bytes (response);
++                        var dis = new GLib.DataInputStream (data_stream);
++                        string? data = dis.read_upto ("", 0, null); // liest gesamten Stream
++
++                        if (data == null)
++                            data = "";
++
++                        var parser = new Json.Parser();
++                        parser.load_from_data(data, data.length);
++
++                        var root = parser.get_root();
++                        var rootObject = root.get_object();
++                        if (root != null && rootObject.has_member("results")) {
++                            var results = rootObject.get_array_member("results");
++
++                            locationLayout.foreach(child => {
++                                locationLayout.remove(child);
++                                child = null;
++                            });
++
++                            locations.clear();
++
++                            results.foreach_element((element, index) => {
++                                var resultNode = element.get_object_element(index);
++                                LocationItem item = new LocationItem();
++                                item.name = resultNode.get_string_member("name");
++                                item.country = resultNode.get_string_member("country");
++                                item.admin1 = resultNode.has_member("admin1") ? resultNode.get_string_member("admin1") : null;
++                                item.admin2 = resultNode.has_member("admin2") ? resultNode.get_string_member("admin2") : null;
++                                item.admin3 = resultNode.has_member("admin3") ? resultNode.get_string_member("admin3") : null;
++                                item.admin4 = resultNode.has_member("admin4") ? resultNode.get_string_member("admin4") : null;
++                                item.latitude = resultNode.has_member("latitude") ? resultNode.get_double_member("latitude") : 0;
++                                item.longitude = resultNode.has_member("longitude") ? resultNode.get_double_member("longitude") : 0;
++                                locations.add(item);
++
++                                var layoutItem = new CustomListItem();
++                                layoutItem.setData(item);
++                                layoutItem.setPrimaryText(item.name);
++                                layoutItem.setSecondaryText(item.getDescription());
++                                layoutItem.valign = Gtk.Align.START;
++                                locationLayout.pack_start(layoutItem, false, false);
++
++                                layoutItem.selected.connect(() => {
++                                    locationLayout.get_children().foreach(child => {
++                                        if(child is CustomListItem && child != layoutItem) {
++                                            ((CustomListItem)child).setSelected(false);
++                                        }
++                                    });
++                                    selectedLocation = (LocationItem) layoutItem.getData();
++                                    okButton.set_sensitive(true);
++                                    okButton.grab_focus();
++                                });
++
++                                if((index + 1) < results.get_length()) {
++                                    var divider = new Gtk.Separator(Gtk.Orientation.HORIZONTAL);
++                                    divider.get_style_context().add_class ("border-bottom");
++                                    divider.margin_bottom = 1;
++                                    divider.margin_top = 1;
++                                    divider.valign = Gtk.Align.START;
++                                    locationLayout.pack_start(divider, false);
+                                 }
+                             });
+-                            selectedLocation = (LocationItem) layoutItem.getData();
+-                            okButton.set_sensitive(true);
+-                            okButton.grab_focus();
+-                        });
+-
+-                        if((index + 1) < results.get_length()) {
+-                            var divider = new Gtk.Separator(Gtk.Orientation.HORIZONTAL);
+-                            divider.get_style_context().add_class ("border-bottom");
+-                            divider.margin_bottom = 1;
+-                            divider.margin_top = 1;
+-                            divider.valign = Gtk.Align.START;
+-                            locationLayout.pack_start(divider, false);
++                            if(results.get_length() > 0) {
++                                locationLayout.show_all();
++                                scrollArea.show();
++                            }
+                         }
+-                    });
+-                    if(results.get_length() > 0) {
+-                        locationLayout.show_all();
+-                        scrollArea.show();
++                    } catch(Error e) {
++                        warning("Error on rendering weather locations: %s", e.message);
+                     }
+-                }
++                    return false;
++                }, Priority.DEFAULT);
+ 
+             } catch (Error e) {
+-                warning("Fehler beim Abrufen der Daten: %s", e.message);
++                warning("error on requesting weather locations: %s", e.message);
+             }
+         }
+     }
+-- 
+2.43.0
+

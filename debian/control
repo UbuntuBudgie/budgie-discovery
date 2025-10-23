@@ -1,0 +1,28 @@
+Source: budgie-discovery-applet
+Section: misc
+Priority: optional
+Maintainer: David Mohammed <fossfreedom@ubuntu.com>
+Build-Depends: debhelper (>= 13),
+ debhelper-compat (= 13),
+ libgtk-3-dev,
+ valac,
+ budgie-core-dev,
+ libjson-glib-dev,
+ libglib2.0-dev,
+ libsoup-3.0-dev,
+ meson,
+ libpeas-dev,
+ libgee-0.8-dev,
+ libxml2-dev,
+ libgoa-1.0-dev
+Standards-Version: 4.6.2
+Vcs-Browser: https://github.com/UbuntuBudgie/budgie-discovery/tree/debian
+Vcs-Git: https://github.com/UbuntuBudgie/budgie-discovery -b debian
+Homepage: https://github.com/k8s-cloud-io/budgie-discovery
+
+Package: budgie-discovery-applet
+Architecture: any
+Depends: ${misc:Depends}, ${shlibs:Depends}
+Description: Add news, weather and applications to the Budgie panel
+ A budgie-desktop applet to show latest news, weather, favorite locations
+ and applications in a popover.

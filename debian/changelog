@@ -1,0 +1,11 @@
+budgie-discovery-applet (1.0.7-dev-0ubuntu1~ppaplucky) plucky; urgency=medium
+
+  * rebuild for plucky
+
+ -- David Mohammed <fossfreedom@ubuntu.com>  Thu, 23 Oct 2025 13:55:14 +0100
+
+budgie-discovery-applet (1.0.7-dev-0ubuntu1~ppanoble) noble; urgency=medium
+
+  * Initial Release
+
+ -- David Mohammed <fossfreedom@ubuntu.com>  Thu, 23 Oct 2025 13:52:09 +0100
